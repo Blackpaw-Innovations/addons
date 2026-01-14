@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <record id="view_hr_contract_form_inherit_bp_benefits" model="ir.ui.view">
+        <field name="name">hr.contract.form.inherit.bp.benefits</field>
+        <field name="model">hr.contract</field>
+        <field name="inherit_id" ref="hr_contract.hr_contract_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//notebook" position="inside">
+                <page string="Allowances &amp; Deductions" name="bp_benefits">
+                    <group>
+                        <group string="Basic Allowances">
+                            <field name="house_allowance"/>
+                            <field name="other_allowance"/>
+                        </group>
+                        <group string="Other Benefits">
+                            <field name="food_allowance"/>
+                            <field name="airtime_allowance"/>
+                            <field name="pension_allowance"/>
+                            <field name="insurance_premium"/>
+                            <field name="education_benefit"/>
+                        </group>
+                        <group string="Tax Deductions">
+                            <field name="pension_contribution"/>
+                            <field name="helb_deduction"/>
+                            <field name="equipment_recovery"/>
+                            <field name="other_deduction"/>
+                        </group>
+                        <group string="Insurance">
+                            <field name="voluntary_medical_insurance"/>
+                            <field name="life_insurance"/>
+                        </group>
+                    </group>
+                </page>
+            </xpath>
+        </field>
+    </record>
+</odoo>

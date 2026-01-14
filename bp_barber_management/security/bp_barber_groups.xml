@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+    <!-- BP Barber User Group -->
+    <record id="group_bp_barber_user" model="res.groups">
+        <field name="name">BP Barber User</field>
+        <field name="category_id" ref="base.module_category_services"/>
+    </record>
+
+    <!-- BP Barber Manager Group -->
+    <record id="group_bp_barber_manager" model="res.groups">
+        <field name="name">BP Barber Manager</field>
+        <field name="category_id" ref="base.module_category_services"/>
+        <field name="implied_ids" eval="[(4, ref('bp_barber_management.group_bp_barber_user'))]"/>
+    </record>
+</odoo>

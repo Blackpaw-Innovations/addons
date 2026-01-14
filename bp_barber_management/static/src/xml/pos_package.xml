@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates id="template" xml:space="preserve">
+
+    <t t-name="bp_barber_management.PackageDialog" owl="1">
+        <Dialog size="'lg'" title="'Apply Packages'">
+            <div class="package-dialog">
+                <t t-if="!partner">
+                    <div class="alert alert-warning" role="alert">
+                        <h5><i class="fa fa-exclamation-triangle"/> No Customer Selected</h5>
+                        <p>Please select a customer to view and apply packages.</p>
+                    </div>
+                </t>
+
+                <t t-elif="!hasWallets">
+                    <div class="alert alert-info" role="alert">
+                        <h5><i class="fa fa-info-circle"/> No Packages Available</h5>
+                        <p>This customer has no active package wallets.</p>
+                    </div>
+                </t>
+
+                <t t-else="">
+                    <div class="row">
+                        <!-- Available Wallets -->
+                        <div class="col-md-7">
+                            <h5>Available Packages</h5>
+                            <div class="wallet-list">
+                                <t t-foreach="wallets" t-as="wallet" t-key="wallet.id">
+                                    <div t-att-class="'wallet-card card mb-2 ' + (isWalletExpired(wallet) ? 'border-danger' : 'border-secondary')">
+                                        <div class="card-body p-2">
+                                            <div class="d-flex justify-content-between align-items-start">
+                                                <div>
+                                                    <h6 class="card-title mb-1" t-esc="wallet.package_name"/>
+                                                    <small class="text-muted" t-esc="wallet.name"/>
+                                                    <br/>
+                                                    <small t-if="wallet.expiry_date" t-att-class="'badge ' + (isWalletExpired(wallet) ? 'badge-danger' : 'badge-secondary')">
+                                                        Expires: <t t-esc="wallet.expiry_date"/>
+                                                    </small>
+                                                </div>
+                                                <div class="text-end">
+                                                    <div class="wallet-balance">
+                                                        <t t-if="wallet.package_type === 'value'">
+                                                            <strong t-esc="formatCurrency(wallet.balance_amount)"/>
+                                                        </t>
+                                                        <t t-else="">
+                                                            <small class="text-muted">Service Units:</small>
+                                                            <br/>
+                                                            <t t-if="wallet.service_balances">
+                                                                <t t-foreach="Object.entries(wallet.service_balances)" t-as="serviceEntry" t-key="serviceEntry[0]">
+                                                                    <span class="badge badge-primary me-1" t-esc="serviceEntry[1].service_name + ': ' + serviceEntry[1].units"/>
+                                                                </t>
+                                                            </t>
+                                                        </t>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <t t-if="!isWalletExpired(wallet)">
+                                                <hr class="my-2"/>
+                                                <div class="wallet-actions">
+                                                    <!-- Value wallet actions -->
+                                                    <t t-if="canApplyValue(wallet)">
+                                                        <div class="input-group input-group-sm">
+                                                            <span class="input-group-text">Apply:</span>
+                                                            <input type="number" class="form-control" 
+                                                                   t-att-max="wallet.balance_amount"
+                                                                   t-att-placeholder="'Max: ' + formatCurrency(wallet.balance_amount)"
+                                                                   t-att-id="'value_input_' + wallet.id"/>
+                                                            <button class="btn btn-primary btn-sm" type="button"
+                                                                    t-on-click="() => this.applyValue(wallet.id, parseFloat(document.getElementById('value_input_' + wallet.id).value) || 0)">
+                                                                Apply
+                                                            </button>
+                                                        </div>
+                                                    </t>
+
+                                                    <!-- Service unit actions -->
+                                                    <t t-if="wallet.service_balances">
+                                                        <t t-foreach="Object.entries(wallet.service_balances)" t-as="serviceEntry" t-key="serviceEntry[0]">
+                                                            <t t-if="serviceEntry[1].units > 0">
+                                                                <div class="d-flex justify-content-between align-items-center mb-1">
+                                                                    <small t-esc="serviceEntry[1].service_name"/>
+                                                                    <button class="btn btn-sm btn-outline-primary"
+                                                                            t-on-click="() => this.applyServiceUnits(wallet.id, parseInt(serviceEntry[0]))">
+                                                                        Apply 1 Unit
+                                                                    </button>
+                                                                </div>
+                                                            </t>
+                                                        </t>
+                                                    </t>
+                                                </div>
+                                            </t>
+                                        </div>
+                                    </div>
+                                </t>
+                            </div>
+                        </div>
+
+                        <!-- Applied Redemptions -->
+                        <div class="col-md-5">
+                            <h5>Applied Redemptions</h5>
+                            <div class="redemption-list">
+                                <t t-if="state.appliedRedemptions.length === 0">
+                                    <div class="alert alert-light" role="alert">
+                                        <small>No redemptions applied yet.</small>
+                                    </div>
+                                </t>
+                                <t t-else="">
+                                    <t t-foreach="state.appliedRedemptions" t-as="redemption" t-key="redemption_index">
+                                        <div class="card mb-2 border-success">
+                                            <div class="card-body p-2">
+                                                <div class="d-flex justify-content-between align-items-start">
+                                                    <div>
+                                                        <small class="text-muted" t-esc="redemption.wallet_name"/>
+                                                        <br/>
+                                                        <t t-if="redemption.service_id">
+                                                            <strong t-esc="redemption.service_name"/>
+                                                            <span class="text-success">(-<t t-esc="redemption.qty"/> unit<t t-if="redemption.qty !== 1">s</t>)</span>
+                                                        </t>
+                                                        <t t-else="">
+                                                            <strong t-esc="formatCurrency(redemption.amount)"/> <span class="text-success">credit applied</span>
+                                                        </t>
+                                                    </div>
+                                                    <button class="btn btn-sm btn-outline-danger" 
+                                                            t-on-click="() => this.removeRedemption(redemption_index)">
+                                                        <i class="fa fa-times"/>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </t>
+                                </t>
+                            </div>
+                        </div>
+                    </div>
+                </t>
+            </div>
+
+            <t t-set-slot="footer">
+                <button class="btn btn-secondary" t-on-click="cancel">Cancel</button>
+                <button class="btn btn-primary" t-on-click="confirm">Apply Packages</button>
+            </t>
+        </Dialog>
+    </t>
+
+</templates>

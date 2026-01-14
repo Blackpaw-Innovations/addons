@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Kiosk Page Template -->
+    <template id="kiosk_page" name="Barber Kiosk Display">
+        <t t-call="website.layout">
+            <t t-set="no_header" t-value="True"/>
+            <t t-set="no_footer" t-value="True"/>
+            
+            <head>
+                <meta charset="utf-8"/>
+                <meta name="viewport" content="width=device-width, initial-scale=1"/>
+                <title>Barber Queue - <t t-esc="company.name"/></title>
+                
+                <!-- Prevent caching of this page -->
+                <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
+                <meta http-equiv="Pragma" content="no-cache"/>
+                <meta http-equiv="Expires" content="0"/>
+                
+                <!-- Kiosk specific styles -->
+                <style>
+                    body {
+                        background: #1a1a1a;
+                        color: #ffffff;
+                        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+                        margin: 0;
+                        padding: 0;
+                        overflow-x: hidden;
+                    }
+                    
+                    .kiosk-loading {
+                        display: flex;
+                        justify-content: center;
+                        align-items: center;
+                        height: 100vh;
+                        font-size: 24px;
+                        color: #ffffff;
+                    }
+                    
+                    .kiosk-loading .spinner {
+                        border: 4px solid #333;
+                        border-top: 4px solid #007bff;
+                        border-radius: 50%;
+                        width: 50px;
+                        height: 50px;
+                        animation: spin 1s linear infinite;
+                        margin-right: 20px;
+                    }
+                    
+                    @keyframes spin {
+                        0% { transform: rotate(0deg); }
+                        100% { transform: rotate(360deg); }
+                    }
+                    
+                    #bp-barber-kiosk {
+                        min-height: 100vh;
+                        padding: 20px;
+                        box-sizing: border-box;
+                    }
+                    
+                    /* Hide website chrome */
+                    .navbar, .o_main_navbar, #wrapwrap > header, #wrapwrap > footer {
+                        display: none !important;
+                    }
+                    
+                    #wrap {
+                        padding-top: 0 !important;
+                    }
+                </style>
+            </head>
+            
+            <body>
+                <!-- Loading state -->
+                <div class="kiosk-loading" id="kiosk-loading">
+                    <div class="spinner"></div>
+                    <span>Loading Barber Queue...</span>
+                </div>
+                
+                <!-- Kiosk app container -->
+                <div id="bp-barber-kiosk" 
+                     t-att-data-token="kiosk_token or ''"
+                     t-att-data-refresh-seconds="refresh_seconds"
+                     t-att-data-base-url="base_url"
+                     t-att-data-company-name="company.name"
+                     t-att-data-company-logo="company.logo and '/web/image/res.company/%s/logo' % company.id or ''">
+                </div>
+
+                <!-- Error fallback -->
+                <div id="kiosk-error" style="display: none; text-align: center; padding: 50px;">
+                    <h1 style="color: #dc3545; margin-bottom: 20px;">
+                        <i class="fa fa-exclamation-triangle"></i>
+                        Kiosk Unavailable
+                    </h1>
+                    <p style="font-size: 18px; margin-bottom: 30px;">
+                        Unable to load the barber queue display.
+                    </p>
+                    <button onclick="location.reload()" 
+                            style="background: #007bff; color: white; border: none; padding: 12px 24px; border-radius: 6px; font-size: 16px; cursor: pointer;">
+                        <i class="fa fa-refresh"></i> Retry
+                    </button>
+                </div>
+
+                <script type="text/javascript">
+                    // Global error handler for kiosk app
+                    window.addEventListener('error', function(e) {
+                        console.error('Kiosk error:', e.error);
+                        document.getElementById('kiosk-loading').style.display = 'none';
+                        document.getElementById('bp-barber-kiosk').style.display = 'none';
+                        document.getElementById('kiosk-error').style.display = 'block';
+                    });
+                    
+                    // Timeout fallback if app doesn't load in 10 seconds
+                    setTimeout(function() {
+                        if (document.getElementById('kiosk-loading').style.display !== 'none') {
+                            document.getElementById('kiosk-loading').innerHTML = 
+                                '<div class="spinner"></div><span>Loading takes longer than expected...</span>';
+                        }
+                    }, 10000);
+                </script>
+            </body>
+        </t>
+    </template>
+    
+    <!-- Minimal layout without website chrome -->
+    <template id="kiosk_layout" name="Kiosk Layout">
+        <html t-att-lang="lang and lang.replace('_', '-')">
+            <head>
+                <meta charset="utf-8"/>
+                <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+                <meta name="viewport" content="width=device-width, initial-scale=1"/>
+                
+                <t t-out="head or ''"/>
+            </head>
+            <body>
+                <t t-out="0"/>
+            </body>
+        </html>
+    </template>
+</odoo>

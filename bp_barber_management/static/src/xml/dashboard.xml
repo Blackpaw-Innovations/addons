@@ -1,0 +1,244 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates>
+    <t t-name="bp_barber_management.dashboard_template">
+        <div class="o_barber_dashboard">
+            <!-- Dashboard Header -->
+            <div class="o_dashboard_header d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h2 class="mb-0">Barber Management Dashboard</h2>
+                    <small class="text-muted" t-if="state.meta.from and state.meta.to">
+                        <t t-esc="state.meta.from"/> to <t t-esc="state.meta.to"/>
+                    </small>
+                </div>
+                
+                <!-- Period Controls -->
+                <div class="d-flex align-items-center gap-3">
+                    <!-- Period Selector -->
+                    <select class="form-select" t-model="state.period" t-on-change="onPeriodChange">
+                        <option t-foreach="periodOptions" t-as="option" 
+                                t-key="option.key" t-att-value="option.key"
+                                t-att-selected="state.period === option.key">
+                            <t t-esc="option.label"/>
+                        </option>
+                    </select>
+
+                    <!-- Custom Date Inputs -->
+                    <div t-if="state.customMode" class="d-flex align-items-center gap-2">
+                        <input type="date" class="form-control" 
+                               t-model="state.dateFrom" t-on-change="onDateFromChange"
+                               placeholder="From"/>
+                        <span>to</span>
+                        <input type="date" class="form-control" 
+                               t-model="state.dateTo" t-on-change="onDateToChange"
+                               placeholder="To"/>
+                    </div>
+
+                    <!-- Refresh Button -->
+                    <button class="btn btn-primary" t-on-click="onRefresh" 
+                            t-att-disabled="state.loading">
+                        <i class="fa fa-refresh" t-att-class="{'fa-spin': state.loading}"></i>
+                        Refresh
+                    </button>
+                </div>
+            </div>
+
+            <!-- Loading State -->
+            <div t-if="state.loading" class="text-center py-5">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+                <p class="mt-2 text-muted">Loading dashboard data...</p>
+            </div>
+
+            <!-- Error State -->
+            <div t-elif="state.error" class="alert alert-danger">
+                <h4>Error Loading Dashboard</h4>
+                <p t-esc="state.error"></p>
+                <button class="btn btn-outline-danger" t-on-click="onRefresh">
+                    Try Again
+                </button>
+            </div>
+
+            <!-- Dashboard Content -->
+            <div t-else="" class="o_dashboard_content">
+                <!-- KPI Tiles Row 1 -->
+                <div class="row mb-4">
+                    <!-- Revenue by Barber Tile -->
+                    <div class="col-md-6 col-lg-4">
+                        <div class="card h-100">
+                            <div class="card-body">
+                                <h5 class="card-title d-flex align-items-center">
+                                    <i class="fa fa-users text-primary me-2"></i>
+                                    Revenue by Barber
+                                </h5>
+                                <div class="h3 text-primary mb-3" t-esc="formatCurrency(getTotalRevenue())"></div>
+                                
+                                <!-- Top 3 Barbers Mini Chart -->
+                                <div class="small">
+                                    <div t-foreach="getTopBarbers()" t-as="barber" t-key="barber.barber_id" 
+                                         class="d-flex align-items-center mb-2">
+                                        <div class="flex-grow-1">
+                                            <strong t-esc="barber.name"></strong>
+                                            <span class="text-muted ms-1" t-esc="formatCurrency(barber.amount)"></span>
+                                        </div>
+                                        <div class="progress ms-2" style="width: 60px; height: 8px;">
+                                            <div class="progress-bar bg-primary" 
+                                                 t-attf-style="width: #{getBarWidth(barber.amount, getMaxBarberRevenue())}%"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div t-if="!getTopBarbers().length" class="text-muted small">
+                                    No revenue data for this period
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Revenue by Service Tile -->
+                    <div class="col-md-6 col-lg-4">
+                        <div class="card h-100">
+                            <div class="card-body">
+                                <h5 class="card-title d-flex align-items-center">
+                                    <i class="fa fa-scissors text-success me-2"></i>
+                                    Revenue by Service
+                                </h5>
+                                <div class="h3 text-success mb-3" t-esc="getTopServices().length + ' Services'"></div>
+                                
+                                <!-- Top 3 Services Mini Chart -->
+                                <div class="small">
+                                    <div t-foreach="getTopServices()" t-as="service" t-key="service.service_id" 
+                                         class="d-flex align-items-center mb-2">
+                                        <div class="flex-grow-1">
+                                            <strong t-esc="service.name"></strong>
+                                            <span class="text-muted ms-1" t-esc="formatCurrency(service.amount)"></span>
+                                        </div>
+                                        <div class="progress ms-2" style="width: 60px; height: 8px;">
+                                            <div class="progress-bar bg-success" 
+                                                 t-attf-style="width: #{getBarWidth(service.amount, getMaxServiceRevenue())}%"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div t-if="!getTopServices().length" class="text-muted small">
+                                    No service data for this period
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Utilization Tile -->
+                    <div class="col-md-6 col-lg-4">
+                        <div class="card h-100">
+                            <div class="card-body">
+                                <h5 class="card-title d-flex align-items-center">
+                                    <i class="fa fa-clock-o text-warning me-2"></i>
+                                    Utilization
+                                </h5>
+                                <div class="h3 text-warning mb-3" t-esc="formatPercent(state.kpis.utilization.percent)"></div>
+                                
+                                <!-- Utilization Progress Bar -->
+                                <div class="progress mb-2" style="height: 20px;">
+                                    <div class="progress-bar bg-warning" 
+                                         t-attf-style="width: #{state.kpis.utilization.percent}%"
+                                         t-esc="formatPercent(state.kpis.utilization.percent)"></div>
+                                </div>
+                                
+                                <div class="small text-muted">
+                                    <div><t t-esc="state.kpis.utilization.busy_minutes"/> busy minutes</div>
+                                    <div><t t-esc="state.kpis.utilization.available_minutes"/> available minutes</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- KPI Tiles Row 2 -->
+                <div class="row mb-4">
+                    <!-- No-Show Rate Tile -->
+                    <div class="col-md-6">
+                        <div class="card h-100">
+                            <div class="card-body">
+                                <h5 class="card-title d-flex align-items-center">
+                                    <i class="fa fa-user-times text-danger me-2"></i>
+                                    No-Show Rate
+                                </h5>
+                                <div class="h3 text-danger mb-3" t-esc="formatPercent(state.kpis.no_show_rate.percent)"></div>
+                                
+                                <div class="small text-muted">
+                                    <div><t t-esc="state.kpis.no_show_rate.no_shows"/> no-shows</div>
+                                    <div><t t-esc="state.kpis.no_show_rate.total_bookings"/> total bookings</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Attach Rate Tile -->
+                    <div class="col-md-6">
+                        <div class="card h-100">
+                            <div class="card-body">
+                                <h5 class="card-title d-flex align-items-center">
+                                    <i class="fa fa-shopping-cart text-info me-2"></i>
+                                    Retail Attach Rate
+                                </h5>
+                                <div class="h3 text-info mb-3" t-esc="formatPercent(state.kpis.attach_rate.percent)"></div>
+                                
+                                <div class="small text-muted">
+                                    <div><t t-esc="state.kpis.attach_rate.with_retail_attached"/> with retail</div>
+                                    <div><t t-esc="state.kpis.attach_rate.orders_with_services"/> service orders</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Top Consumables Table -->
+                <div class="row">
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title d-flex align-items-center">
+                                    <i class="fa fa-cubes text-secondary me-2"></i>
+                                    Top Consumables
+                                </h5>
+                                
+                                <div t-if="getTopConsumables().length" class="table-responsive">
+                                    <table class="table table-sm">
+                                        <thead>
+                                            <tr>
+                                                <th>Product</th>
+                                                <th class="text-end">Quantity Used</th>
+                                                <th width="30%">Usage</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr t-foreach="getTopConsumables()" t-as="consumable" t-key="consumable.product_id">
+                                                <td>
+                                                    <strong t-esc="consumable.name"></strong>
+                                                </td>
+                                                <td class="text-end">
+                                                    <span class="badge bg-secondary" t-esc="consumable.qty"></span>
+                                                </td>
+                                                <td>
+                                                    <div class="progress" style="height: 6px;">
+                                                        <div class="progress-bar bg-secondary" 
+                                                             t-attf-style="width: #{getBarWidth(consumable.qty, getTopConsumables()[0].qty)}%"></div>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                
+                                <div t-else="" class="text-center text-muted py-4">
+                                    <i class="fa fa-cubes fa-3x opacity-25 mb-3"></i>
+                                    <p>No consumable usage data for this period</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </t>
+</templates>

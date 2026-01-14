@@ -1,0 +1,11 @@
+Version: 17.0.0.1 (21/05/2024)
+	- Fix the traceback for the paid orders filter at POS.
+	- Fix the add last order orderline after reload the POS.
+	- Fix the random order generate and listed on order screen at the POS.
+
+Version: 17.0.0.2 (31/12/2024)
+	- Fixed issue for add pos order sequence in kitchen receipt.
+
+
+Version: 17.0.0.3 (16/01/2025)
+	- Fixed issue for  pos order sequence in kitchen receipt and order receipt should be same.

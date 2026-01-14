@@ -1,0 +1,170 @@
+/** @odoo-module **/
+
+import { PosStore } from "@point_of_sale/app/store/pos_store";
+import { patch } from "@web/core/utils/patch";
+
+// Patch POS Store to load package data
+patch(PosStore.prototype, {
+    async _processData(loadedData) {
+        await super._processData(...arguments);
+
+        // Load packages for this company if packages are enabled
+        if (this.config.enable_packages) {
+            this.packages = loadedData['bp.barber.package'] || [];
+            this.package_lines = loadedData['bp.barber.package.line'] || [];
+
+            // Create lookup map for package lines by package_id
+            this.packageLinesMap = {};
+            for (const line of this.package_lines) {
+                if (!this.packageLinesMap[line.package_id[0]]) {
+                    this.packageLinesMap[line.package_id[0]] = [];
+                }
+                this.packageLinesMap[line.package_id[0]].push(line);
+            }
+        }
+    },
+
+    // Override order loading to get customer wallets
+    async setPartner(partner) {
+        const result = await super.setPartner(partner);
+
+        if (this.config.enable_packages && partner) {
+            await this.loadCustomerWallets(partner.id);
+        }
+
+        return result;
+    },
+
+    async loadCustomerWallets(partnerId) {
+        try {
+            const wallets = await this.env.services.rpc({
+                model: 'pos.order',
+                method: 'get_partner_wallets',
+                args: [partnerId, this.config.company_id[0]],
+            });
+
+            this.customerWallets = wallets || [];
+        } catch (error) {
+            console.error('Failed to load customer wallets:', error);
+            this.customerWallets = [];
+        }
+    },
+
+    getPackageByProduct(productId) {
+        if (!this.packages) return null;
+        return this.packages.find(pkg => pkg.pos_product_id && pkg.pos_product_id[0] === productId);
+    },
+
+    getPackageLines(packageId) {
+        return this.packageLinesMap[packageId] || [];
+    },
+
+    getWalletsForService(serviceId) {
+        if (!this.customerWallets) return [];
+
+        return this.customerWallets.filter(wallet => {
+            if (wallet.package_type === 'value' && wallet.balance_amount > 0) {
+                return true;
+            }
+            if (wallet.service_balances && wallet.service_balances[serviceId]) {
+                return wallet.service_balances[serviceId].units > 0;
+            }
+            return false;
+        });
+    },
+
+    getValueWallets() {
+        if (!this.customerWallets) return [];
+        return this.customerWallets.filter(wallet =>
+            wallet.package_type === 'value' && wallet.balance_amount > 0
+        );
+    }
+});
+
+// Patch Order to handle package redemptions
+import { Order } from "@point_of_sale/app/store/models";
+
+patch(Order.prototype, {
+    init_from_JSON(json) {
+        super.init_from_JSON(json);
+        this.packageRedemptions = json.packageRedemptions || [];
+        this.packageValueRedemption = json.packageValueRedemption || 0;
+    },
+
+    export_as_JSON() {
+        const json = super.export_as_JSON();
+        json.packageRedemptions = this.packageRedemptions || [];
+        json.packageValueRedemption = this.packageValueRedemption || 0;
+        return json;
+    },
+
+    set_package_redemptions(redemptions) {
+        this.packageRedemptions = redemptions;
+        this.trigger('change', this);
+    },
+
+    add_package_value_redemption(amount, walletName) {
+        this.packageValueRedemption = (this.packageValueRedemption || 0) + amount;
+        this.trigger('change', this);
+    },
+
+    remove_package_value_redemption(amount) {
+        this.packageValueRedemption = Math.max(0, (this.packageValueRedemption || 0) - amount);
+        this.trigger('change', this);
+    },
+
+    get_package_value_applied() {
+        return this.packageValueRedemption || 0;
+    },
+
+    // Override total calculation to include package value redemptions
+    get_total_with_tax() {
+        const total = super.get_total_with_tax();
+        return Math.max(0, total - this.get_package_value_applied());
+    },
+
+    export_for_printing() {
+        const result = super.export_for_printing();
+        result.package_value_applied = this.get_package_value_applied();
+        result.package_redemptions = this.packageRedemptions || [];
+        return result;
+    }
+});
+
+// Patch Orderline to handle package coverage
+import { Orderline } from "@point_of_sale/app/store/models";
+
+patch(Orderline.prototype, {
+    init_from_JSON(json) {
+        super.init_from_JSON(json);
+        this.packageCoverage = json.packageCoverage || null;
+    },
+
+    export_as_JSON() {
+        const json = super.export_as_JSON();
+        if (this.packageCoverage) {
+            json.packageCoverage = this.packageCoverage;
+        }
+        return json;
+    },
+
+    set_package_coverage(units, walletName) {
+        this.packageCoverage = { units, walletName };
+        this.trigger('change', this);
+    },
+
+    clear_package_coverage() {
+        this.packageCoverage = null;
+        this.trigger('change', this);
+    },
+
+    get_package_coverage() {
+        return this.packageCoverage;
+    },
+
+    has_package_coverage() {
+        return !!this.packageCoverage;
+    }
+});
+
+export default PosStore;

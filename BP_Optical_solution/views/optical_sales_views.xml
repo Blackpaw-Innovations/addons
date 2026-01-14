@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- Sales Menu (Parent) -->
+        <menuitem id="menu_optical_sales"
+                  name="Sales"
+                  parent="menu_bp_optical_root"
+                  sequence="20"
+                  groups="group_optical_user,group_optical_manager"/>
+
+        <!-- Search View for Pending Invoices -->
+        <record id="view_optical_pending_invoice_search" model="ir.ui.view">
+            <field name="name">optical.pending.invoice.search</field>
+            <field name="model">account.move</field>
+            <field name="inherit_id" ref="account.view_account_invoice_filter"/>
+            <field name="mode">primary</field>
+            <field name="arch" type="xml">
+                <xpath expr="//search" position="inside">
+                    <searchpanel>
+                        <field name="branch_id" icon="fa-code-fork" enable_counters="1"/>
+                    </searchpanel>
+                </xpath>
+            </field>
+        </record>
+
+        <!-- Action for Pending Invoices -->
+        <record id="action_optical_pending_invoices" model="ir.actions.act_window">
+            <field name="name">Pending Invoices</field>
+            <field name="res_model">account.move</field>
+            <field name="view_mode">tree,form</field>
+            <field name="search_view_id" ref="view_optical_pending_invoice_search"/>
+            <field name="domain">[('move_type', '=', 'out_invoice'), ('state', '=', 'posted'), ('payment_state', 'in', ('not_paid', 'partial'))]</field>
+            <field name="context">{'default_move_type': 'out_invoice'}</field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    No pending invoices found
+                </p>
+            </field>
+        </record>
+
+        <menuitem id="menu_optical_pending_invoices"
+                  name="Pending Invoice"
+                  parent="menu_optical_sales"
+                  action="action_optical_pending_invoices"
+                  sequence="10"/>
+
+        <!-- Search View for Insurance Invoices -->
+        <record id="view_optical_insurance_invoice_search" model="ir.ui.view">
+            <field name="name">optical.insurance.invoice.search</field>
+            <field name="model">account.move</field>
+            <field name="inherit_id" ref="account.view_account_invoice_filter"/>
+            <field name="mode">primary</field>
+            <field name="arch" type="xml">
+                <xpath expr="//search" position="inside">
+                    <searchpanel>
+                        <field name="branch_id" icon="fa-code-fork" enable_counters="1" select="multi"/>
+                        <field name="insurance_company_id" icon="fa-shield" enable_counters="1" select="multi"/>
+                    </searchpanel>
+                </xpath>
+            </field>
+        </record>
+
+        <!-- Tree View for Insurance Invoices -->
+        <record id="view_optical_insurance_invoice_tree" model="ir.ui.view">
+            <field name="name">optical.insurance.invoice.tree</field>
+            <field name="model">account.move</field>
+            <field name="arch" type="xml">
+                <tree string="Insurance Invoices" sample="1" decoration-info="state == 'draft'" decoration-muted="state == 'cancel'">
+                    <field name="name" decoration-bf="1"/>
+                    <field name="associated_patient" string="Patient" widget="many2one_avatar"/>
+                    <field name="invoice_date_due" optional="show"/>
+                    <field name="activity_ids" widget="list_activity" optional="show"/>
+                    <field name="amount_untaxed_signed" string="Tax Excluded" sum="Total" optional="show"/>
+                    <field name="amount_total_signed" string="Total" sum="Total" decoration-bf="1" optional="show"/>
+                    <field name="amount_total_in_currency_signed" string="Total in Currency" groups="base.group_multi_currency" optional="show"/>
+                    <field name="payment_state" widget="badge" decoration-danger="payment_state == 'not_paid'" decoration-warning="payment_state in ('partial', 'in_payment')" decoration-success="payment_state in ('paid', 'reversed')" optional="show"/>
+                    <field name="state" widget="badge" decoration-success="state == 'posted'" decoration-info="state == 'draft'" optional="show"/>
+                </tree>
+            </field>
+        </record>
+
+        <!-- Server Action for Insurance Invoices -->
+        <record id="action_optical_insurance_invoices_server" model="ir.actions.server">
+            <field name="name">Insurance Invoices</field>
+            <field name="model_id" ref="account.model_account_move"/>
+            <field name="state">code</field>
+            <field name="code">
+domain = [('move_type', '=', 'out_invoice'), ('state', '=', 'posted'), ('payment_state', 'in', ('not_paid', 'partial'))]
+if 'is_insurance_invoice' in env['account.move']._fields:
+    domain.append(('is_insurance_invoice', '=', True))
+else:
+    insurance_company_ids = env['optical.insurance.company'].search([]).mapped('partner_id.id')
+    domain.append(('partner_id', 'in', insurance_company_ids))
+
+action = {
+    'name': 'Insurance Invoices',
+    'type': 'ir.actions.act_window',
+    'res_model': 'account.move',
+    'view_mode': 'tree,form',
+    'views': [(env.ref('BP_Optical_solution.view_optical_insurance_invoice_tree').id, 'tree'), (False, 'form')],
+    'search_view_id': [env.ref('BP_Optical_solution.view_optical_insurance_invoice_search').id, 'search'],
+    'domain': domain,
+    'context': {'default_move_type': 'out_invoice'},
+}
+            </field>
+        </record>
+
+        <menuitem id="menu_optical_insurance_invoices"
+                  name="Insurance invoices"
+                  parent="menu_optical_sales"
+                  action="action_optical_insurance_invoices_server"
+                  sequence="20"/>
+
+    </data>
+</odoo>

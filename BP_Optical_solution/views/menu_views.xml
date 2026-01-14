@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- Root Menu -->
+        <menuitem id="menu_bp_optical_root"
+                  name="Optical"
+                  sequence="10"
+                  groups="group_optical_user,group_optical_manager"
+                  web_icon="BP_Optical_solution,static/description/icon.png"/>
+
+        <!-- Reporting Menu -->
+        <menuitem id="menu_optical_reporting"
+                  name="Reporting"
+                  parent="menu_bp_optical_root"
+                  sequence="90"/>
+    </data>
+</odoo>

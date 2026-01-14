@@ -1,0 +1,14 @@
+// Simple test file to verify loading
+console.log('BP Barber: TEST FILE LOADED - pos_barber_test.js');
+
+// Log when POS starts
+if (typeof odoo !== 'undefined') {
+    console.log('BP Barber: Odoo framework detected');
+
+    // Try to register a simple test
+    odoo.define('bp_barber_management.test', function (require) {
+        'use strict';
+        console.log('BP Barber: Test module loading...');
+        return {};
+    });
+}

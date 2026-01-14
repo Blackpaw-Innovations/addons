@@ -1,0 +1,547 @@
+odoo.define('bp_barber_management.pos_barber', function (require) {
+    'use strict';
+
+    // Add loading confirmation
+    console.log('BP Barber: Loading pos_barber.js module...');
+
+    const ProductScreen = require('point_of_sale.ProductScreen');
+    const Orderline = require('point_of_sale.Orderline');
+    const { useListener } = require("@web/core/utils/hooks");
+    const { Component } = owl;
+    const { useState } = owl.hooks;
+    const Registries = require('point_of_sale.Registries');
+
+    console.log('BP Barber: All dependencies loaded successfully');
+
+    // Appointments Pane Component
+    class AppointmentsPane extends Component {
+        constructor() {
+            super(...arguments);
+            this.state = useState({
+                showAppointments: false,
+                filterBarber: '',
+                filterState: ''
+            });
+
+            useListener('refresh-appointments', this._onRefreshAppointments);
+        }
+
+        get filteredAppointments() {
+            let appointments = this.env.pos.getTodayAppointments();
+
+            // Filter by barber
+            if (this.state.filterBarber) {
+                appointments = appointments.filter(apt =>
+                    apt.barber_id === parseInt(this.state.filterBarber)
+                );
+            }
+
+            // Filter by state
+            if (this.state.filterState) {
+                appointments = appointments.filter(apt =>
+                    apt.state === this.state.filterState
+                );
+            }
+
+            return appointments;
+        }
+
+        formatTime(datetimeStr) {
+            if (!datetimeStr) return '';
+            const date = new Date(datetimeStr);
+            return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        }
+
+        formatCurrency(amount) {
+            return this.env.pos.format_currency(amount);
+        }
+
+        getBarberColor(colorIndex) {
+            const colors = [
+                '#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4',
+                '#FECA57', '#FF9FF3', '#54A0FF', '#5F27CD'
+            ];
+            return colors[colorIndex % colors.length] || colors[0];
+        }
+
+        getStateBadgeClass(state) {
+            const classes = {
+                'confirmed': 'badge-info',
+                'in_service': 'badge-success',
+                'done': 'badge-secondary'
+            };
+            return classes[state] || 'badge-light';
+        }
+
+        async refreshAppointments() {
+            try {
+                await this.env.pos.refreshTodayAppointments();
+                this.showPopup('ConfirmPopup', {
+                    title: 'Refreshed',
+                    body: 'Appointments have been refreshed successfully.'
+                });
+            } catch (error) {
+                this.showPopup('ErrorPopup', {
+                    title: 'Error',
+                    body: 'Failed to refresh appointments: ' + error.message
+                });
+            }
+        }
+
+        setStateFilter(state) {
+            this.state.filterState = state;
+        }
+
+        filterAppointments() {
+            // Trigger re-render by updating state
+            this.render();
+        }
+
+        async loadAppointment(appointment) {
+            const order = this.env.pos.get_order();
+
+            try {
+                const linesAdded = order.loadAppointment(appointment);
+
+                if (linesAdded > 0) {
+                    this.showPopup('ConfirmPopup', {
+                        title: 'Appointment Loaded',
+                        body: `Successfully loaded appointment ${appointment.name} (${linesAdded} items)`
+                    });
+                } else {
+                    this.showPopup('ErrorPopup', {
+                        title: 'No Products Found',
+                        body: 'No matching products found for the appointment services.'
+                    });
+                }
+            } catch (error) {
+                this.showPopup('ErrorPopup', {
+                    title: 'Error',
+                    body: 'Failed to load appointment: ' + error.message
+                });
+            }
+        }
+
+        closePane() {
+            this.state.showAppointments = false;
+        }
+
+        _onRefreshAppointments() {
+            this.render();
+        }
+    }
+
+    AppointmentsPane.template = 'AppointmentsPane';
+
+    // Extend ProductScreen to add appointments functionality and barber selection
+    const BpBarberProductScreen = (ProductScreen) => class extends ProductScreen {
+        constructor() {
+            super(...arguments);
+            this.appointmentsPane = null;
+        }
+
+        mounted() {
+            super.mounted();
+            if (this.env.pos.config.enable_barber_mode) {
+                this._setupAppointmentsPane();
+            }
+        }
+
+        async _clickProduct(event) {
+            console.log('BP Barber: _clickProduct called with product:', event.detail);
+            const product = event.detail;
+
+            // Enhanced debugging
+            console.log('BP Barber: POS Config:', {
+                enable_barber_mode: this.env.pos.config.enable_barber_mode,
+                config_name: this.env.pos.config.name
+            });
+            console.log('BP Barber: Available barbers:', this.env.pos.barbers);
+
+            // Check if this is a barber service and barber mode is enabled
+            const isBarberService = this._isBarberService(product);
+            const barberModeEnabled = this.env.pos.config.enable_barber_mode;
+
+            console.log('BP Barber: Decision check:', {
+                isBarberService: isBarberService,
+                barberModeEnabled: barberModeEnabled,
+                willShowBarberSelection: barberModeEnabled && isBarberService
+            });
+
+            if (barberModeEnabled && isBarberService) {
+                console.log('BP Barber: Detected service product, showing barber selection');
+                // First add the product to cart
+                const order = this.env.pos.get_order();
+                const orderline = order.add_product(product, { merge: false });
+
+                if (orderline) {
+                    // Mark as requiring barber selection
+                    orderline.requires_barber = true;
+                    // Then prompt for barber selection
+                    await this._selectBarberForService(orderline);
+                } else {
+                    console.error('BP Barber: Failed to add product to order');
+                }
+            } else {
+                console.log('BP Barber: Using default behavior - barber mode:', barberModeEnabled, 'is service:', isBarberService);
+                // For non-service products, use default behavior
+                await super._clickProduct(event);
+            }
+        }
+
+        // Alternative method - override click_product if _clickProduct doesn't work
+        async click_product(product) {
+            console.log('BP Barber: click_product called with product:', product);
+
+            // Enhanced debugging
+            console.log('BP Barber: POS Config in click_product:', {
+                enable_barber_mode: this.env.pos.config.enable_barber_mode,
+                config_name: this.env.pos.config.name
+            });
+            console.log('BP Barber: Available barbers in click_product:', this.env.pos.barbers);
+
+            // Check if this is a barber service and barber mode is enabled
+            const isBarberService = this._isBarberService(product);
+            const barberModeEnabled = this.env.pos.config.enable_barber_mode;
+
+            console.log('BP Barber: Decision check in click_product:', {
+                isBarberService: isBarberService,
+                barberModeEnabled: barberModeEnabled,
+                willShowBarberSelection: barberModeEnabled && isBarberService
+            });
+
+            if (barberModeEnabled && isBarberService) {
+                console.log('BP Barber: Detected service product in click_product, showing barber selection');
+                // First add the product to cart
+                const order = this.env.pos.get_order();
+                const orderline = order.add_product(product, { merge: false });
+
+                if (orderline) {
+                    // Mark as requiring barber selection
+                    orderline.requires_barber = true;
+                    // Then prompt for barber selection
+                    await this._selectBarberForService(orderline);
+                } else {
+                    console.error('BP Barber: Failed to add product to order in click_product');
+                }
+            } else {
+                console.log('BP Barber: Using default behavior in click_product - barber mode:', barberModeEnabled, 'is service:', isBarberService);
+                // For non-service products, use default behavior
+                if (super.click_product) {
+                    await super.click_product(product);
+                } else {
+                    console.log('BP Barber: No super.click_product available, adding product directly');
+                    const order = this.env.pos.get_order();
+                    order.add_product(product);
+                }
+            }
+        }
+
+        // Override payment validation to check for required barber assignments
+        async _finalizeValidation() {
+            const order = this.env.pos.get_order();
+            const unassignedServiceLines = [];
+
+            // Check for service lines without barber assignment
+            for (const line of order.orderlines) {
+                if (line.requires_barber && !line.get_barber_id()) {
+                    unassignedServiceLines.push(line);
+                }
+            }
+
+            if (unassignedServiceLines.length > 0) {
+                // Show error and prevent payment
+                const serviceNames = unassignedServiceLines.map(line => line.get_product().display_name).join(', ');
+                this.showPopup('ErrorPopup', {
+                    title: 'Barber Assignment Required',
+                    body: `The following services require a barber assignment before payment: ${serviceNames}\n\nPlease assign barbers to all services first.`
+                });
+                return false;
+            }
+
+            return await super._finalizeValidation();
+        }
+
+        _isBarberService(product) {
+            // Enhanced debugging to see what's happening
+            console.log('BP Barber: Full product object:', product);
+            console.log('BP Barber: All product properties:', Object.keys(product));
+            console.log('BP Barber: Checking if product requires service provider:', {
+                name: product.display_name,
+                type: product.type,
+                requires_service_provider: product.requires_service_provider,
+                service_provider_type: product.service_provider_type,
+                id: product.id
+            });
+
+            // Use the explicit field if available, fallback to type check
+            const requiresServiceProvider = product.requires_service_provider === true;
+
+            // Fallback for products without the field set (backward compatibility)
+            const fallbackIsService = product.type === 'service' ||
+                (product.categ_id &&
+                    (product.categ_id[1].toLowerCase().includes('service') ||
+                        product.categ_id[1].toLowerCase().includes('barber')));
+
+            console.log('BP Barber: Decision factors:', {
+                requiresServiceProvider: requiresServiceProvider,
+                fallbackIsService: fallbackIsService,
+                fieldExists: product.hasOwnProperty('requires_service_provider'),
+                fieldValue: product.requires_service_provider
+            });
+
+            const result = requiresServiceProvider || (product.requires_service_provider === undefined && fallbackIsService);
+            console.log('BP Barber: Final result - requires service provider:', result);
+            return result;
+        }
+
+        async _selectBarberForService(orderline) {
+            console.log('BP Barber: _selectBarberForService called');
+            console.log('BP Barber: Barber mode enabled:', this.env.pos.config.enable_barber_mode);
+
+            if (!this.env.pos.config.enable_barber_mode) {
+                console.log('BP Barber: Barber mode not enabled, returning');
+                return;
+            }
+
+            const barbers = this.env.pos.barbers || [];
+            console.log('BP Barber: Available barbers:', barbers);
+
+            if (barbers.length === 0) {
+                console.log('BP Barber: No barbers available, showing error');
+                this.showPopup('ErrorPopup', {
+                    title: 'No Barbers Available',
+                    body: 'Please configure barbers in the system before selling services.'
+                });
+                return;
+            }
+
+            console.log('BP Barber: Showing barber picker dialog');
+            const { confirmed, payload } = await this.showPopup('BarberPickerDialog', {
+                title: `Select Barber for ${orderline.get_product().display_name}`,
+                barbers: barbers
+            });
+
+            console.log('BP Barber: Dialog result:', { confirmed, payload });
+
+            if (confirmed && payload) {
+                orderline.set_barber_id(payload);
+                console.log('BP Barber: Barber assigned to orderline');
+            } else {
+                // If barber selection is cancelled, remove the orderline
+                console.log('BP Barber: Barber selection cancelled, removing orderline');
+                const order = this.env.pos.get_order();
+                order.remove_orderline(orderline);
+            }
+        }
+
+        _setupAppointmentsPane() {
+            // Add appointments pane to the screen
+            const appointmentsPaneEl = document.createElement('div');
+            appointmentsPaneEl.className = 'appointments-pane-container';
+            this.el.appendChild(appointmentsPaneEl);
+
+            this.appointmentsPane = new AppointmentsPane(this, {});
+            this.appointmentsPane.mount(appointmentsPaneEl);
+        }
+
+        toggleAppointmentsPane() {
+            if (this.appointmentsPane) {
+                this.appointmentsPane.state.showAppointments = !this.appointmentsPane.state.showAppointments;
+            }
+        }
+
+        // Override the ProductScreen's _onClickProduct method as a fallback
+        _onClickProduct(event) {
+            console.log('BP Barber: _onClickProduct called');
+            const product = event.detail;
+
+            if (this.env.pos.config.enable_barber_mode && this._isBarberService(product)) {
+                console.log('BP Barber: Intercepting product click in _onClickProduct');
+                this._handleBarberServiceClick(product);
+            } else {
+                console.log('BP Barber: Passing through to super._onClickProduct');
+                if (super._onClickProduct) {
+                    super._onClickProduct(event);
+                }
+            }
+        }
+
+        async _handleBarberServiceClick(product) {
+            console.log('BP Barber: _handleBarberServiceClick called for product:', product.display_name);
+
+            // Add product to cart first
+            const order = this.env.pos.get_order();
+            const orderline = order.add_product(product, { merge: false });
+
+            if (orderline) {
+                orderline.requires_barber = true;
+                await this._selectBarberForService(orderline);
+            }
+        }
+    };
+
+    console.log('BP Barber: Registering ProductScreen extension...');
+    Registries.Component.extend(ProductScreen, BpBarberProductScreen);
+    console.log('BP Barber: ProductScreen extended successfully');
+
+    // Extend PaymentScreen to validate barber assignments
+    const PaymentScreen = require('point_of_sale.PaymentScreen');
+
+    const BpBarberPaymentScreen = (PaymentScreen) => class extends PaymentScreen {
+        async validateOrder(isForceValidate) {
+            const order = this.env.pos.get_order();
+            const unassignedServiceLines = [];
+
+            // Check for service lines without barber assignment
+            if (this.env.pos.config.enable_barber_mode) {
+                for (const line of order.orderlines) {
+                    if (this._isServiceLine(line) && !line.get_barber_id()) {
+                        unassignedServiceLines.push(line);
+                    }
+                }
+
+                if (unassignedServiceLines.length > 0) {
+                    // Show error and prevent payment
+                    const serviceNames = unassignedServiceLines.map(line => line.get_product().display_name).join(', ');
+                    this.showPopup('ErrorPopup', {
+                        title: 'Barber Assignment Required',
+                        body: `The following services require a barber assignment before payment:\n\n${serviceNames}\n\nPlease assign barbers to all services first.`
+                    });
+                    return false;
+                }
+            }
+
+            return await super.validateOrder(isForceValidate);
+        }
+
+        _isServiceLine(line) {
+            const product = line.get_product();
+            // Use the explicit field if available, fallback to type check
+            const requiresServiceProvider = product.requires_service_provider || false;
+
+            // Fallback for products without the field set (backward compatibility)
+            const fallbackIsService = product.type === 'service' ||
+                (product.categ_id &&
+                    (product.categ_id[1].toLowerCase().includes('service') ||
+                        product.categ_id[1].toLowerCase().includes('barber')));
+
+            return requiresServiceProvider || (product.requires_service_provider === undefined && fallbackIsService);
+        }
+    };
+
+    console.log('BP Barber: Registering PaymentScreen extension...');
+    Registries.Component.extend(PaymentScreen, BpBarberPaymentScreen);
+    console.log('BP Barber: PaymentScreen extended successfully');
+
+    // Barber Picker Dialog
+    class BarberPickerDialog extends Component {
+        constructor() {
+            super(...arguments);
+        }
+
+        get barbers() {
+            return this.props.barbers || this.env.pos.barbers || [];
+        }
+
+        getBarberColor(colorIndex) {
+            const colors = [
+                '#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4',
+                '#FECA57', '#FF9FF3', '#54A0FF', '#5F27CD'
+            ];
+            return colors[colorIndex % colors.length] || colors[0];
+        }
+
+        selectBarber(barberId) {
+            this.props.resolve({ confirmed: true, payload: barberId });
+        }
+
+        cancel() {
+            this.props.resolve({ confirmed: false, payload: null });
+        }
+    }
+
+    BarberPickerDialog.template = 'BarberPickerDialog';
+
+    // Extend Orderline to handle barber assignment
+    const BpBarberOrderline = (Orderline) => class extends Orderline {
+
+        getBarberColor(colorIndex) {
+            const colors = [
+                '#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4',
+                '#FECA57', '#FF9FF3', '#54A0FF', '#5F27CD'
+            ];
+            return colors[colorIndex % colors.length] || colors[0];
+        }
+
+        get isServiceLine() {
+            const product = this.props.line.get_product();
+            // Use the explicit field if available, fallback to type check
+            const requiresServiceProvider = product.requires_service_provider || false;
+
+            // Fallback for products without the field set (backward compatibility)
+            const fallbackIsService = product.type === 'service' ||
+                (product.categ_id &&
+                    (product.categ_id[1].toLowerCase().includes('service') ||
+                        product.categ_id[1].toLowerCase().includes('barber')));
+
+            return requiresServiceProvider || (product.requires_service_provider === undefined && fallbackIsService);
+        }
+
+        get requiresBarber() {
+            return this.env.pos.config.enable_barber_mode && this.isServiceLine;
+        }
+
+        get hasBarberAssigned() {
+            return Boolean(this.props.line.get_barber_id());
+        }
+
+        get barberAssignmentStatus() {
+            if (!this.requiresBarber) return 'not-required';
+            return this.hasBarberAssigned ? 'assigned' : 'required';
+        }
+
+        async changeBarber() {
+            if (!this.env.pos.config.enable_barber_mode) return;
+
+            const barbers = this.env.pos.barbers || [];
+            if (barbers.length === 0) {
+                this.showPopup('ErrorPopup', {
+                    title: 'No Barbers Available',
+                    body: 'Please configure barbers in the system before assigning services.'
+                });
+                return;
+            }
+
+            const { confirmed, payload } = await this.showPopup('BarberPickerDialog', {
+                title: `Select Barber for ${this.props.line.get_product().display_name}`,
+                barbers: barbers
+            });
+
+            if (confirmed) {
+                this.props.line.set_barber_id(payload);
+            }
+        }
+
+        async removeBarber() {
+            if (this.requiresBarber) {
+                this.showPopup('ErrorPopup', {
+                    title: 'Cannot Remove Barber',
+                    body: 'This service requires a barber assignment. You can change the barber but cannot remove it completely.'
+                });
+                return;
+            }
+
+            this.props.line.set_barber_id(null);
+        }
+    };
+
+    Registries.Component.extend(Orderline, BpBarberOrderline);
+
+    // Register the BarberPickerDialog
+    console.log('BP Barber: Registering BarberPickerDialog...');
+    Registries.Component.add(BarberPickerDialog);
+    console.log('BP Barber: All components registered successfully');
+
+    console.log('BP Barber: pos_barber.js module loaded completely');
+});

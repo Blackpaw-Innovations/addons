@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_stock_lot_form_lpg" model="ir.ui.view">
+        <field name="name">stock.lot.form.lpg</field>
+        <field name="model">stock.lot</field>
+        <field name="inherit_id" ref="stock.view_production_lot_form" />
+        <field name="arch" type="xml">
+            <xpath expr="//sheet/group" position="after">
+                <group string="LPG">
+                    <field name="cylinder_status" />
+                    <field name="current_customer_id" />
+                    <field name="last_movement_date" readonly="1" />
+                </group>
+            </xpath>
+        </field>
+    </record>
+</odoo>

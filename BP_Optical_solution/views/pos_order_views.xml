@@ -1,0 +1,34 @@
+<odoo>
+    <record id="view_pos_order_tree_invoice_payment" model="ir.ui.view">
+        <field name="name">pos.order.tree.invoice.payment</field>
+        <field name="model">pos.order</field>
+        <field name="inherit_id" ref="point_of_sale.view_pos_order_tree"/>
+        <field name="arch" type="xml">
+            <xpath expr="//tree" position="inside">
+                <field name="is_invoice_payment"/>
+                <field name="invoice_id"/>
+                <field name="invoice_payment_amount"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_pos_order_form_invoice_payment" model="ir.ui.view">
+        <field name="name">pos.order.form.invoice.payment</field>
+        <field name="model">pos.order</field>
+        <field name="inherit_id" ref="point_of_sale.view_pos_pos_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//sheet/notebook" position="inside">
+                <page string="Invoice Payment">
+                    <group>
+                        <field name="is_invoice_payment"/>
+                        <field name="invoice_id"/>
+                        <field name="invoice_payment_amount"/>
+                        <field name="invoice_payment_mode"/>
+                        <field name="invoice_residual_before"/>
+                        <field name="invoice_residual_after"/>
+                    </group>
+                </page>
+            </xpath>
+        </field>
+    </record>
+</odoo>

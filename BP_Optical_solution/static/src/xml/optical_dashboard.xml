@@ -1,0 +1,329 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="BP_Optical_solution.OpticalDashboard" owl="1">
+        <div class="o_optical_dashboard h-100 overflow-auto bg-100" style="background-color: #f8f9fa;">
+            <!-- Header -->
+            <div class="d-flex justify-content-between align-items-center p-4 bg-white shadow-sm mb-4 sticky-top">
+                <h1 class="h3 mb-0 text-gray-800">Optical Clinic Dashboard</h1>
+                
+                <div class="d-flex align-items-center gap-2">
+                    <!-- Branch Filter -->
+                    <select class="form-select me-2" style="width: auto;" t-on-change="(ev) => this.onBranchChange(ev)">
+                        <option value="">All Branches</option>
+                        <t t-foreach="state.branches" t-as="branch" t-key="branch.id">
+                            <option t-att-value="branch.id"><t t-esc="branch.name"/></option>
+                        </t>
+                    </select>
+
+                    <!-- Date Range Buttons -->
+                    <div class="btn-group me-2">
+                        <button class="btn btn-outline-primary" t-on-click="() => this.loadData('today')">Today</button>
+                        <button class="btn btn-outline-secondary" t-on-click="() => this.loadData('week')">This Week</button>
+                        <button class="btn btn-outline-secondary" t-on-click="() => this.loadData('month')">This Month</button>
+                    </div>
+
+                    <!-- Custom Date -->
+                    <div class="d-flex gap-1 align-items-center">
+                        <input type="date" class="form-control form-control-sm" t-model="state.customDate.start"/>
+                        <span class="text-muted">-</span>
+                        <input type="date" class="form-control form-control-sm" t-model="state.customDate.end"/>
+                        <button class="btn btn-primary btn-sm" t-on-click="() => this.loadData('custom')">Go</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="container-fluid p-4">
+                <!-- KPI Cards -->
+                <div class="row g-4 mb-4">
+                    <!-- Total Patients -->
+                    <div class="col-md-3">
+                        <div class="card card-blue border-0 shadow-sm h-100 hover-shadow transition">
+                            <div class="card-body d-flex justify-content-between align-items-start">
+                                <div>
+                                    <p class="text-muted small mb-1">Total Patients</p>
+                                    <h3 class="fw-bold mb-0 text-dark"><t t-esc="state.kpi.total_patients"/></h3>
+                                </div>
+                                <div class="text-primary">
+                                    <i class="fa fa-users fa-2x"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Appointments -->
+                    <div class="col-md-3">
+                        <div class="card card-purple border-0 shadow-sm h-100 hover-shadow transition">
+                            <div class="card-body d-flex justify-content-between align-items-start">
+                                <div>
+                                    <p class="text-muted small mb-1">Appointments</p>
+                                    <h3 class="fw-bold mb-0 text-dark"><t t-esc="state.kpi.appointments"/></h3>
+                                </div>
+                                <div class="text-info">
+                                    <i class="fa fa-calendar fa-2x"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Exams Completed -->
+                    <div class="col-md-3">
+                        <div class="card card-teal border-0 shadow-sm h-100 hover-shadow transition">
+                            <div class="card-body d-flex justify-content-between align-items-start">
+                                <div>
+                                    <p class="text-muted small mb-1">Exams Completed</p>
+                                    <h3 class="fw-bold mb-0 text-dark"><t t-esc="state.kpi.exams_completed"/></h3>
+                                </div>
+                                <div class="text-teal">
+                                    <i class="fa fa-eye fa-2x"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Pending Tests -->
+                    <div class="col-md-3">
+                        <div class="card card-orange border-0 shadow-sm h-100 hover-shadow transition">
+                            <div class="card-body d-flex justify-content-between align-items-start">
+                                <div>
+                                    <p class="text-muted small mb-1">Pending Tests</p>
+                                    <h3 class="fw-bold mb-0 text-dark"><t t-esc="state.kpi.pending_tests"/></h3>
+                                </div>
+                                <div class="text-warning">
+                                    <i class="fa fa-clock-o fa-2x"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Revenue -->
+                    <div class="col-md-3">
+                        <div class="card card-green border-0 shadow-sm h-100 hover-shadow transition">
+                            <div class="card-body d-flex justify-content-between align-items-start">
+                                <div>
+                                    <p class="text-muted small mb-1">Revenue</p>
+                                    <h3 class="fw-bold mb-0 text-dark"><t t-esc="formatCurrency(state.kpi.revenue)"/></h3>
+                                </div>
+                                <div class="text-success">
+                                    <i class="fa fa-usd fa-2x"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- No-Show Rate -->
+                    <div class="col-md-3">
+                        <div class="card card-red border-0 shadow-sm h-100 hover-shadow transition">
+                            <div class="card-body d-flex justify-content-between align-items-start">
+                                <div>
+                                    <p class="text-muted small mb-1">No-Show Rate</p>
+                                    <h3 class="fw-bold mb-0 text-dark"><t t-esc="state.kpi.no_show_rate"/>%</h3>
+                                </div>
+                                <div class="text-danger">
+                                    <i class="fa fa-times-circle fa-2x"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Avg Waiting Time -->
+                    <div class="col-md-3">
+                        <div class="card card-blue border-0 shadow-sm h-100 hover-shadow transition">
+                            <div class="card-body d-flex justify-content-between align-items-start">
+                                <div>
+                                    <p class="text-muted small mb-1">Avg Waiting Time</p>
+                                    <h3 class="fw-bold mb-0 text-dark"><t t-esc="state.kpi.avg_waiting_time"/> min</h3>
+                                </div>
+                                <div class="text-primary">
+                                    <i class="fa fa-clock-o fa-2x"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Follow-ups Due -->
+                    <div class="col-md-3">
+                        <div class="card card-purple border-0 shadow-sm h-100 hover-shadow transition">
+                            <div class="card-body d-flex justify-content-between align-items-start">
+                                <div>
+                                    <p class="text-muted small mb-1">Follow-ups Due</p>
+                                    <h3 class="fw-bold mb-0 text-dark"><t t-esc="state.kpi.follow_ups_due"/></h3>
+                                </div>
+                                <div class="text-info">
+                                    <i class="fa fa-refresh fa-2x"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Patient Insights & Demographics -->
+                <div class="row g-4 mb-4">
+                    <div class="col-lg-6">
+                        <div class="card border-0 shadow-sm h-100">
+                            <div class="card-body">
+                                <h5 class="card-title mb-4 fw-bold">Patient Insights</h5>
+                                <div class="row mb-4">
+                                    <div class="col-6">
+                                        <small class="text-muted">New Patients</small>
+                                        <h4 class="fw-bold"><t t-esc="state.charts.patient_type.data[0]"/></h4>
+                                    </div>
+                                    <div class="col-6">
+                                        <small class="text-muted">Returning Patients</small>
+                                        <h4 class="fw-bold"><t t-esc="state.charts.patient_type.data[1]"/></h4>
+                                    </div>
+                                </div>
+                                <div class="mb-4">
+                                    <small class="text-muted">Repeat Visit Rate</small>
+                                    <h4 class="fw-bold"><t t-esc="state.kpi.repeat_visit_rate"/>%</h4>
+                                </div>
+                                <div class="chart-container" style="height: 200px; position: relative;">
+                                    <canvas t-ref="patientTypeChart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-6">
+                        <div class="card border-0 shadow-sm h-100">
+                            <div class="card-body">
+                                <h5 class="card-title mb-4 fw-bold">Patient Demographics</h5>
+                                <div class="row">
+                                    <div class="col-6">
+                                        <div class="chart-container" style="height: 150px; position: relative;">
+                                            <canvas t-ref="genderChart"></canvas>
+                                        </div>
+                                    </div>
+                                    <div class="col-6">
+                                        <div class="chart-container" style="height: 150px; position: relative;">
+                                            <canvas t-ref="ageGroupChart"></canvas>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Appointments Overview -->
+                <div class="card border-0 shadow-sm mb-4">
+                    <div class="card-body">
+                        <h5 class="card-title mb-4 fw-bold">Appointments Overview</h5>
+                        <div class="chart-container" style="height: 250px; position: relative;">
+                            <canvas t-ref="appointmentTimeline"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Clinical Performance -->
+                <div class="row g-4 mb-4">
+                    <div class="col-lg-6">
+                        <div class="card border-0 shadow-sm h-100">
+                            <div class="card-body">
+                                <h5 class="card-title mb-4 fw-bold">Clinical Performance</h5>
+                                <div class="row g-4">
+                                    <div class="col-6">
+                                        <p class="text-muted small mb-1">Prescriptions Issued</p>
+                                        <h4 class="fw-bold"><t t-esc="state.kpi.exams_completed"/></h4>
+                                    </div>
+                                    <div class="col-6">
+                                        <p class="text-muted small mb-1">Hospital Referrals</p>
+                                        <h4 class="fw-bold">2</h4>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-6">
+                        <div class="card border-0 shadow-sm h-100">
+                            <div class="card-body">
+                                <h5 class="card-title mb-4 fw-bold">Top Diagnosed Conditions</h5>
+                                <div class="chart-container" style="height: 200px; position: relative;">
+                                    <canvas t-ref="diagnosisChart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Revenue Breakdown & Sales Metrics -->
+                <div class="row g-4 mb-4">
+                    <div class="col-lg-6">
+                        <div class="card border-0 shadow-sm h-100">
+                            <div class="card-body">
+                                <h5 class="card-title mb-4 fw-bold">Revenue Breakdown</h5>
+                                <div class="chart-container" style="height: 250px; position: relative;">
+                                    <canvas t-ref="revenueBreakdownChart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-6">
+                        <div class="card border-0 shadow-sm h-100">
+                            <div class="card-body">
+                                <h5 class="card-title mb-4 fw-bold">Sales Metrics</h5>
+                                <div class="row g-4">
+                                    <div class="col-6">
+                                        <p class="text-muted small mb-1">Avg Sale Per Patient</p>
+                                        <h4 class="fw-bold"><t t-esc="formatCurrency(state.sales_metrics.avg_sale_per_patient)"/></h4>
+                                    </div>
+                                    <div class="col-6">
+                                        <p class="text-muted small mb-1">Top Selling Frame</p>
+                                        <h4 class="fw-bold text-truncate" t-att-title="state.sales_metrics.top_selling_frame"><t t-esc="state.sales_metrics.top_selling_frame"/></h4>
+                                    </div>
+                                    <div class="col-6">
+                                        <p class="text-muted small mb-1">Top Lens Type</p>
+                                        <h4 class="fw-bold text-truncate" t-att-title="state.sales_metrics.top_lens_type"><t t-esc="state.sales_metrics.top_lens_type"/></h4>
+                                    </div>
+                                    <div class="col-6">
+                                        <p class="text-muted small mb-1">Insurance vs Cash</p>
+                                        <div class="d-flex align-items-center">
+                                            <div class="flex-grow-1 me-2">
+                                                <div class="progress" style="height: 8px;">
+                                                    <div class="progress-bar bg-primary" role="progressbar" t-att-style="'width: ' + state.sales_metrics.insurance_pct + '%'"></div>
+                                                    <div class="progress-bar bg-success" role="progressbar" t-att-style="'width: ' + state.sales_metrics.cash_pct + '%'"></div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <small class="text-muted">
+                                            <span class="text-primary"><t t-esc="state.sales_metrics.insurance_pct"/>% Ins</span> / 
+                                            <span class="text-success"><t t-esc="state.sales_metrics.cash_pct"/>% Cash</span>
+                                        </small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Staff Performance -->
+                <div class="card border-0 shadow-sm mb-4">
+                    <div class="card-body">
+                        <h5 class="card-title mb-4 fw-bold">Staff Performance</h5>
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle">
+                                <thead class="bg-light">
+                                    <tr>
+                                        <th class="border-0 text-muted small text-uppercase">Name</th>
+                                        <th class="border-0 text-muted small text-uppercase">Tests</th>
+                                        <th class="border-0 text-muted small text-uppercase">Prescriptions</th>
+                                        <th class="border-0 text-muted small text-uppercase">Revenue</th>
+                                        <th class="border-0 text-muted small text-uppercase">Rating</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr t-foreach="state.staff" t-as="staff" t-key="staff.name">
+                                        <td class="fw-bold"><t t-esc="staff.name"/></td>
+                                        <td><t t-esc="staff.tests"/></td>
+                                        <td><t t-esc="staff.prescriptions"/></td>
+                                        <td><t t-esc="formatCurrency(staff.revenue)"/></td>
+                                        <td>
+                                            <div class="text-warning">
+                                                <i class="fa fa-star"></i>
+                                                <i class="fa fa-star"></i>
+                                                <i class="fa fa-star"></i>
+                                                <i class="fa fa-star"></i>
+                                                <i class="fa fa-star"></i>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </t>
+</templates>

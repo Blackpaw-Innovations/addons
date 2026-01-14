@@ -1,0 +1,27 @@
+include README.md
+include LICENSE
+include CHANGELOG.md
+include UPGRADE_NOTES.md
+include SECURITY.md
+include CONTRIBUTING.md
+recursive-include bp_barber_management *.py
+recursive-include bp_barber_management *.xml
+recursive-include bp_barber_management *.csv
+recursive-include bp_barber_management *.yml
+recursive-include bp_barber_management *.yaml
+recursive-include bp_barber_management *.js
+recursive-include bp_barber_management *.scss
+recursive-include bp_barber_management *.css
+recursive-include bp_barber_management *.png
+recursive-include bp_barber_management *.jpg
+recursive-include bp_barber_management *.gif
+recursive-include bp_barber_management *.svg
+recursive-include bp_barber_management *.html
+recursive-include bp_barber_management *.po
+recursive-include bp_barber_management *.pot
+recursive-include bp_barber_management *.md
+recursive-exclude bp_barber_management __pycache__
+recursive-exclude bp_barber_management *.pyc
+recursive-exclude bp_barber_management *.pyo
+recursive-exclude bp_barber_management .git*
+prune bp_barber_management/tests/__pycache__

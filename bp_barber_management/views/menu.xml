@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Barber Root Menu -->
+    <menuitem 
+        id="menu_bp_barber_root"
+        name="Barber"
+        sequence="40"
+        web_icon="bp_barber_management,static/description/icon.png"
+        groups="bp_barber_management.group_bp_barber_user"/>
+
+    <!-- Services Menu -->
+    <menuitem 
+        id="menu_bp_services"
+        name="Services"
+        parent="menu_bp_barber_root"
+        action="action_bp_barber_services"
+        sequence="10"/>
+
+    <!-- Chairs Menu -->
+    <menuitem 
+        id="menu_bp_chairs"
+        name="Chairs"
+        parent="menu_bp_barber_root"
+        action="action_bp_barber_chairs"
+        sequence="15"/>
+
+    <!-- Barbers Menu -->
+    <menuitem 
+        id="menu_bp_barbers"
+        name="Barbers"
+        parent="menu_bp_barber_root"
+        action="action_bp_barber_barbers"
+        sequence="20"/>
+
+    <!-- Appointments Menu -->
+    <menuitem 
+        id="menu_bp_appointments"
+        name="Appointments"
+        parent="menu_bp_barber_root"
+        action="action_bp_barber_appointments"
+        sequence="30"/>
+
+    <!-- Commission and package menus removed -->
+
+    <!-- Consumables Menu Section -->
+    <menuitem 
+        id="menu_bp_consumables"
+        name="Consumables"
+        parent="menu_bp_barber_root"
+        sequence="60"
+        groups="bp_barber_management.group_bp_barber_user"/>
+
+    <!-- Service BOM Menu - temporarily disabled -->
+    <!-- <menuitem 
+        id="menu_bp_consumables_bom"
+        name="Service BOM"
+        parent="menu_bp_consumables"
+        action="action_bp_service_bom"
+        sequence="10"
+        groups="bp_barber_management.group_bp_barber_manager"/> -->
+
+    <!-- Supply Profiles Menu - temporarily disabled -->
+    <!-- <menuitem 
+        id="menu_bp_consumables_supply"
+        name="Supply Profiles"
+        parent="menu_bp_consumables"
+        action="action_bp_barber_supply"
+        sequence="20"
+        groups="bp_barber_management.group_bp_barber_manager"/> -->
+
+    <!-- Usage Logs Menu - temporarily disabled -->
+    <!-- <menuitem 
+        id="menu_bp_consumables_usage"
+        name="Usage Logs"
+        parent="menu_bp_consumables"
+        action="action_bp_consumable_usage"
+        sequence="30"/> -->
+
+    <!-- Replenishment Menu - temporarily disabled -->
+    <!-- <menuitem 
+        id="menu_bp_consumables_replenish"
+        name="Replenishment"
+        parent="menu_bp_consumables"
+        action="action_bp_consumable_replenishment_wizard"
+        sequence="40"/> -->
+
+    <!-- Reports Menu - temporarily disabled -->
+    <!-- <menuitem 
+        id="menu_bp_consumables_reports"
+        name="Reports"
+        parent="menu_bp_consumables"
+        action="action_bp_consumable_report_wizard"
+        sequence="50"/> -->
+
+    <!-- Maintenance menus removed -->
+</odoo>

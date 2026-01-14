@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- Optical User Group -->
+        <record id="group_optical_user" model="res.groups">
+            <field name="name">User</field>
+            <field name="category_id" ref="base.module_category_medical"/>
+            <field name="comment">User can view and manage optical records.</field>
+        </record>
+
+        <!-- Optical Manager Group -->
+        <record id="group_optical_manager" model="res.groups">
+            <field name="name">Manager</field>
+            <field name="category_id" ref="base.module_category_medical"/>
+            <field name="comment">Manager has full access to optical module configuration.</field>
+            <field name="implied_ids" eval="[(4, ref('BP_Optical_solution.group_optical_user'))]"/>
+        </record>
+
+        <!-- Optical Admin Group -->
+        <record id="group_optical_admin" model="res.groups">
+            <field name="name">Admin</field>
+            <field name="category_id" ref="base.module_category_medical"/>
+            <field name="comment">Admin has full access to all optical data and configuration.</field>
+            <field name="implied_ids" eval="[(4, ref('BP_Optical_solution.group_optical_manager'))]"/>
+        </record>
+    </data>
+</odoo>

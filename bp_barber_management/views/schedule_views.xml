@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Schedule Tree View -->
+    <record id="view_bp_schedule_tree" model="ir.ui.view">
+        <field name="name">bp.barber.schedule.tree</field>
+        <field name="model">bp.barber.schedule</field>
+        <field name="arch" type="xml">
+            <tree string="Working Hours">
+                <field name="name"/>
+                <field name="barber_id"/>
+                <field name="weekday"/>
+                <field name="start_time" widget="float_time"/>
+                <field name="end_time" widget="float_time"/>
+                <field name="active"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Schedule Form View -->
+    <record id="view_bp_schedule_form" model="ir.ui.view">
+        <field name="name">bp.barber.schedule.form</field>
+        <field name="model">bp.barber.schedule</field>
+        <field name="arch" type="xml">
+            <form string="Working Hours">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="barber_id"/>
+                            <field name="weekday"/>
+                        </group>
+                        <group>
+                            <field name="start_time" widget="float_time"/>
+                            <field name="end_time" widget="float_time"/>
+                            <field name="active"/>
+                            <field name="company_id" readonly="1" groups="base.group_multi_company"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Schedule Search View -->
+    <record id="view_bp_schedule_search" model="ir.ui.view">
+        <field name="name">bp.barber.schedule.search</field>
+        <field name="model">bp.barber.schedule</field>
+        <field name="arch" type="xml">
+            <search string="Search Working Hours">
+                <field name="name"/>
+                <field name="barber_id"/>
+                <field name="weekday"/>
+                <separator/>
+                <filter string="Active" name="active" domain="[('active', '=', True)]"/>
+                <filter string="Archived" name="inactive" domain="[('active', '=', False)]"/>
+                <separator/>
+                <group expand="0" string="Group By">
+                    <filter string="Barber" name="group_barber" context="{'group_by': 'barber_id'}"/>
+                    <filter string="Weekday" name="group_weekday" context="{'group_by': 'weekday'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Schedule Action -->
+    <record id="action_bp_barber_schedules" model="ir.actions.act_window">
+        <field name="name">Working Hours</field>
+        <field name="res_model">bp.barber.schedule</field>
+        <field name="view_mode">tree,form</field>
+        <field name="search_view_id" ref="view_bp_schedule_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Set up working hours
+            </p>
+            <p>
+                Define when your barbers are available for appointments by setting their working hours for each day of the week.
+            </p>
+        </field>
+    </record>
+
+    <!-- Add Working Hours button to Barber form -->
+    <record id="view_bp_barber_form_schedule" model="ir.ui.view">
+        <field name="name">bp.barber.barber.form.schedule</field>
+        <field name="model">bp.barber.barber</field>
+        <field name="inherit_id" ref="view_bp_barber_form"/>
+        <field name="arch" type="xml">
+            <div name="button_box" position="inside">
+                <button name="%(action_bp_barber_schedules)d" type="action" 
+                        class="oe_stat_button" icon="fa-calendar" 
+                        context="{'search_default_barber_id': active_id, 'default_barber_id': active_id}">
+                    <field name="schedule_ids" widget="statinfo" string="Working Hours"/>
+                </button>
+            </div>
+        </field>
+    </record>
+</odoo>

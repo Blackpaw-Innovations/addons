@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- Inherit res.config.settings view -->
+        <record id="view_optical_config_settings" model="ir.ui.view">
+            <field name="name">res.config.settings.optical</field>
+            <field name="model">res.config.settings</field>
+            <field name="priority">90</field>
+            <field name="inherit_id" ref="base.res_config_settings_view_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//form" position="inside">
+                    <app string="Optical" name="BP_Optical_solution">
+                        <block title="Point of Sale">
+                            <setting help="Enable the optical POS flows (BP_Optical_solution).">
+                                <field name="enable_optical_pos"/>
+                            </setting>
+                            <setting help="Enable POS Pay Invoice features alongside optical POS.">
+                                <field name="enable_pos_pay_invoice"/>
+                            </setting>
+                        </block>
+
+                        <block title="Prescription Validity">
+                            <setting>
+                                <label for="prescription_validity_months"/>
+                                <div class="content-group">
+                                    <div class="row mt16">
+                                        <label for="prescription_validity_months" string="Default Validity Period" class="col-lg-3 o_light_label"/>
+                                        <field name="prescription_validity_months"/>
+                                        <span> months</span>
+                                    </div>
+                                </div>
+                                <div class="text-muted">
+                                    Set the default validity period for new optical prescriptions
+                                </div>
+                            </setting>
+                        </block>
+
+                        <block title="Reminder Settings">
+                            <setting>
+                                <label for="enable_follow_up_reminders"/>
+                                <div class="text-muted">
+                                    Automatically create activities for follow-up appointments
+                                </div>
+                                <field name="enable_follow_up_reminders"/>
+                            </setting>
+
+                            <setting>
+                                <label for="enable_expiry_reminders"/>
+                                <div class="text-muted">
+                                    Automatically create activities for expiring prescriptions
+                                </div>
+                                <field name="enable_expiry_reminders"/>
+                            </setting>
+
+                            <setting>
+                                <label for="notification_group_id" string="Notification Group"/>
+                                <div class="text-muted">
+                                    Select which user group receives optical reminders
+                                </div>
+                                <div class="content-group">
+                                    <div class="row mt16">
+                                        <label for="notification_group_id" class="col-lg-3 o_light_label"/>
+                                        <field name="notification_group_id"/>
+                                    </div>
+                                </div>
+                            </setting>
+                        </block>
+                    </app>
+                </xpath>
+            </field>
+        </record>
+    </data>
+</odoo>

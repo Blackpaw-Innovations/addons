@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <record id="view_company_form_bp_payroll" model="ir.ui.view">
+        <field name="name">res.company.form.bp.payroll</field>
+        <field name="model">res.company</field>
+        <field name="inherit_id" ref="base.view_company_form"/>
+        <field name="arch" type="xml">
+            <notebook position="inside">
+                <page string="Payroll">
+                    <group>
+                        <group>
+                            <field name="payroll_journal_id"/>
+                            <field name="payroll_structure_id"/>
+                            <field name="payroll_requires_bank_account"/>
+                        </group>
+                        <group>
+                            <field name="payroll_auto_post"/>
+                            <field name="payroll_analytic_account_id"/>
+                            <!-- <field name="payroll_analytic_tag_ids" widget="many2many_tags"/> -->
+                        </group>
+                    </group>
+                    <div class="o_form_label">These settings drive payroll validation and accounting defaults for the company.</div>
+                </page>
+            </notebook>
+        </field>
+    </record>
+</odoo>

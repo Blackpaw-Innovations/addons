@@ -1,0 +1,290 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- Configuration Parent Menu -->
+        <menuitem id="menu_optical_configuration"
+                  name="Configuration"
+                  parent="menu_bp_optical_root"
+                  sequence="90"
+                  groups="BP_Optical_solution.group_optical_admin"/>
+
+        <!-- Settings Action -->
+        <record id="action_optical_config_settings" model="ir.actions.act_window">
+            <field name="name">Optical Settings</field>
+            <field name="res_model">res.config.settings</field>
+            <field name="view_mode">form</field>
+            <field name="target">inline</field>
+            <field name="context">{'module': 'BP_Optical_solution'}</field>
+        </record>
+
+        <!-- Settings Menu -->
+        <menuitem id="menu_optical_settings"
+                  name="Settings"
+                  parent="menu_optical_configuration"
+                  action="action_optical_config_settings"
+                  sequence="10"
+                  groups="BP_Optical_solution.group_optical_admin"/>
+
+        <!-- ========== OPTICIANS ========== -->
+        <record id="view_optical_optician_tree" model="ir.ui.view">
+            <field name="name">optical.optician.tree</field>
+            <field name="model">optical.optician</field>
+            <field name="arch" type="xml">
+                <tree string="Opticians">
+                    <field name="name"/>
+                    <field name="user_id"/>
+                    <field name="branch_id"/>
+                    <field name="active"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="view_optical_optician_form" model="ir.ui.view">
+            <field name="name">optical.optician.form</field>
+            <field name="model">optical.optician</field>
+            <field name="arch" type="xml">
+                <form string="Optician">
+                    <sheet>
+                        <group>
+                            <group>
+                                <field name="name"/>
+                                <field name="user_id"/>
+                            </group>
+                            <group>
+                                <field name="branch_id" string="Default Branch"/>
+                                <field name="allowed_branch_ids" widget="many2many_tags"/>
+                                <field name="active"/>
+                            </group>
+                        </group>
+                        <group>
+                            <field name="note" placeholder="Additional notes..."/>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record id="action_optical_opticians" model="ir.actions.act_window">
+            <field name="name">Opticians</field>
+            <field name="res_model">optical.optician</field>
+            <field name="view_mode">tree,form</field>
+            <field name="target">current</field>
+        </record>
+
+        <menuitem id="menu_optical_opticians"
+                  name="Opticians"
+                  parent="menu_optical_configuration"
+                  action="action_optical_opticians"
+                  sequence="20"
+                  groups="BP_Optical_solution.group_optical_admin"/>
+
+        <!-- ========== PRESCRIPTION STAGES ========== -->
+        <record id="view_optical_prescription_stage_tree" model="ir.ui.view">
+            <field name="name">optical.prescription.stage.tree</field>
+            <field name="model">optical.prescription.stage</field>
+            <field name="arch" type="xml">
+                <tree string="Prescription Stages">
+                    <field name="sequence" widget="handle"/>
+                    <field name="name"/>
+                    <field name="fold"/>
+                    <field name="is_final"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="view_optical_prescription_stage_form" model="ir.ui.view">
+            <field name="name">optical.prescription.stage.form</field>
+            <field name="model">optical.prescription.stage</field>
+            <field name="arch" type="xml">
+                <form string="Prescription Stage">
+                    <sheet>
+                        <group>
+                            <group>
+                                <field name="name"/>
+                                <field name="sequence"/>
+                            </group>
+                            <group>
+                                <field name="fold"/>
+                                <field name="is_final"/>
+                            </group>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record id="action_optical_prescription_stages" model="ir.actions.act_window">
+            <field name="name">Prescription Stages</field>
+            <field name="res_model">optical.prescription.stage</field>
+            <field name="view_mode">tree,form</field>
+            <field name="target">current</field>
+        </record>
+
+        <menuitem id="menu_optical_prescription_stages"
+                  name="Prescription Stages"
+                  parent="menu_optical_configuration"
+                  action="action_optical_prescription_stages"
+                  sequence="30"
+                  groups="BP_Optical_solution.group_optical_admin"/>
+
+        <!-- ========== RECORD DATA PARENT MENU ========== -->
+        <menuitem id="menu_optical_record_data"
+                  name="Record Data"
+                  parent="menu_optical_configuration"
+                  sequence="40"
+                  groups="BP_Optical_solution.group_optical_admin"/>
+
+        <!-- ========== BRANCH ========== -->
+        <record id="view_optical_branch_tree" model="ir.ui.view">
+            <field name="name">optical.branch.tree</field>
+            <field name="model">optical.branch</field>
+            <field name="arch" type="xml">
+                <tree string="Branches">
+                    <field name="name"/>
+                    <field name="code"/>
+                    <field name="company_id" groups="base.group_multi_company"/>
+                    <field name="active"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="view_optical_branch_form" model="ir.ui.view">
+            <field name="name">optical.branch.form</field>
+            <field name="model">optical.branch</field>
+            <field name="arch" type="xml">
+                <form string="Branch">
+                    <sheet>
+                        <group>
+                            <group>
+                                <field name="name"/>
+                                <field name="code"/>
+                            </group>
+                            <group>
+                                <field name="company_id" groups="base.group_multi_company"/>
+                                <field name="analytic_account_id"/>
+                                <field name="active"/>
+                            </group>
+                        </group>
+                        <group string="Configuration">
+                            <group>
+                                <field name="manager_id"/>
+                                <field name="user_ids" widget="many2many_tags"/>
+                                <field name="optician_ids" widget="many2many_tags"/>
+                            </group>
+                        </group>
+                        <group>
+                            <field name="note" placeholder="Additional notes..."/>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record id="action_optical_branch" model="ir.actions.act_window">
+            <field name="name">Branch</field>
+            <field name="res_model">optical.branch</field>
+            <field name="view_mode">tree,form</field>
+            <field name="target">current</field>
+        </record>
+
+        <menuitem id="menu_optical_branch"
+                  name="Branch"
+                  parent="menu_optical_record_data"
+                  action="action_optical_branch"
+                  sequence="10"/>
+
+        <!-- ========== INSURANCE COMPANIES ========== -->
+        <record id="view_optical_insurance_company_tree" model="ir.ui.view">
+            <field name="name">optical.insurance.company.tree</field>
+            <field name="model">optical.insurance.company</field>
+            <field name="arch" type="xml">
+                <tree string="Insurance Companies" import="1">
+                    <field name="name"/>
+                    <field name="partner_id"/>
+                    <field name="code"/>
+                    <field name="active"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="view_optical_insurance_company_form" model="ir.ui.view">
+            <field name="name">optical.insurance.company.form</field>
+            <field name="model">optical.insurance.company</field>
+            <field name="arch" type="xml">
+                <form string="Insurance Company">
+                    <sheet>
+                        <group>
+                            <group>
+                                <field name="name"/>
+                                <field name="partner_id"/>
+                            </group>
+                            <group>
+                                <field name="code"/>
+                                <field name="active"/>
+                            </group>
+                        </group>
+                        <group>
+                            <field name="note" placeholder="Additional notes..."/>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record id="action_optical_insurance_company" model="ir.actions.act_window">
+            <field name="name">Insurance Companies</field>
+            <field name="res_model">optical.insurance.company</field>
+            <field name="view_mode">tree,form</field>
+            <field name="target">current</field>
+        </record>
+
+        <menuitem id="menu_optical_insurance_company"
+                  name="Insurance Companies"
+                  parent="menu_optical_record_data"
+                  action="action_optical_insurance_company"
+                  sequence="20"/>
+
+        <!-- ========== SYMPTOMS ========== -->
+        <record id="view_optical_symptom_tree" model="ir.ui.view">
+            <field name="name">optical.symptom.tree</field>
+            <field name="model">optical.symptom</field>
+            <field name="arch" type="xml">
+                <tree string="Symptoms">
+                    <field name="name"/>
+                    <field name="code"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="view_optical_symptom_form" model="ir.ui.view">
+            <field name="name">optical.symptom.form</field>
+            <field name="model">optical.symptom</field>
+            <field name="arch" type="xml">
+                <form string="Symptom">
+                    <sheet>
+                        <group>
+                            <field name="name"/>
+                            <field name="code"/>
+                        </group>
+                        <group>
+                            <field name="description" placeholder="Symptom description..."/>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record id="action_optical_symptom" model="ir.actions.act_window">
+            <field name="name">Symptoms Data</field>
+            <field name="res_model">optical.symptom</field>
+            <field name="view_mode">tree,form</field>
+            <field name="target">current</field>
+        </record>
+
+        <menuitem id="menu_optical_symptom"
+                  name="Symptoms Data"
+                  parent="menu_optical_record_data"
+                  action="action_optical_symptom"
+                  sequence="60"/>
+    </data>
+</odoo>

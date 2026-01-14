@@ -1,0 +1,195 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Service Tree View -->
+    <record id="view_bp_service_tree" model="ir.ui.view">
+        <field name="name">bp.barber.service.tree</field>
+        <field name="model">bp.barber.service</field>
+        <field name="arch" type="xml">
+            <tree string="Services">
+                <field name="name"/>
+                <field name="code"/>
+                <field name="duration_minutes"/>
+                <field name="list_price"/>
+                <field name="product_tmpl_id"/>
+                <field name="active"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Service Form View -->
+    <record id="view_bp_service_form" model="ir.ui.view">
+        <field name="name">bp.barber.service.form</field>
+        <field name="model">bp.barber.service</field>
+        <field name="arch" type="xml">
+            <form string="Service">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="name"/>
+                            <field name="code"/>
+                        </group>
+                        <group>
+                            <field name="duration_minutes"/>
+                            <field name="list_price"/>
+                            <field name="active"/>
+                            <field name="company_id" readonly="1" groups="base.group_multi_company"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Description" name="description">
+                            <field name="description"/>
+                        </page>
+                        <page string="POS Integration" name="pos_integration">
+                            <group>
+                                <group string="Product Template">
+                                    <field name="product_tmpl_id" options="{'no_create_edit': True}"/>
+                                    <field name="product_id" readonly="1"/>
+                                </group>
+                            </group>
+                            <div class="alert alert-info" role="alert">
+                                <strong>Info:</strong> The Product Template is automatically created when you save the service.
+                                This allows the service to be sold through the Point of Sale system.
+                            </div>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Service Search View -->
+    <record id="view_bp_service_search" model="ir.ui.view">
+        <field name="name">bp.barber.service.search</field>
+        <field name="model">bp.barber.service</field>
+        <field name="arch" type="xml">
+            <search string="Search Services">
+                <field name="name" string="Name or Code" filter_domain="['|', ('name', 'ilike', self), ('code', 'ilike', self)]"/>
+                <separator/>
+                <filter string="Active" name="active" domain="[('active', '=', True)]"/>
+                <filter string="Archived" name="inactive" domain="[('active', '=', False)]"/>
+                <separator/>
+                <group expand="0" string="Group By">
+                    <filter string="Company" name="group_company" context="{'group_by': 'company_id'}" groups="base.group_multi_company"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Service Kanban View -->
+    <record id="view_bp_service_kanban" model="ir.ui.view">
+        <field name="name">bp.barber.service.kanban</field>
+        <field name="model">bp.barber.service</field>
+        <field name="arch" type="xml">
+            <kanban default_group_by="active" class="o_kanban_mobile bp-kanban">
+                <field name="id"/>
+                <field name="name"/>
+                <field name="code"/>
+                <field name="duration_minutes"/>
+                <field name="list_price"/>
+                <field name="description"/>
+                <field name="active"/>
+                <field name="company_id"/>
+                <field name="product_tmpl_id"/>
+                <templates>
+                    <t t-name="kanban-box">
+                        <div class="bp-kanban-card oe_kanban_global_click">
+                            <!-- Card Header -->
+                            <div class="bp-card-header">
+                                <div class="bp-header-content">
+                                    <div class="bp-title-section">
+                                        <div class="bp-heading">
+                                            <field name="name"/>
+                                        </div>
+                                        <div class="bp-subtitle">
+                                            [<field name="code"/>]
+                                        </div>
+                                    </div>
+                                    <div class="bp-actions-section">
+                                        <div class="o_dropdown_kanban dropdown">
+                                            <a class="dropdown-toggle o-no-caret btn" role="button" data-bs-toggle="dropdown" data-bs-display="static" href="#" aria-label="Dropdown menu" title="Dropdown menu">
+                                                <span class="fa fa-ellipsis-v"/>
+                                            </a>
+                                            <div class="dropdown-menu" role="menu">
+                                                <t t-if="widget.editable"><a role="menuitem" type="edit" class="dropdown-item">Edit</a></t>
+                                                <t t-if="widget.deletable"><a role="menuitem" type="delete" class="dropdown-item">Delete</a></t>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Card Body -->
+                            <div class="bp-card-body">
+                                <!-- Duration Info -->
+                                <div class="bp-info-row">
+                                    <i class="fa fa-clock-o bp-icon" title="Duration"/>
+                                    <div class="bp-content bp-body">
+                                        <field name="duration_minutes"/> minutes
+                                    </div>
+                                </div>
+
+                                <!-- Price Info -->
+                                <div class="bp-info-row">
+                                    <i class="fa fa-money bp-icon success" title="Price"/>
+                                    <div class="bp-content bp-body">
+                                        <strong>$<field name="list_price"/></strong>
+                                    </div>
+                                </div>
+
+                                <!-- Description Preview -->
+                                <div class="bp-info-row" t-if="record.description.value">
+                                    <i class="fa fa-info-circle bp-icon" title="Description"/>
+                                    <div class="bp-content bp-caption truncate">
+                                        <field name="description"/>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Card Footer -->
+                            <div class="bp-card-footer">
+                                <div class="bp-footer-content">
+                                    <div class="bp-footer-left">
+                                        <!-- POS Integration Status -->
+                                        <div t-if="record.product_tmpl_id.value">
+                                            <i class="fa fa-shopping-cart bp-icon success" title="Available in POS"/>
+                                            <span class="bp-caption">POS Ready</span>
+                                        </div>
+                                        <div t-else="">
+                                            <i class="fa fa-exclamation-triangle bp-icon warning" title="Not configured for POS"/>
+                                            <span class="bp-caption">Setup Required</span>
+                                        </div>
+                                    </div>
+                                    <div class="bp-footer-right">
+                                        <!-- Active Status Badge -->
+                                        <div class="bp-status-badge" t-att-class="record.active.value ? 'active' : 'inactive'">
+                                            <t t-if="record.active.value">Active</t>
+                                            <t t-else="">Archived</t>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <!-- Service Action -->
+    <record id="action_bp_barber_services" model="ir.actions.act_window">
+        <field name="name">Services</field>
+        <field name="res_model">bp.barber.service</field>
+        <field name="view_mode">kanban,tree,form</field>
+        <field name="search_view_id" ref="view_bp_service_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create your first service
+            </p>
+            <p>
+                Define the services offered in your barber shop with their duration and pricing.
+            </p>
+        </field>
+    </record>
+
+
+</odoo>

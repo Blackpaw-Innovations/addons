@@ -1,0 +1,73 @@
+.o_optical_dashboard .card {
+    border-radius: 0.75rem;
+    transition: all 0.3s ease;
+    border: none;
+}
+
+.o_optical_dashboard .hover-shadow:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 .5rem 1rem rgba(0, 0, 0, .15) !important;
+}
+
+.o_optical_dashboard .text-gray-800 {
+    color: #1f2937;
+}
+
+.o_optical_dashboard .bg-100 {
+    background-color: #f3f4f6;
+}
+
+/* Card Color Variants */
+.o_optical_dashboard .card-blue {
+    background: linear-gradient(135deg, #ffffff 0%, #e3f2fd 100%);
+    border-left: 4px solid #2196f3;
+}
+
+.o_optical_dashboard .card-blue .text-primary {
+    color: #1976d2 !important;
+}
+
+.o_optical_dashboard .card-green {
+    background: linear-gradient(135deg, #ffffff 0%, #e8f5e9 100%);
+    border-left: 4px solid #4caf50;
+}
+
+.o_optical_dashboard .card-green .text-success {
+    color: #388e3c !important;
+}
+
+.o_optical_dashboard .card-orange {
+    background: linear-gradient(135deg, #ffffff 0%, #fff3e0 100%);
+    border-left: 4px solid #ff9800;
+}
+
+.o_optical_dashboard .card-orange .text-warning {
+    color: #f57c00 !important;
+}
+
+.o_optical_dashboard .card-red {
+    background: linear-gradient(135deg, #ffffff 0%, #ffebee 100%);
+    border-left: 4px solid #f44336;
+}
+
+.o_optical_dashboard .card-red .text-danger {
+    color: #d32f2f !important;
+}
+
+.o_optical_dashboard .card-purple {
+    background: linear-gradient(135deg, #ffffff 0%, #f3e5f5 100%);
+    border-left: 4px solid #9c27b0;
+}
+
+.o_optical_dashboard .card-purple .text-info {
+    color: #7b1fa2 !important;
+}
+
+.o_optical_dashboard .card-teal {
+    background: linear-gradient(135deg, #ffffff 0%, #e0f2f1 100%);
+    border-left: 4px solid #009688;
+}
+
+.o_optical_dashboard .card-teal .text-teal {
+    color: #00796b !important;
+}

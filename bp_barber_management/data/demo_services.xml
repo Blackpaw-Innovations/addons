@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+    <!-- Demo Services -->
+    <record id="bp_service_cut" model="bp.service">
+        <field name="name">Haircut</field>
+        <field name="code">CUT</field>
+        <field name="description">Standard haircut service</field>
+        <field name="duration_minutes">30</field>
+        <field name="list_price">10.00</field>
+        <field name="active">True</field>
+    </record>
+
+    <record id="bp_service_shave" model="bp.service">
+        <field name="name">Shave</field>
+        <field name="code">SHV</field>
+        <field name="description">Traditional wet shave</field>
+        <field name="duration_minutes">20</field>
+        <field name="list_price">6.00</field>
+        <field name="active">True</field>
+    </record>
+
+    <record id="bp_service_cut_shave" model="bp.service">
+        <field name="name">Cut + Shave</field>
+        <field name="code">CNS</field>
+        <field name="description">Complete haircut and shave service</field>
+        <field name="duration_minutes">50</field>
+        <field name="list_price">15.00</field>
+        <field name="active">True</field>
+    </record>
+
+    <record id="bp_service_beard_trim" model="bp.service">
+        <field name="name">Beard Trim</field>
+        <field name="code">BRD</field>
+        <field name="description">Professional beard trimming and shaping</field>
+        <field name="duration_minutes">20</field>
+        <field name="list_price">7.00</field>
+        <field name="active">True</field>
+    </record>
+
+    <record id="bp_service_kids_cut" model="bp.service">
+        <field name="name">Kids Cut</field>
+        <field name="code">KID</field>
+        <field name="description">Haircut service for children (12 and under)</field>
+        <field name="duration_minutes">25</field>
+        <field name="list_price">8.00</field>
+        <field name="active">True</field>
+    </record>
+</odoo>

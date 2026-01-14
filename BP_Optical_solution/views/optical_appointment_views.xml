@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- Action for Optical Appointments -->
+        <record id="action_optical_appointments" model="ir.actions.act_window">
+            <field name="name">Appointments</field>
+            <field name="res_model">calendar.event</field>
+            <field name="view_mode">calendar,tree,form</field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    Schedule a new appointment
+                </p>
+                <p>
+                    Manage optical appointments and schedules.
+                </p>
+            </field>
+        </record>
+
+        <!-- Menu Item for Appointments -->
+        <menuitem id="menu_optical_appointments"
+                  name="Appointments"
+                  parent="menu_bp_optical_root"
+                  action="action_optical_appointments"
+                  sequence="15"
+                  groups="group_optical_user,group_optical_manager"/>
+    </data>
+</odoo>

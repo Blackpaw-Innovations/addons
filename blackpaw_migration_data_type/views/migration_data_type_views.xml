@@ -1,0 +1,148 @@
+<odoo>
+ 
+ <!-- Staff Tracking Views -->
+<record id="view_staff_tracking_form" model="ir.ui.view">
+  <field name="name">migration.staff.tracking.form</field>
+  <field name="model">migration.staff.tracking</field>
+  <field name="arch" type="xml">
+    <form>
+      <sheet>
+        <group>
+          <field name="name"/>
+          <field name="color"/>
+        </group>
+      </sheet>
+    </form>
+  </field>
+</record>
+
+<record id="view_staff_tracking_tree" model="ir.ui.view">
+  <field name="name">migration.staff.tracking.tree</field>
+  <field name="model">migration.staff.tracking</field>
+  <field name="arch" type="xml">
+    <tree>
+      <field name="name"/>
+      <field name="color"/>
+    </tree>
+  </field>
+</record>
+
+<record id="action_staff_tracking" model="ir.actions.act_window">
+  <field name="name">Staff Tracking</field>
+  <field name="res_model">migration.staff.tracking</field>
+  <field name="view_mode">tree,form</field>
+</record>
+
+<menuitem id="menu_staff_tracking" name="Staff Tracking"
+          parent="menu_crm_migration_root" action="action_staff_tracking" sequence="10"/>
+
+
+<!-- Inefficiencies Views -->
+<record id="view_inefficiency_form" model="ir.ui.view">
+  <field name="name">migration.inefficiency.form</field>
+  <field name="model">migration.inefficiency</field>
+  <field name="arch" type="xml">
+    <form>
+      <sheet>
+        <group>
+          <field name="name"/>
+          <field name="color"/>
+        </group>
+      </sheet>
+    </form>
+  </field>
+</record>
+
+<record id="view_inefficiency_tree" model="ir.ui.view">
+  <field name="name">migration.inefficiency.tree</field>
+  <field name="model">migration.inefficiency</field>
+  <field name="arch" type="xml">
+    <tree>
+      <field name="name"/>
+      <field name="color"/>
+    </tree>
+  </field>
+</record>
+
+<record id="action_inefficiency" model="ir.actions.act_window">
+  <field name="name">Inefficiencies</field>
+  <field name="res_model">migration.inefficiency</field>
+  <field name="view_mode">tree,form</field>
+</record>
+
+<menuitem id="menu_inefficiency" name="Inefficiencies"
+          parent="menu_crm_migration_root" action="action_inefficiency" sequence="20"/>
+
+
+<!-- Data Format Views -->
+<record id="view_data_format_form" model="ir.ui.view">
+  <field name="name">migration.data.format.form</field>
+  <field name="model">migration.data.format</field>
+  <field name="arch" type="xml">
+    <form>
+      <sheet>
+        <group>
+          <field name="name"/>
+          <field name="color"/>
+        </group>
+      </sheet>
+    </form>
+  </field>
+</record>
+
+<record id="view_data_format_tree" model="ir.ui.view">
+  <field name="name">migration.data.format.tree</field>
+  <field name="model">migration.data.format</field>
+  <field name="arch" type="xml">
+    <tree>
+      <field name="name"/>
+      <field name="color"/>
+    </tree>
+  </field>
+</record>
+
+<record id="action_data_format" model="ir.actions.act_window">
+  <field name="name">Data Formats</field>
+  <field name="res_model">migration.data.format</field>
+  <field name="view_mode">tree,form</field>
+</record>
+
+<menuitem id="menu_data_format" name="Data Formats"
+          parent="menu_crm_migration_root" action="action_data_format" sequence="30"/>
+
+
+  <record id="view_migration_data_type_form" model="ir.ui.view">
+    <field name="name">migration.data.type.form</field>
+    <field name="model">migration.data.type</field>
+    <field name="arch" type="xml">
+      <form>
+        <sheet>
+          <group>
+            <field name="name"/>
+            <field name="color"/>
+          </group>
+        </sheet>
+      </form>
+    </field>
+  </record>
+
+  <record id="view_migration_data_type_tree" model="ir.ui.view">
+    <field name="name">migration.data.type.tree</field>
+    <field name="model">migration.data.type</field>
+    <field name="arch" type="xml">
+      <tree>
+        <field name="name"/>
+        <field name="color"/>
+      </tree>
+    </field>
+  </record>
+
+  <record id="action_migration_data_type" model="ir.actions.act_window">
+    <field name="name">Migration Data Types</field>
+    <field name="res_model">migration.data.type</field>
+    <field name="view_mode">tree,form</field>
+  </record>
+
+  <menuitem id="menu_crm_migration_root" name="Migration Setup" parent="crm.crm_menu_root" sequence="60"/>
+  <menuitem id="menu_migration_data_type" name="Migration Data Types" parent="menu_crm_migration_root" action="action_migration_data_type"/>
+</odoo>

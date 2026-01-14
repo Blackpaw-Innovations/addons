@@ -1,0 +1,142 @@
+// Simple server-side RPC approach for barber selection
+console.log('Barber Management: Server integration loaded');
+
+odoo.define('bp_barber_management.server_integration', function (require) {
+    'use strict';
+
+    const { Gui } = require('point_of_sale.Gui');
+    const PosComponent = require('point_of_sale.PosComponent');
+    const ProductScreen = require('point_of_sale.ProductScreen');
+    const Registries = require('point_of_sale.Registries');
+    const { useListener } = require("@web/core/utils/hooks");
+
+    console.log('Barber Management: Starting server integration module');
+
+    // Simple product click handler using RPC
+    class BarberServerIntegration extends PosComponent {
+        constructor() {
+            super(...arguments);
+            console.log('Barber Management: BarberServerIntegration constructed');
+        }
+
+        async checkProductRequiresBarber(product) {
+            console.log('Barber Management: Checking product for barber requirement:', product.display_name);
+
+            try {
+                const result = await this.rpc({
+                    model: 'pos.config',
+                    method: 'validate_barber_assignment',
+                    args: [product.id],
+                });
+
+                console.log('Barber Management: Server response:', result);
+                return result;
+            } catch (error) {
+                console.error('Barber Management: Error checking barber requirement:', error);
+                return { success: true, requires_barber: false };
+            }
+        }
+
+        async getAvailableBarbers() {
+            try {
+                const barbers = await this.rpc({
+                    model: 'pos.config',
+                    method: 'get_available_barbers',
+                    args: [this.env.pos.config.id],
+                });
+
+                console.log('Barber Management: Available barbers:', barbers);
+                return barbers;
+            } catch (error) {
+                console.error('Barber Management: Error getting barbers:', error);
+                return [];
+            }
+        }
+
+        async showBarberSelection(product) {
+            console.log('Barber Management: Showing barber selection for:', product.display_name);
+
+            const barbers = await this.getAvailableBarbers();
+
+            if (barbers.length === 0) {
+                this.showPopup('ErrorPopup', {
+                    title: 'No Barbers Available',
+                    body: 'Please configure barbers in the system before selling services.'
+                });
+                return null;
+            }
+
+            // Use simple ConfirmPopup for now - can be enhanced later
+            const { confirmed } = await this.showPopup('ConfirmPopup', {
+                title: `Barber Required for ${product.display_name}`,
+                body: `This product requires a barber assignment. Available barbers: ${barbers.map(b => b.name).join(', ')}. Continue with first available barber?`
+            });
+
+            if (confirmed && barbers.length > 0) {
+                return barbers[0]; // Return first barber for now
+            }
+
+            return null;
+        }
+    }
+
+    // Extend ProductScreen to add barber checking
+    const BarberProductScreen = (ProductScreen) => class extends ProductScreen {
+        constructor() {
+            super(...arguments);
+            this.barberIntegration = new BarberServerIntegration();
+            this.barberIntegration.env = this.env;
+            this.barberIntegration.rpc = this.rpc.bind(this);
+            this.barberIntegration.showPopup = this.showPopup.bind(this);
+            console.log('Barber Management: ProductScreen extended');
+        }
+
+        async _clickProduct(event) {
+            console.log('Barber Management: Product clicked:', event.detail);
+
+            const product = event.detail;
+
+            // Check if barber mode is enabled
+            if (!this.env.pos.config.enable_barber_mode) {
+                console.log('Barber Management: Barber mode disabled, using default behavior');
+                return super._clickProduct(event);
+            }
+
+            // Check server-side if product requires barber
+            const validation = await this.barberIntegration.checkProductRequiresBarber(product);
+
+            if (validation.requires_barber) {
+                console.log('Barber Management: Product requires barber, showing selection');
+
+                const selectedBarber = await this.barberIntegration.showBarberSelection(product);
+
+                if (!selectedBarber) {
+                    console.log('Barber Management: No barber selected, aborting product addition');
+                    return;
+                }
+
+                console.log('Barber Management: Barber selected:', selectedBarber);
+
+                // Add product with barber assignment
+                const order = this.env.pos.get_order();
+                const line = order.add_product(product, { merge: false });
+
+                if (line) {
+                    // Assign barber to line (store for later processing)
+                    line.barber_id = selectedBarber.id;
+                    line.barber_name = selectedBarber.name;
+                    console.log('Barber Management: Barber assigned to line');
+                }
+            } else {
+                console.log('Barber Management: Product does not require barber, using default behavior');
+                return super._clickProduct(event);
+            }
+        }
+    };
+
+    Registries.Component.extend(ProductScreen, BarberProductScreen);
+
+    console.log('Barber Management: Server integration registered');
+
+    return BarberServerIntegration;
+});

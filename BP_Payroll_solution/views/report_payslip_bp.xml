@@ -1,0 +1,213 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <template id="report_payslip_bp">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="o">
+                <t t-call="web.external_layout">
+                    <!-- Variables -->
+                    <t t-set="employee" t-value="o.employee_id"/>
+                    <t t-set="currency" t-value="o.company_id.currency_id"/>
+                    <!-- Filter Logic -->
+                    <t t-set="earning_lines" t-value="o.line_ids.filtered(lambda l: l.category_id.code in ['EARN', 'BASIC', 'ALW', 'TAX_BASE'] and l.code not in ['GROSS', 'SEC_EARN', 'SEC_TAX_BASE'])"/>
+                    <t t-set="deduction_lines" t-value="o.line_ids.filtered(lambda l: (l.category_id.code in ['STAT_DED', 'DED'] or l.code == 'PAYE') and l.code not in ['SEC_STAT_DED', 'SEC_RELIEFS'])"/>
+                    <t t-set="employer_lines" t-value="o.line_ids.filtered(lambda l: l.category_id.code == 'EMP' and l.code not in ['SEC_EMP', 'TOTAL_EMP'])"/>
+                    
+                    <t t-set="total_gross" t-value="sum(o.line_ids.filtered(lambda l: l.code == 'GROSS').mapped('total')) or 0.0"/>
+                    <t t-set="total_deduction" t-value="sum(o.line_ids.filtered(lambda l: l.code == 'TOTAL_DED').mapped('total')) or 0.0"/>
+                    <t t-set="net_pay" t-value="sum(o.line_ids.filtered(lambda l: l.code == 'NET').mapped('total')) or 0.0"/>
+
+                    <div class="page bp_payslip_modern" style="font-family: 'Roboto', sans-serif; color: #333;">
+                        <style>
+                            .bp_payslip_modern h1, .bp_payslip_modern h2, .bp_payslip_modern h3 { font-weight: 700; margin: 0; }
+                            .bp_payslip_modern .text-muted { color: #6c757d !important; }
+                            .bp_payslip_modern .text-accent { color: #2C3E50; }
+                            .bp_payslip_modern .bg-light-accent { background-color: #F8F9FA; }
+                            .bp_payslip_modern .table-header { background-color: #F1F3F5; font-weight: 600; color: #495057; }
+                            .bp_payslip_modern .table td, .bp_payslip_modern .table th { padding: 8px 12px; border-color: #e9ecef; }
+                            .bp_payslip_modern .divider { border-bottom: 1px solid #dee2e6; margin: 15px 0; }
+                            .bp_payslip_modern .net-pay-band { background-color: #e9ecef; padding: 15px; border-radius: 4px; }
+                        </style>
+
+                        <!-- 1) HEADER -->
+                        <div class="row mb-4 align-items-end">
+                            <div class="col-6">
+                            </div>
+                            <div class="col-6 text-end">
+                                <h1 class="text-accent mb-2">PAYSLIP</h1>
+                                <table class="table-borderless ms-auto small">
+                                    <tr>
+                                        <td class="text-muted pe-3">Payroll Period:</td>
+                                        <td class="fw-bold"><span t-field="o.date_from"/> - <span t-field="o.date_to"/></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="text-muted pe-3">Pay Date:</td>
+                                        <td class="fw-bold"><span t-field="o.date_to"/></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="text-muted pe-3">Payslip No:</td>
+                                        <td class="fw-bold"><span t-field="o.name"/></td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+                        <div class="divider"/>
+
+                        <!-- 2) EMPLOYEE INFORMATION -->
+                        <div class="row mb-4">
+                            <div class="col-6">
+                                <div class="row mb-2">
+                                    <div class="col-4 text-muted small">Employee Name</div>
+                                    <div class="col-8 fw-bold"><span t-field="employee.name"/></div>
+                                </div>
+                                <div class="row mb-2">
+                                    <div class="col-4 text-muted small">Employee ID</div>
+                                    <div class="col-8 fw-bold">
+                                        <span t-if="employee.identification_id" t-field="employee.identification_id"/>
+                                        <span t-else="" t-field="employee.barcode"/>
+                                    </div>
+                                </div>
+                                <div class="row mb-2">
+                                    <div class="col-4 text-muted small">Position</div>
+                                    <div class="col-8 fw-bold"><span t-field="employee.job_id.name"/></div>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="row mb-2">
+                                    <div class="col-4 text-muted small">Department</div>
+                                    <div class="col-8 fw-bold"><span t-field="employee.department_id.name"/></div>
+                                </div>
+                                <div class="row mb-2">
+                                    <div class="col-4 text-muted small">Pay Method</div>
+                                    <div class="col-8 fw-bold">
+                                        <span t-if="employee.bank_account_id">Bank Transfer</span>
+                                        <span t-else="">Cash</span>
+                                    </div>
+                                </div>
+                                <div class="row mb-2">
+                                    <div class="col-4 text-muted small">Account</div>
+                                    <div class="col-8 fw-bold">
+                                        <t t-if="employee.bank_account_id">
+                                            <span t-field="employee.bank_account_id.bank_id.name"/> 
+                                            <span t-if="employee.bank_account_id.acc_number"> ****<span t-esc="employee.bank_account_id.acc_number[-4:]"/></span>
+                                        </t>
+                                        <t t-else="">—</t>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="divider"/>
+
+                        <!-- 3) MAIN TABLES -->
+                        <div class="row mb-4">
+                            <!-- Earnings -->
+                            <div class="col-6 pe-4">
+                                <h5 class="text-accent mb-3">Earnings</h5>
+                                <table class="table table-sm table-borderless">
+                                    <thead class="table-header rounded">
+                                        <tr>
+                                            <th class="ps-3 rounded-start">Description</th>
+                                            <th class="text-end pe-3 rounded-end">Amount</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr t-foreach="earning_lines" t-as="line" class="border-bottom">
+                                            <td class="ps-3"><span t-field="line.name"/></td>
+                                            <td class="text-end pe-3"><span t-field="line.total" t-options='{"widget": "monetary", "display_currency": currency}'/></td>
+                                        </tr>
+                                    </tbody>
+                                    <tfoot>
+                                        <tr class="fw-bold" style="background-color: #f8f9fa;">
+                                            <td class="ps-3 py-2">Total Gross Pay</td>
+                                            <td class="text-end pe-3 py-2"><span t-esc="total_gross" t-options='{"widget": "monetary", "display_currency": currency}'/></td>
+                                        </tr>
+                                    </tfoot>
+                                </table>
+                            </div>
+
+                            <!-- Deductions -->
+                            <div class="col-6 ps-4">
+                                <h5 class="text-accent mb-3">Deductions</h5>
+                                <table class="table table-sm table-borderless">
+                                    <thead class="table-header rounded">
+                                        <tr>
+                                            <th class="ps-3 rounded-start">Description</th>
+                                            <th class="text-end pe-3 rounded-end">Amount</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr t-foreach="deduction_lines" t-as="line" class="border-bottom">
+                                            <td class="ps-3"><span t-field="line.name"/></td>
+                                            <td class="text-end pe-3"><span t-esc="abs(line.total)" t-options='{"widget": "monetary", "display_currency": currency}'/></td>
+                                        </tr>
+                                    </tbody>
+                                    <tfoot>
+                                        <tr class="fw-bold" style="background-color: #f8f9fa;">
+                                            <td class="ps-3 py-2">Total Deductions</td>
+                                            <td class="text-end pe-3 py-2"><span t-esc="total_deduction" t-options='{"widget": "monetary", "display_currency": currency}'/></td>
+                                        </tr>
+                                    </tfoot>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- 4) NET PAY BAND -->
+                        <div class="row mb-5">
+                            <div class="col-12">
+                                <div class="net-pay-band text-center">
+                                    <div class="h2 fw-bold text-accent mb-1">
+                                        <span t-esc="net_pay" t-options='{"widget": "monetary", "display_currency": currency}'/>
+                                    </div>
+                                    <table class="w-100">
+                                        <tr>
+                                            <td style="vertical-align: middle; width: 35%;"><div style="border-top: 1px solid #adb5bd;"></div></td>
+                                            <td class="text-center text-muted small text-uppercase" style="width: 30%; white-space: nowrap; padding: 0 10px;">Amount Payable</td>
+                                            <td style="vertical-align: middle; width: 35%;"><div style="border-top: 1px solid #adb5bd;"></div></td>
+                                        </tr>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 5) EMPLOYER CONTRIBUTIONS -->
+                        <div class="row mb-5" t-if="employer_lines">
+                            <div class="col-12">
+                                <h6 class="text-muted text-uppercase small fw-bold mb-3">Employer Contributions</h6>
+                              <div class="row">
+                                    <t t-foreach="employer_lines" t-as="line">
+                                        <div class="col-4 mb-2">
+                                            <span class="text-muted small d-block"><t t-esc="line.name"/></span>
+                                            <span class="fw-bold"><span t-field="line.total" t-options='{"widget": "monetary", "display_currency": currency}'/></span>
+                                        </div>
+                                    </t>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row mb-5" t-if="not employer_lines">
+                             <div class="col-12">
+                                <h6 class="text-muted text-uppercase small fw-bold mb-3">Employer Contributions</h6>
+                                <p class="text-muted small">No employer contributions in this payslip.</p>
+                             </div>
+                        </div>
+
+                        <!-- 6) FOOTER -->
+                        <div class="text-center text-muted small mt-auto pt-4 border-top">
+                            <p class="mb-1">This is a system-generated payslip and does not require a signature.</p>
+                            <p class="mb-1" t-if="o.company_id.email">Contact: <span t-field="o.company_id.email"/></p>
+                            <p>Page <span class="page"/> of <span class="topage"/></p>
+                        </div>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+
+    <record id="action_report_payslip_bp" model="ir.actions.report">
+        <field name="name">Employee Payslip (Blackpaw Kenya)</field>
+        <field name="model">hr.payslip</field>
+        <field name="report_type">qweb-html</field>
+        <field name="report_name">BP_Payroll_solution.report_payslip_bp</field>
+        <field name="report_file">BP_Payroll_solution.report_payslip_bp</field>
+        <field name="binding_model_id" ref="model_hr_payslip"/>
+        <field name="binding_type">report</field>
+    </record>
+</odoo>

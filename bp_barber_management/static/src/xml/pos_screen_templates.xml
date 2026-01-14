@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates id="template" xml:space="preserve">
+    <t t-name="BarberAssignmentButton">
+        <button class="control-button btn btn-light rounded-0 fw-bolder" t-on-click="() => this.onClick()">
+            <i class="fa fa-scissors" role="img" aria-label="Assign Barber" title="Assign Barber"/>
+            <span> </span>
+            <span>Assign Barber</span>
+        </button>
+    </t>
+</templates>

@@ -1,0 +1,22 @@
+<odoo>
+  <record id="crm_lead_view_form_inherit_convert_employee" model="ir.ui.view">
+    <field name="name">crm.lead.form.convert.employee</field>
+    <field name="model">crm.lead</field>
+    <field name="inherit_id" ref="crm.crm_lead_view_form"/>
+    <field name="arch" type="xml">
+
+     <!-- First: make sure the field exists in the form -->
+      <xpath expr="//form" position="inside">
+        <field name="show_convert_button" invisible="1"/>
+      </xpath>
+
+      <xpath expr="//header" position="inside">
+         <button name="action_convert_to_employee"
+                 type="object"
+                 string="Create Member"
+                 class="btn btn-primary"
+                 invisible="not show_convert_button"/>
+      </xpath>
+    </field>
+  </record>
+</odoo>

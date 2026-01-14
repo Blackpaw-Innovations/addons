@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Extend Product Template Form to add Service Provider fields -->
+    <record id="view_product_template_form_barber_ext" model="ir.ui.view">
+        <field name="name">product.template.form.barber.ext</field>
+        <field name="model">product.template</field>
+        <field name="inherit_id" ref="product.product_template_form_view"/>
+        <field name="arch" type="xml">
+            <!-- Add to Sales tab in a proper group -->
+            <xpath expr="//page[@name='sales']/group" position="inside">
+                <group string="Service Provider" col="2">
+                    <field name="requires_service_provider"/>
+                    <field name="service_provider_type" 
+                           invisible="not requires_service_provider"/>
+                </group>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Extend Product Variant Form to show Service Provider fields -->
+    <record id="view_product_product_form_barber_ext" model="ir.ui.view">
+        <field name="name">product.product.form.barber.ext</field>
+        <field name="model">product.product</field>
+        <field name="inherit_id" ref="product.product_normal_form_view"/>
+        <field name="arch" type="xml">
+            <!-- Add to General Information group -->
+            <xpath expr="//field[@name='barcode']" position="after">
+                <field name="requires_service_provider" readonly="1"/>
+                <field name="service_provider_type" readonly="1" 
+                       invisible="not requires_service_provider"/>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Add Service Provider fields to Product Tree View -->
+    <record id="view_product_template_tree_barber_ext" model="ir.ui.view">
+        <field name="name">product.template.tree.barber.ext</field>
+        <field name="model">product.template</field>
+        <field name="inherit_id" ref="product.product_template_tree_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='list_price']" position="after">
+                <field name="requires_service_provider" optional="hide"/>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Extend Product Search to filter by service provider requirement -->
+    <record id="view_product_template_search_barber_ext" model="ir.ui.view">
+        <field name="name">product.template.search.barber.ext</field>
+        <field name="model">product.template</field>
+        <field name="inherit_id" ref="product.product_template_search_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//filter[@name='services']" position="after">
+                <separator/>
+                <filter string="Requires Service Provider" name="requires_service_provider" 
+                        domain="[('requires_service_provider', '=', True)]"/>
+            </xpath>
+            <xpath expr="//group[@expand='1']" position="inside">
+                <filter string="Service Provider Requirement" name="group_service_provider" 
+                        context="{'group_by': 'requires_service_provider'}"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>

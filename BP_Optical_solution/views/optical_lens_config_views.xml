@@ -1,0 +1,201 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Lens Type Views -->
+    <record id="view_optical_lens_type_tree" model="ir.ui.view">
+        <field name="name">optical.lens.type.tree</field>
+        <field name="model">optical.lens.type</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="code"/>
+                <field name="name"/>
+                <field name="active"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_optical_lens_type_form" model="ir.ui.view">
+        <field name="name">optical.lens.type.form</field>
+        <field name="model">optical.lens.type</field>
+        <field name="arch" type="xml">
+            <form string="Lens Type">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="name"/>
+                            <field name="code"/>
+                        </group>
+                        <group>
+                            <field name="active"/>
+                        </group>
+                    </group>
+                    <group>
+                        <field name="note" placeholder="Additional notes..."/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_optical_lens_type" model="ir.actions.act_window">
+        <field name="name">Lens Types</field>
+        <field name="res_model">optical.lens.type</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <!-- Coating Views -->
+    <record id="view_optical_coating_tree" model="ir.ui.view">
+        <field name="name">optical.coating.tree</field>
+        <field name="model">optical.coating</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="code"/>
+                <field name="name"/>
+                <field name="active"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_optical_coating_form" model="ir.ui.view">
+        <field name="name">optical.coating.form</field>
+        <field name="model">optical.coating</field>
+        <field name="arch" type="xml">
+            <form string="Coating">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="name"/>
+                            <field name="code"/>
+                        </group>
+                        <group>
+                            <field name="active"/>
+                        </group>
+                    </group>
+                    <group>
+                        <field name="note" placeholder="Additional notes..."/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_optical_coating" model="ir.actions.act_window">
+        <field name="name">Coatings</field>
+        <field name="res_model">optical.coating</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <!-- Index Views -->
+    <record id="view_optical_index_tree" model="ir.ui.view">
+        <field name="name">optical.index.tree</field>
+        <field name="model">optical.index</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="code"/>
+                <field name="name"/>
+                <field name="active"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_optical_index_form" model="ir.ui.view">
+        <field name="name">optical.index.form</field>
+        <field name="model">optical.index</field>
+        <field name="arch" type="xml">
+            <form string="Index">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="name"/>
+                            <field name="code"/>
+                        </group>
+                        <group>
+                            <field name="active"/>
+                        </group>
+                    </group>
+                    <group>
+                        <field name="note" placeholder="Additional notes..."/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_optical_index" model="ir.actions.act_window">
+        <field name="name">Index</field>
+        <field name="res_model">optical.index</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <!-- Material Views -->
+    <record id="view_optical_material_tree" model="ir.ui.view">
+        <field name="name">optical.material.tree</field>
+        <field name="model">optical.material</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="code"/>
+                <field name="name"/>
+                <field name="active"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_optical_material_form" model="ir.ui.view">
+        <field name="name">optical.material.form</field>
+        <field name="model">optical.material</field>
+        <field name="arch" type="xml">
+            <form string="Material">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="name"/>
+                            <field name="code"/>
+                        </group>
+                        <group>
+                            <field name="active"/>
+                        </group>
+                    </group>
+                    <group>
+                        <field name="note" placeholder="Additional notes..."/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_optical_material" model="ir.actions.act_window">
+        <field name="name">Materials</field>
+        <field name="res_model">optical.material</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <!-- Menu Structure -->
+    <menuitem id="menu_optical_lens" 
+              name="Lens" 
+              parent="menu_optical_configuration" 
+              sequence="30"
+              groups="BP_Optical_solution.group_optical_admin"/>
+
+    <menuitem id="menu_optical_lens_type" 
+              name="Lens Types" 
+              parent="menu_optical_lens" 
+              action="action_optical_lens_type" 
+              sequence="10"/>
+
+    <menuitem id="menu_optical_coating" 
+              name="Coatings" 
+              parent="menu_optical_lens" 
+              action="action_optical_coating" 
+              sequence="20"/>
+
+    <menuitem id="menu_optical_index" 
+              name="Index" 
+              parent="menu_optical_lens" 
+              action="action_optical_index" 
+              sequence="30"/>
+
+    <menuitem id="menu_optical_material" 
+              name="Materials" 
+              parent="menu_optical_lens" 
+              action="action_optical_material" 
+              sequence="40"/>
+</odoo>

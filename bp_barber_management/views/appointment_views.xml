@@ -1,0 +1,290 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Appointment Tree View -->
+    <record id="view_bp_appt_tree" model="ir.ui.view">
+        <field name="name">bp.barber.appointment.tree</field>
+        <field name="model">bp.barber.appointment</field>
+        <field name="arch" type="xml">
+            <tree string="Appointments">
+                <field name="name"/>
+                <field name="state" widget="badge" decoration-success="state=='done'" decoration-info="state in ('confirmed', 'in_service')" decoration-muted="state=='cancelled'" decoration-danger="state=='no_show'"/>
+                <field name="partner_id"/>
+                <field name="phone"/>
+                <field name="barber_id"/>
+                <field name="chair_id"/>
+                <field name="start_datetime"/>
+                <field name="end_datetime"/>
+                <field name="duration_minutes"/>
+                <field name="price_total"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Appointment Form View -->
+    <record id="view_bp_appt_form" model="ir.ui.view">
+        <field name="name">bp.barber.appointment.form</field>
+        <field name="model">bp.barber.appointment</field>
+        <field name="arch" type="xml">
+            <form string="Appointment">
+                <header>
+                    <button name="action_confirm" type="object" string="Confirm" class="oe_highlight" invisible="state != 'draft'"/>
+                    <button name="action_start_service" type="object" string="Start Service" class="oe_highlight" invisible="state != 'confirmed'"/>
+                    <button name="action_finish_service" type="object" string="Finish" class="oe_highlight" invisible="state != 'in_service'"/>
+                    <button name="action_cancel" type="object" string="Cancel" invisible="state not in ('draft', 'confirmed', 'in_service')"/>
+                    <button name="action_no_show" type="object" string="Mark No-Show" invisible="state != 'confirmed'"/>
+                    <button name="action_print_visit_summary" type="object" string="Print Visit Summary" class="btn-primary" invisible="state not in ('confirmed', 'in_service', 'done')"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,confirmed,in_service,done"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_partner_wallets"
+                                type="object"
+                                class="oe_stat_button"
+                                icon="fa-wallet"
+                                invisible="not partner_id">
+                            <div class="o_field_widget o_stat_info">
+                                <span class="o_stat_text">Customer</span>
+                                <span class="o_stat_text">Wallets</span>
+                            </div>
+                        </button>
+                    </div>
+                    
+                    <group>
+                        <group>
+                            <field name="name" readonly="1"/>
+                            <field name="partner_id"/>
+                            <field name="phone"/>
+                            <field name="email"/>
+                        </group>
+                        <group>
+                            <field name="barber_id"/>
+                            <field name="chair_id" readonly="state != 'draft'"/>
+                            <field name="start_datetime"/>
+                            <field name="end_datetime" readonly="1"/>
+                            <field name="duration_minutes" readonly="1"/>
+                            <field name="company_id" readonly="1" groups="base.group_multi_company"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Services" name="services">
+                            <field name="service_ids" widget="many2many_tags">
+                                <tree>
+                                    <field name="name"/>
+                                    <field name="duration_minutes"/>
+                                    <field name="list_price"/>
+                                </tree>
+                            </field>
+                            <group class="oe_subtotal_footer oe_right">
+                                <field name="discount_percent"/>
+                                <field name="price_subtotal" readonly="1"/>
+                                <field name="price_total" readonly="1" class="oe_subtotal_footer_separator"/>
+                            </group>
+                        </page>
+                        <page string="Notes" name="notes">
+                            <field name="note"/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <!-- Appointment Kanban View -->
+    <record id="view_bp_appt_kanban" model="ir.ui.view">
+        <field name="name">bp.barber.appointment.kanban</field>
+        <field name="model">bp.barber.appointment</field>
+        <field name="arch" type="xml">
+            <kanban default_group_by="state" class="o_kanban_small_column bp-kanban">
+                <field name="id"/>
+                <field name="name"/>
+                <field name="state"/>
+                <field name="partner_id"/>
+                <field name="barber_id"/>
+                <field name="start_datetime"/>
+                <field name="end_datetime"/>
+                <field name="service_ids"/>
+                <field name="price_total"/>
+                <field name="activity_ids"/>
+                <field name="activity_state"/>
+                <templates>
+                    <t t-name="kanban-box">
+                        <div class="bp-kanban-card oe_kanban_global_click">
+                            <!-- Card Header -->
+                            <div class="bp-card-header">
+                                <div class="bp-header-content">
+                                    <div class="bp-title-section">
+                                        <div class="bp-heading">
+                                            <field name="name"/>
+                                        </div>
+                                        <div class="bp-subtitle" t-if="record.start_datetime.raw_value and record.end_datetime.raw_value">
+                                            <i class="fa fa-clock-o bp-icon"/>
+                                            <field name="start_datetime" widget="datetime"/> - <field name="end_datetime" widget="time"/>
+                                        </div>
+                                    </div>
+                                    <div class="bp-actions-section">
+                                        <div class="bp-status-badge" t-att-class="record.state.raw_value">
+                                            <t t-if="record.state.raw_value == 'draft'">Draft</t>
+                                            <t t-if="record.state.raw_value == 'confirmed'">Confirmed</t>
+                                            <t t-if="record.state.raw_value == 'in_service'">In Service</t>
+                                            <t t-if="record.state.raw_value == 'done'">Done</t>
+                                            <t t-if="record.state.raw_value == 'no_show'">No Show</t>
+                                            <t t-if="record.state.raw_value == 'cancelled'">Cancelled</t>
+                                        </div>
+                                        <div class="o_dropdown_kanban dropdown">
+                                            <a class="dropdown-toggle o-no-caret btn" role="button" data-bs-toggle="dropdown" href="#" aria-label="Dropdown menu">
+                                                <span class="fa fa-ellipsis-v"/>
+                                            </a>
+                                            <div class="dropdown-menu" role="menu">
+                                                <t t-if="record.state.raw_value == 'draft'">
+                                                    <a role="menuitem" type="object" name="action_confirm" class="dropdown-item">
+                                                        <i class="fa fa-check"/> Confirm
+                                                    </a>
+                                                </t>
+                                                <t t-if="record.state.raw_value == 'confirmed'">
+                                                    <a role="menuitem" type="object" name="action_start_service" class="dropdown-item">
+                                                        <i class="fa fa-play"/> Start Service
+                                                    </a>
+                                                    <a role="menuitem" type="object" name="action_no_show" class="dropdown-item">
+                                                        <i class="fa fa-times"/> Mark No-Show
+                                                    </a>
+                                                </t>
+                                                <t t-if="record.state.raw_value == 'in_service'">
+                                                    <a role="menuitem" type="object" name="action_finish_service" class="dropdown-item">
+                                                        <i class="fa fa-flag-checkered"/> Finish
+                                                    </a>
+                                                </t>
+                                                <t t-if="widget.editable">
+                                                    <a role="menuitem" type="edit" class="dropdown-item">
+                                                        <i class="fa fa-edit"/> Edit
+                                                    </a>
+                                                </t>
+                                                <t t-if="widget.deletable">
+                                                    <a role="menuitem" type="delete" class="dropdown-item text-danger">
+                                                        <i class="fa fa-trash"/> Delete
+                                                    </a>
+                                                </t>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Card Body -->
+                            <div class="bp-card-body">
+                                <!-- Customer Information -->
+                                <div class="bp-info-row" t-if="record.partner_id.raw_value">
+                                    <i class="fa fa-user bp-icon primary"/>
+                                    <div class="bp-content bp-body">
+                                        <field name="partner_id"/>
+                                    </div>
+                                </div>
+                                
+                                <!-- Barber Information -->
+                                <div class="bp-info-row" t-if="record.barber_id.raw_value">
+                                    <i class="fa fa-scissors bp-icon success"/>
+                                    <div class="bp-content bp-body">
+                                        <field name="barber_id"/>
+                                    </div>
+                                </div>
+                                
+                                <!-- Services -->
+                                <div class="bp-info-row" t-if="record.service_ids.raw_value">
+                                    <i class="fa fa-list bp-icon"/>
+                                    <div class="bp-content bp-body">
+                                        <field name="service_ids" widget="many2many_tags"/>
+                                    </div>
+                                </div>
+                                
+                                <!-- Price Information -->
+                                <div class="bp-info-row" t-if="record.price_total.raw_value">
+                                    <i class="fa fa-dollar bp-icon success"/>
+                                    <div class="bp-content bp-body">
+                                        <strong><field name="price_total" widget="monetary"/></strong>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Card Footer -->
+                            <div class="bp-card-footer">
+                                <div class="bp-footer-content">
+                                    <div class="bp-footer-left">
+                                        <div class="o_activity_summary">
+                                            <field name="activity_ids" widget="kanban_activity"/>
+                                        </div>
+                                    </div>
+                                    <div class="bp-footer-right">
+                                        <!-- Quick Actions based on state -->
+                                        <t t-if="record.state.raw_value == 'draft'">
+                                            <a type="object" name="action_confirm" class="bp-action-button primary">
+                                                <i class="fa fa-check"/> Confirm
+                                            </a>
+                                        </t>
+                                        <t t-if="record.state.raw_value == 'confirmed'">
+                                            <a type="object" name="action_start_service" class="bp-action-button success">
+                                                <i class="fa fa-play"/> Start
+                                            </a>
+                                        </t>
+                                        <t t-if="record.state.raw_value == 'in_service'">
+                                            <a type="object" name="action_finish_service" class="bp-action-button success">
+                                                <i class="fa fa-flag-checkered"/> Finish
+                                            </a>
+                                        </t>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <!-- Appointment Search View -->
+    <record id="view_bp_appt_search" model="ir.ui.view">
+        <field name="name">bp.barber.appointment.search</field>
+        <field name="model">bp.barber.appointment</field>
+        <field name="arch" type="xml">
+            <search string="Search Appointments">
+                <field name="name" string="Name, Partner, Phone, Email" filter_domain="['|', '|', '|', ('name', 'ilike', self), ('partner_id', 'ilike', self), ('phone', 'ilike', self), ('email', 'ilike', self)]"/>
+                <separator/>
+                <filter string="My Appointments" name="my_appointments" domain="[('barber_id.user_id', '=', uid)]"/>
+                <filter string="Today" name="today" domain="[('start_datetime', '&gt;=', datetime.datetime.combine(context_today(), datetime.time(0,0,0))), ('start_datetime', '&lt;', datetime.datetime.combine(context_today() + datetime.timedelta(days=1), datetime.time(0,0,0)))]"/>
+                <separator/>
+                <filter string="Draft" name="draft" domain="[('state', '=', 'draft')]"/>
+                <filter string="Confirmed" name="confirmed" domain="[('state', '=', 'confirmed')]"/>
+                <filter string="In Service" name="in_service" domain="[('state', '=', 'in_service')]"/>
+                <filter string="Done" name="done" domain="[('state', '=', 'done')]"/>
+                <filter string="No Show" name="no_show" domain="[('state', '=', 'no_show')]"/>
+                <separator/>
+                <group expand="0" string="Group By">
+                    <filter string="Barber" name="group_barber" context="{'group_by': 'barber_id'}"/>
+                    <filter string="Date" name="group_date" context="{'group_by': 'start_datetime:day'}"/>
+                    <filter string="State" name="group_state" context="{'group_by': 'state'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Appointment Action -->
+    <record id="action_bp_barber_appointments" model="ir.actions.act_window">
+        <field name="name">Appointments</field>
+        <field name="res_model">bp.barber.appointment</field>
+        <field name="view_mode">tree,form,kanban</field>
+        <field name="search_view_id" ref="view_bp_appt_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Schedule your first appointment
+            </p>
+            <p>
+                Create and manage appointments for your barber shop. Track the appointment lifecycle from booking to completion.
+            </p>
+        </field>
+    </record>
+
+
+</odoo>

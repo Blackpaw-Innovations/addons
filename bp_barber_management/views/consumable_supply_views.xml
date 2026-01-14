@@ -1,0 +1,227 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Barber Supply Profile Tree View -->
+    <record id="view_bp_barber_supply_tree" model="ir.ui.view">
+        <field name="name">bp.barber.barber.supply.tree</field>
+        <field name="model">bp.barber.barber.supply</field>
+        <field name="arch" type="xml">
+            <tree string="Barber Supply Profiles" editable="bottom">
+                <field name="barber_id"/>
+                <field name="product_id"/>
+                <field name="min_qty"/>
+                <field name="target_qty"/>
+                <field name="avg_daily_usage" readonly="1"/>
+                <field name="product_uom_id" readonly="1"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Barber Supply Profile Form View -->
+    <record id="view_bp_barber_supply_form" model="ir.ui.view">
+        <field name="name">bp.barber.barber.supply.form</field>
+        <field name="model">bp.barber.barber.supply</field>
+        <field name="arch" type="xml">
+            <form string="Supply Profile">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="barber_id"/>
+                            <field name="product_id"/>
+                        </group>
+                        <group>
+                            <field name="min_qty"/>
+                            <field name="target_qty"/>
+                            <field name="avg_daily_usage" readonly="1"/>
+                            <field name="product_uom_id" readonly="1"/>
+                            <field name="company_id" readonly="1"/>
+                        </group>
+                    </group>
+                    
+                    <div class="alert alert-info" role="alert" style="margin-top: 16px;">
+                        <h5><i class="fa fa-info-circle"/> Supply Profile Settings</h5>
+                        <p><strong>Minimum Quantity:</strong> Alert level when stock falls below this amount</p>
+                        <p><strong>Target Quantity:</strong> Ideal stock level for replenishment</p>
+                        <p><strong>Average Daily Usage:</strong> Automatically calculated from last 30 days</p>
+                    </div>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Barber Supply Profile Search View -->
+    <record id="view_bp_barber_supply_search" model="ir.ui.view">
+        <field name="name">bp.barber.barber.supply.search</field>
+        <field name="model">bp.barber.barber.supply</field>
+        <field name="arch" type="xml">
+            <search string="Search Supply Profiles">
+                <field name="barber_id" string="Barber"/>
+                <field name="product_id" string="Product"/>
+                <separator/>
+                <group expand="0" string="Group By">
+                    <filter string="Barber" name="group_barber" context="{'group_by': 'barber_id'}"/>
+                    <filter string="Product" name="group_product" context="{'group_by': 'product_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Barber Supply Profile Action -->
+    <record id="action_bp_barber_supply" model="ir.actions.act_window">
+        <field name="name">Barber Supply Profiles</field>
+        <field name="res_model">bp.barber.barber.supply</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create your first supply profile!
+            </p>
+            <p>
+                Supply profiles define minimum and target inventory levels for 
+                each barber and product combination. This enables automated 
+                replenishment suggestions based on usage patterns.
+            </p>
+        </field>
+    </record>
+
+    <!-- Replenishment Suggestions Tree View -->
+    <record id="view_bp_consumable_suggestion_tree" model="ir.ui.view">
+        <field name="name">bp.barber.consumable.suggestion.tree</field>
+        <field name="model">bp.barber.consumable.suggestion</field>
+        <field name="arch" type="xml">
+            <tree string="Replenishment Suggestions" decoration-danger="is_below_min" decoration-warning="is_urgent">
+                <field name="barber_name"/>
+                <field name="product_name"/>
+                <field name="on_hand"/>
+                <field name="min_qty"/>
+                <field name="target_qty"/>
+                <field name="suggest_qty"/>
+                <field name="avg_daily_usage"/>
+                <field name="days_to_empty"/>
+                <field name="uom_name"/>
+                <field name="state" widget="badge"/>
+                <field name="is_below_min" invisible="1"/>
+                <field name="is_urgent" invisible="1"/>
+                <button name="action_issue_suggested" type="object" 
+                        string="Issue" class="btn-primary" 
+                        invisible="state != 'draft' or suggest_qty &lt;= 0"/>
+                <button name="action_dismiss" type="object" 
+                        string="Dismiss" class="btn-secondary"
+                        invisible="state != 'draft'"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Replenishment Suggestions Form View -->
+    <record id="view_bp_consumable_suggestion_form" model="ir.ui.view">
+        <field name="name">bp.barber.consumable.suggestion.form</field>
+        <field name="model">bp.barber.consumable.suggestion</field>
+        <field name="arch" type="xml">
+            <form string="Replenishment Suggestion">
+                <header>
+                    <button name="action_issue_suggested" type="object" string="Issue Suggested"
+                            class="oe_highlight" invisible="state != 'draft' or suggest_qty &lt;= 0"/>
+                    <button name="action_dismiss" type="object" string="Dismiss"
+                            invisible="state != 'draft'"/>
+                    <field name="state" widget="statusbar"/>
+                </header>
+                <sheet>
+                    <div class="alert alert-warning" role="alert" invisible="not is_below_min">
+                        <h5><i class="fa fa-exclamation-triangle"/> Below Minimum Stock</h5>
+                        <p>Current stock is below the minimum threshold.</p>
+                    </div>
+                    
+                    <div class="alert alert-danger" role="alert" invisible="not is_urgent">
+                        <h5><i class="fa fa-clock-o"/> Urgent Replenishment</h5>
+                        <p>Less than 3 days of stock remaining at current usage rate.</p>
+                    </div>
+                    
+                    <group>
+                        <group>
+                            <field name="barber_id"/>
+                            <field name="product_id"/>
+                            <field name="uom_name" readonly="1"/>
+                        </group>
+                        <group>
+                            <field name="on_hand"/>
+                            <field name="min_qty"/>
+                            <field name="target_qty"/>
+                            <field name="suggest_qty"/>
+                        </group>
+                    </group>
+                    
+                    <group string="Usage Analytics">
+                        <group>
+                            <field name="avg_daily_usage"/>
+                            <field name="days_to_empty"/>
+                        </group>
+                        <group>
+                            <field name="is_below_min" readonly="1"/>
+                            <field name="is_urgent" readonly="1"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Replenishment Action -->
+    <record id="action_bp_consumable_replenishment" model="ir.actions.act_window">
+        <field name="name">Replenishment Suggestions</field>
+        <field name="res_model">bp.barber.consumable.suggestion</field>
+        <field name="view_mode">tree,form</field>
+        <field name="context">{
+            'search_default_group_barber': 1
+        }</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                No replenishment suggestions!
+            </p>
+            <p>
+                Generate replenishment suggestions based on current stock levels, 
+                minimum thresholds, and usage patterns.
+            </p>
+        </field>
+    </record>
+
+    <!-- Replenishment Generation Wizard -->
+    <record id="view_bp_consumable_replenishment_wizard_form" model="ir.ui.view">
+        <field name="name">bp.barber.consumable.replenishment.wizard.form</field>
+        <field name="model">bp.barber.consumable.replenishment.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Generate Replenishment Suggestions">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="barber_ids" widget="many2many_tags"/>
+                            <field name="days_threshold"/>
+                        </group>
+                        <group>
+                            <field name="include_all_products"/>
+                        </group>
+                    </group>
+                    
+                    <div class="alert alert-info" role="alert">
+                        <h5><i class="fa fa-info-circle"/> Generation Criteria</h5>
+                        <p>Suggestions will be generated for items that:</p>
+                        <ul>
+                            <li>Are below their minimum quantity threshold</li>
+                            <li>Have less than the specified days of stock remaining</li>
+                            <li>Have defined supply profiles (unless "Include All Products" is checked)</li>
+                        </ul>
+                    </div>
+                </sheet>
+                <footer>
+                    <button name="action_generate_suggestions" type="object" string="Generate Suggestions" class="oe_highlight"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <!-- Replenishment Generation Wizard Action -->
+    <record id="action_bp_consumable_replenishment_wizard" model="ir.actions.act_window">
+        <field name="name">Generate Replenishment Suggestions</field>
+        <field name="res_model">bp.barber.consumable.replenishment.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+</odoo>

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+    <!-- Demo POS Configuration -->
+    <record id="bp_pos_config_front_desk" model="pos.config">
+        <field name="name">Barber Front Desk</field>
+        <field name="enable_barber_mode">True</field>
+        <field name="pos_autocomplete_appointment">True</field>
+        <field name="pos_appointments_scope">all_barbers</field>
+        <field name="pos_barber_default" ref="bp_barber_john"/>
+        <field name="module_pos_hr">False</field>
+        <field name="trusted_config_ids" eval="[]"/>
+        <field name="iface_tipproduct">False</field>
+        <field name="iface_tax_included">True</field>
+        <field name="receipt_show_date">True</field>
+        <field name="receipt_show_time">True</field>
+        <field name="is_posbox">False</field>
+        <field name="proxy_ip">localhost</field>
+        <field name="iface_start_categ_id" ref="bp_category_perfumes"/>
+    </record>
+</odoo>

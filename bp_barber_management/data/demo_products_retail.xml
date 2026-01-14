@@ -1,0 +1,191 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+    <!-- Demo Product Categories -->
+    <record id="bp_category_perfumes" model="product.category">
+        <field name="name">Perfumes</field>
+        <field name="parent_id" ref="product.product_category_all"/>
+    </record>
+
+    <record id="bp_category_shoes" model="product.category">
+        <field name="name">Shoes</field>
+        <field name="parent_id" ref="product.product_category_all"/>
+    </record>
+
+    <record id="bp_category_grooming" model="product.category">
+        <field name="name">Grooming Products</field>
+        <field name="parent_id" ref="product.product_category_all"/>
+    </record>
+
+    <!-- Demo Perfume Products -->
+    <record id="bp_product_perfume_cedar" model="product.product">
+        <field name="name">Cedar Woods 50ml</field>
+        <field name="type">product</field>
+        <field name="categ_id" ref="bp_category_perfumes"/>
+        <field name="list_price">45.00</field>
+        <field name="standard_price">25.00</field>
+        <field name="available_in_pos">True</field>
+        <field name="sale_ok">True</field>
+        <field name="purchase_ok">True</field>
+        <field name="default_code">PERF001</field>
+        <field name="description_sale">Woody fragrance with cedar and sandalwood notes</field>
+        <field name="requires_service_provider">False</field>
+    </record>
+
+    <record id="bp_product_perfume_ocean" model="product.product">
+        <field name="name">Ocean Mist 100ml</field>
+        <field name="type">product</field>
+        <field name="categ_id" ref="bp_category_perfumes"/>
+        <field name="list_price">55.00</field>
+        <field name="standard_price">30.00</field>
+        <field name="available_in_pos">True</field>
+        <field name="sale_ok">True</field>
+        <field name="purchase_ok">True</field>
+        <field name="default_code">PERF002</field>
+        <field name="description_sale">Fresh aquatic fragrance with marine notes</field>
+        <field name="requires_service_provider">False</field>
+    </record>
+
+    <record id="bp_product_perfume_amber" model="product.product">
+        <field name="name">Amber Night 50ml</field>
+        <field name="type">product</field>
+        <field name="categ_id" ref="bp_category_perfumes"/>
+        <field name="list_price">65.00</field>
+        <field name="standard_price">35.00</field>
+        <field name="available_in_pos">True</field>
+        <field name="sale_ok">True</field>
+        <field name="purchase_ok">True</field>
+        <field name="default_code">PERF003</field>
+        <field name="description_sale">Warm oriental fragrance with amber and vanilla</field>
+        <field name="requires_service_provider">False</field>
+    </record>
+
+    <!-- Shoe Product Attributes -->
+    <record id="bp_attr_shoe_size" model="product.attribute">
+        <field name="name">Size</field>
+        <field name="sequence">1</field>
+    </record>
+
+    <record id="bp_attr_shoe_color" model="product.attribute">
+        <field name="name">Color</field>
+        <field name="sequence">2</field>
+    </record>
+
+    <!-- Size Attribute Values -->
+    <record id="bp_attr_val_size_39" model="product.attribute.value">
+        <field name="name">39</field>
+        <field name="attribute_id" ref="bp_attr_shoe_size"/>
+        <field name="sequence">1</field>
+    </record>
+
+    <record id="bp_attr_val_size_40" model="product.attribute.value">
+        <field name="name">40</field>
+        <field name="attribute_id" ref="bp_attr_shoe_size"/>
+        <field name="sequence">2</field>
+    </record>
+
+    <record id="bp_attr_val_size_41" model="product.attribute.value">
+        <field name="name">41</field>
+        <field name="attribute_id" ref="bp_attr_shoe_size"/>
+        <field name="sequence">3</field>
+    </record>
+
+    <record id="bp_attr_val_size_42" model="product.attribute.value">
+        <field name="name">42</field>
+        <field name="attribute_id" ref="bp_attr_shoe_size"/>
+        <field name="sequence">4</field>
+    </record>
+
+    <record id="bp_attr_val_size_43" model="product.attribute.value">
+        <field name="name">43</field>
+        <field name="attribute_id" ref="bp_attr_shoe_size"/>
+        <field name="sequence">5</field>
+    </record>
+
+    <!-- Color Attribute Values -->
+    <record id="bp_attr_val_color_black" model="product.attribute.value">
+        <field name="name">Black</field>
+        <field name="attribute_id" ref="bp_attr_shoe_color"/>
+        <field name="sequence">1</field>
+    </record>
+
+    <record id="bp_attr_val_color_white" model="product.attribute.value">
+        <field name="name">White</field>
+        <field name="attribute_id" ref="bp_attr_shoe_color"/>
+        <field name="sequence">2</field>
+    </record>
+
+    <!-- Shoe Product Template -->
+    <record id="bp_product_tmpl_sneaker" model="product.template">
+        <field name="name">Casual Sneaker</field>
+        <field name="type">product</field>
+        <field name="categ_id" ref="bp_category_shoes"/>
+        <field name="list_price">89.00</field>
+        <field name="standard_price">45.00</field>
+        <field name="available_in_pos">True</field>
+        <field name="sale_ok">True</field>
+        <field name="purchase_ok">True</field>
+        <field name="default_code">SHOE001</field>
+        <field name="description_sale">Comfortable casual sneakers for everyday wear</field>
+        <field name="requires_service_provider">False</field>
+    </record>
+
+    <!-- Product Template Attribute Lines -->
+    <record id="bp_ptal_sneaker_size" model="product.template.attribute.line">
+        <field name="product_tmpl_id" ref="bp_product_tmpl_sneaker"/>
+        <field name="attribute_id" ref="bp_attr_shoe_size"/>
+        <field name="value_ids" eval="[(6, 0, [ref('bp_attr_val_size_39'), ref('bp_attr_val_size_40'), ref('bp_attr_val_size_41'), ref('bp_attr_val_size_42'), ref('bp_attr_val_size_43')])]"/>
+    </record>
+
+    <record id="bp_ptal_sneaker_color" model="product.template.attribute.line">
+        <field name="product_tmpl_id" ref="bp_product_tmpl_sneaker"/>
+        <field name="attribute_id" ref="bp_attr_shoe_color"/>
+        <field name="value_ids" eval="[(6, 0, [ref('bp_attr_val_color_black'), ref('bp_attr_val_color_white')])]"/>
+    </record>
+
+    <!-- Demo Products that REQUIRE Service Provider -->
+    <record id="bp_product_beard_trim" model="product.product">
+        <field name="name">Professional Beard Trim</field>
+        <field name="type">service</field>
+        <field name="categ_id" ref="bp_category_grooming"/>
+        <field name="list_price">25.00</field>
+        <field name="standard_price">0.00</field>
+        <field name="available_in_pos">True</field>
+        <field name="sale_ok">True</field>
+        <field name="purchase_ok">False</field>
+        <field name="default_code">GROOM001</field>
+        <field name="description_sale">Professional beard trimming and shaping service</field>
+        <field name="requires_service_provider">True</field>
+        <field name="service_provider_type">barber</field>
+    </record>
+
+    <record id="bp_product_hair_wash" model="product.product">
+        <field name="name">Hair Wash &amp; Style</field>
+        <field name="type">service</field>
+        <field name="categ_id" ref="bp_category_grooming"/>
+        <field name="list_price">15.00</field>
+        <field name="standard_price">0.00</field>
+        <field name="available_in_pos">True</field>
+        <field name="sale_ok">True</field>
+        <field name="purchase_ok">False</field>
+        <field name="default_code">GROOM002</field>
+        <field name="description_sale">Hair washing and styling service</field>
+        <field name="requires_service_provider">True</field>
+        <field name="service_provider_type">barber</field>
+    </record>
+
+    <!-- Example of a product that could optionally have a service provider -->
+    <record id="bp_product_hair_product_application" model="product.product">
+        <field name="name">Hair Product Application</field>
+        <field name="type">service</field>
+        <field name="categ_id" ref="bp_category_grooming"/>
+        <field name="list_price">10.00</field>
+        <field name="standard_price">0.00</field>
+        <field name="available_in_pos">True</field>
+        <field name="sale_ok">True</field>
+        <field name="purchase_ok">False</field>
+        <field name="default_code">GROOM003</field>
+        <field name="description_sale">Professional application of hair products - can be performed by any staff</field>
+        <field name="requires_service_provider">True</field>
+        <field name="service_provider_type">any</field>
+    </record>
+</odoo>

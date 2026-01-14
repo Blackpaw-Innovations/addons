@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Extend POS Config Form with Barber Settings - TEMPORARILY DISABLED -->
+    <!-- <record id="view_pos_config_form_barber" model="ir.ui.view">
+        <field name="name">pos.config.form.barber</field>
+        <field name="model">pos.config</field>
+        <field name="inherit_id" ref="point_of_sale.pos_config_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//div[@class='row mt16 o_settings_container'][last()]" position="after">
+                <div class="row mt16 o_settings_container" groups="bp_barber_management.group_bp_barber_manager">
+                    <h2>Barber Management</h2>
+                    <setting string="Enable Barber Mode" 
+                             help="Shows appointments pane and per-line barber assignment in POS">
+                        <field name="enable_barber_mode"/>
+                    </setting>
+                    <setting string="Auto-finish Appointment on Payment"
+                             help="Automatically marks linked appointment as done when order is paid"
+                             invisible="not enable_barber_mode">
+                        <field name="pos_autocomplete_appointment"/>
+                    </setting>
+                    <setting string="Appointments Scope"
+                             help="Controls which appointments are visible in POS"
+                             invisible="not enable_barber_mode">
+                        <field name="pos_appointments_scope"/>
+                    </setting>
+                    <setting string="Default Line Barber"
+                             help="Automatically assigns this barber to new order lines"
+                             invisible="not enable_barber_mode">
+                        <field name="pos_barber_default"/>
+                    </setting>
+                    <setting string="Enable Packages"
+                             help="Allow selling and redeeming packages/memberships in POS">
+                        <field name="enable_packages"/>
+                    </setting>
+                </div>
+            </xpath>
+        </field>
+    </record> -->
+</odoo>

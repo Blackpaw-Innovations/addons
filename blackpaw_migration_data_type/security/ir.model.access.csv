@@ -1,0 +1,5 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_migration_data_type_user,migration.data.type.user,model_migration_data_type,base.group_user,1,1,1,1
+access_migration_staff_tracking_user,Staff Tracking,model_migration_staff_tracking,base.group_user,1,1,1,1
+access_migration_inefficiency_user,Inefficiency,model_migration_inefficiency,base.group_user,1,1,1,1
+access_migration_data_format_user,Data Format,model_migration_data_format,base.group_user,1,1,1,1

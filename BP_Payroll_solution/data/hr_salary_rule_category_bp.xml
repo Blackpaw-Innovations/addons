@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo noupdate="1">
+    <record id="bp_cat_earn" model="hr.salary.rule.category">
+        <field name="name">Earnings</field>
+        <field name="code">EARN</field>
+        <field name="sequence">5</field>
+        <field name="debit_account_id" ref="account.data_account_type_expenses"/>
+    </record>
+    <record id="bp_cat_stat_ded" model="hr.salary.rule.category">
+        <field name="name">Statutory Deductions</field>
+        <field name="code">STAT_DED</field>
+        <field name="sequence">10</field>
+    </record>
+    <record id="bp_cat_tax_base" model="hr.salary.rule.category">
+        <field name="name">Tax Base</field>
+        <field name="code">TAX_BASE</field>
+        <field name="sequence">15</field>
+    </record>
+    <record id="bp_cat_paye_calc" model="hr.salary.rule.category">
+        <field name="name">PAYE (gross before relief)</field>
+        <field name="code">PAYE_CALC</field>
+        <field name="sequence">20</field>
+    </record>
+    <record id="bp_cat_reliefs" model="hr.salary.rule.category">
+        <field name="name">Reliefs and Net PAYE</field>
+        <field name="code">RELIEFS</field>
+        <field name="sequence">25</field>
+    </record>
+    <record id="bp_cat_tot_ded" model="hr.salary.rule.category">
+        <field name="name">Total Deductions</field>
+        <field name="code">TOT_DED</field>
+        <field name="sequence">30</field>
+    </record>
+    <record id="bp_cat_ded" model="hr.salary.rule.category">
+        <field name="name">Employee Deductions (Legacy)</field>
+        <field name="code">DED</field>
+        <field name="sequence">98</field>
+    </record>
+    <record id="bp_cat_emp" model="hr.salary.rule.category">
+        <field name="name">Employer Costs</field>
+        <field name="code">EMP</field>
+        <field name="sequence">100</field>
+    </record>
+    <record id="bp_cat_net" model="hr.salary.rule.category">
+        <field name="name">Net Pay</field>
+        <field name="code">NET</field>
+        <field name="sequence">99</field>
+    </record>
+</odoo>

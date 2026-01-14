@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Dashboard Action for Barber Management -->
+    <record id="action_barber_dashboard" model="ir.actions.act_window">
+        <field name="name">Barber Dashboard</field>
+        <field name="res_model">bp.barber.barber</field>
+        <field name="view_mode">kanban,tree,form</field>
+        <field name="target">current</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Welcome to Barber Management
+            </p>
+            <p>
+                Manage your barbershop operations, appointments, and staff from here.
+            </p>
+        </field>
+    </record>
+
+    <!-- Dashboard Menu Item -->
+    <menuitem 
+        id="menu_barber_dashboard"
+        name="Barber Dashboard"
+        action="action_barber_dashboard"
+        web_icon="bp_barber_management,static/description/dashboard_icon.png"
+        sequence="5"/>
+
+</odoo>

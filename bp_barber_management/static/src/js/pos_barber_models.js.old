@@ -1,0 +1,234 @@
+odoo.define('bp_barber_management.pos_barber_models', function (require) {
+    'use strict';
+
+    console.log('BP Barber: Loading pos_barber_models.js module...');
+
+    const { PosGlobalState, Order, Orderline } = require('point_of_sale.models');
+    const Registries = require('point_of_sale.Registries');
+
+    console.log('BP Barber: Models dependencies loaded successfully');
+
+    // Extend POS Global State to load barber data
+    const BpBarberPosGlobalState = (PosGlobalState) => class extends PosGlobalState {
+        async _loadPosData() {
+            await super._loadPosData();
+
+            // Load barbers if barber mode is enabled
+            if (this.config.enable_barber_mode) {
+                await this._loadBarbers();
+                await this._loadTodayAppointments();
+            }
+        }
+
+        // Override product loading to include our custom fields
+        async _loadProducts() {
+            console.log('BP Barber: Loading products with custom fields...');
+            await super._loadProducts();
+
+            // Load additional fields for all products
+            if (this.db.product_by_id) {
+                const productIds = Object.keys(this.db.product_by_id).map(id => parseInt(id));
+                console.log('BP Barber: Found', productIds.length, 'products to enhance');
+
+                if (productIds.length > 0) {
+                    try {
+                        const additionalProductData = await this.rpc({
+                            model: 'product.product',
+                            method: 'read',
+                            args: [productIds, ['requires_service_provider', 'service_provider_type']],
+                        });
+
+                        console.log('BP Barber: Additional product data loaded:', additionalProductData);
+
+                        // Merge the additional data into existing products
+                        let enhancedCount = 0;
+                        for (const productData of additionalProductData) {
+                            const product = this.db.product_by_id[productData.id];
+                            if (product) {
+                                product.requires_service_provider = productData.requires_service_provider;
+                                product.service_provider_type = productData.service_provider_type;
+                                enhancedCount++;
+
+                                // Log products that require service providers
+                                if (productData.requires_service_provider) {
+                                    console.log('BP Barber: Product requires service provider:', {
+                                        name: product.display_name,
+                                        id: product.id,
+                                        service_provider_type: productData.service_provider_type
+                                    });
+                                }
+                            }
+                        }
+                        console.log('BP Barber: Enhanced', enhancedCount, 'products with service provider data');
+                    } catch (error) {
+                        console.error('BP Barber: Error loading additional product data:', error);
+                    }
+                }
+            }
+        }
+
+        async _loadBarbers() {
+            const barbers = await this.rpc({
+                model: 'bp.barber.barber',
+                method: 'search_read',
+                args: [[['active', '=', true], ['company_id', '=', this.config.company_id[0]]]],
+                fields: ['name', 'barber_code', 'color', 'active'],
+            });
+
+            this.db.barbers = barbers;
+            this.barbers = barbers;
+        }
+
+        async _loadTodayAppointments() {
+            try {
+                const appointments = await this.rpc({
+                    model: 'pos.config',
+                    method: 'get_today_appointments',
+                    args: [this.config.id],
+                });
+
+                this.db.today_appointments = appointments;
+                this.today_appointments = appointments;
+            } catch (error) {
+                console.error('Failed to load today appointments:', error);
+                this.db.today_appointments = [];
+                this.today_appointments = [];
+            }
+        }
+
+        async refreshTodayAppointments() {
+            if (this.config.enable_barber_mode) {
+                await this._loadTodayAppointments();
+                // Trigger UI update
+                this.trigger('refresh-appointments');
+            }
+        }
+
+        getBarberById(barberId) {
+            return this.barbers.find(b => b.id === barberId);
+        }
+
+        getTodayAppointments() {
+            return this.today_appointments || [];
+        }
+    };
+
+    Registries.Model.extend(PosGlobalState, BpBarberPosGlobalState);
+
+    // Extend Order to handle appointment linking
+    const BpBarberOrder = (Order) => class extends Order {
+        constructor(obj, options) {
+            super(...arguments);
+            this.appointment_id = obj.appointment_id || null;
+        }
+
+        init_from_JSON(json) {
+            super.init_from_JSON(json);
+            this.appointment_id = json.appointment_id || null;
+        }
+
+        export_as_JSON() {
+            const json = super.export_as_JSON();
+            json.appointment_id = this.appointment_id;
+            return json;
+        }
+
+        loadAppointment(appointment) {
+            if (!appointment) return false;
+
+            // Set appointment ID
+            this.appointment_id = appointment.id;
+
+            let linesAdded = 0;
+
+            // Add products from appointment services
+            if (appointment.service_product_ids && appointment.service_product_ids.length > 0) {
+                for (const productId of appointment.service_product_ids) {
+                    const product = this.pos.db.get_product_by_id(productId);
+                    if (product) {
+                        const line = this.add_product(product, {
+                            quantity: 1,
+                            merge: false
+                        });
+
+                        // Set barber on the line
+                        if (line && appointment.barber_id) {
+                            line.set_barber_id(appointment.barber_id);
+                        }
+
+                        linesAdded++;
+                    }
+                }
+            }
+
+            // Set order note for traceability
+            const note = `Loaded from appointment: ${appointment.name}`;
+            if (this.get_note()) {
+                this.set_note(this.get_note() + '\n' + note);
+            } else {
+                this.set_note(note);
+            }
+
+            return linesAdded;
+        }
+
+        getAppointmentId() {
+            return this.appointment_id;
+        }
+
+        setAppointmentId(appointmentId) {
+            this.appointment_id = appointmentId;
+        }
+    };
+
+    Registries.Model.extend(Order, BpBarberOrder);
+
+    // Extend Orderline to handle barber assignment
+    const BpBarberOrderline = (Orderline) => class extends Orderline {
+        constructor(obj, options) {
+            super(...arguments);
+            this.barber_id = obj.barber_id || null;
+        }
+
+        init_from_JSON(json) {
+            super.init_from_JSON(json);
+            this.barber_id = json.barber_id || null;
+        }
+
+        export_as_JSON() {
+            const json = super.export_as_JSON();
+            json.barber_id = this.barber_id;
+            return json;
+        }
+
+        set_barber_id(barberId) {
+            this.barber_id = barberId;
+            this.trigger('change', this);
+        }
+
+        get_barber_id() {
+            return this.barber_id;
+        }
+
+        get_barber() {
+            if (!this.barber_id) return null;
+            return this.pos.getBarberById(this.barber_id);
+        }
+
+        get_barber_name() {
+            const barber = this.get_barber();
+            return barber ? barber.name : '';
+        }
+
+        get_barber_color() {
+            const barber = this.get_barber();
+            return barber ? barber.color : 0;
+        }
+    };
+
+    console.log('BP Barber: Registering Orderline extension...');
+    Registries.Model.extend(Orderline, BpBarberOrderline);
+    console.log('BP Barber: All models registered successfully');
+
+    console.log('BP Barber: pos_barber_models.js module loaded completely');
+});

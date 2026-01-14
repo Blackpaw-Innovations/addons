@@ -1,0 +1,214 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Appointment Confirmed Page -->
+    <template id="appt_confirmed_page" name="Appointment Confirmed">
+        <t t-call="website.layout">
+            <div id="wrap" class="oe_structure oe_empty">
+                <div class="container mt-5">
+                    <div class="row justify-content-center">
+                        <div class="col-lg-8">
+                            <div class="card border-success">
+                                <div class="card-header bg-success text-white text-center">
+                                    <h2><i class="fa fa-check-circle"></i> Appointment Confirmed</h2>
+                                </div>
+                                <div class="card-body text-center">
+                                    <div class="company-info mb-4">
+                                        <img t-if="company.logo" 
+                                             t-att-src="'/web/image/res.company/%s/logo' % company.id"
+                                             alt="Company Logo" 
+                                             class="img-fluid mb-3" 
+                                             style="max-height: 80px;"/>
+                                        <h3 t-esc="company.name"></h3>
+                                    </div>
+                                    
+                                    <div class="alert alert-success">
+                                        <h4>✓ Your appointment has been confirmed!</h4>
+                                        <p class="mb-0">Thank you for confirming your appointment. We look forward to seeing you.</p>
+                                    </div>
+                                    
+                                    <div class="appointment-details bg-light p-4 rounded mb-4">
+                                        <h5>Appointment Details</h5>
+                                        <table class="table table-borderless">
+                                            <tr>
+                                                <td class="text-start"><strong>Appointment:</strong></td>
+                                                <td class="text-end" t-esc="appointment.name"></td>
+                                            </tr>
+                                            <tr>
+                                                <td class="text-start"><strong>Date &amp; Time:</strong></td>
+                                                <td class="text-end">
+                                                    <span t-field="appointment.start_datetime" 
+                                                          t-options="{'widget': 'datetime', 'format': 'EEEE, MMMM d, y \'at\' h:mm a'}"/>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td class="text-start"><strong>Barber:</strong></td>
+                                                <td class="text-end" t-esc="appointment.barber_id.name"></td>
+                                            </tr>
+                                            <tr>
+                                                <td class="text-start"><strong>Services:</strong></td>
+                                                <td class="text-end">
+                                                    <span t-esc="', '.join(appointment.service_ids.mapped('name'))"/>
+                                                </td>
+                                            </tr>
+                                            <tr t-if="appointment.duration_minutes">
+                                                <td class="text-start"><strong>Duration:</strong></td>
+                                                <td class="text-end">
+                                                    <span t-esc="appointment.duration_minutes"/> minutes
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </div>
+                                    
+                                    <div class="important-note alert alert-info">
+                                        <strong>Please arrive 5 minutes before your scheduled time.</strong><br/>
+                                        This helps ensure we can start your appointment promptly.
+                                    </div>
+                                    
+                                    <div class="action-buttons mt-4">
+                                        <a href="/barber/booking" class="btn btn-primary btn-lg">
+                                            <i class="fa fa-calendar"></i> Book Another Appointment
+                                        </a>
+                                        <br/><br/>
+                                        <small class="text-muted">
+                                            Need to make changes? Please contact us directly.
+                                        </small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </t>
+    </template>
+
+    <!-- Appointment Cancelled Page -->
+    <template id="appt_cancelled_page" name="Appointment Cancelled">
+        <t t-call="website.layout">
+            <div id="wrap" class="oe_structure oe_empty">
+                <div class="container mt-5">
+                    <div class="row justify-content-center">
+                        <div class="col-lg-8">
+                            <div class="card border-warning">
+                                <div class="card-header bg-warning text-dark text-center">
+                                    <h2><i class="fa fa-times-circle"></i> Appointment Cancelled</h2>
+                                </div>
+                                <div class="card-body text-center">
+                                    <div class="company-info mb-4">
+                                        <img t-if="company.logo" 
+                                             t-att-src="'/web/image/res.company/%s/logo' % company.id"
+                                             alt="Company Logo" 
+                                             class="img-fluid mb-3" 
+                                             style="max-height: 80px;"/>
+                                        <h3 t-esc="company.name"></h3>
+                                    </div>
+                                    
+                                    <div class="alert alert-warning">
+                                        <h4>Your appointment has been cancelled</h4>
+                                        <p class="mb-0">We've received your cancellation request and have updated our schedule.</p>
+                                    </div>
+                                    
+                                    <div class="appointment-details bg-light p-4 rounded mb-4">
+                                        <h5>Cancelled Appointment</h5>
+                                        <table class="table table-borderless">
+                                            <tr>
+                                                <td class="text-start"><strong>Appointment:</strong></td>
+                                                <td class="text-end" t-esc="appointment.name"></td>
+                                            </tr>
+                                            <tr>
+                                                <td class="text-start"><strong>Was Scheduled:</strong></td>
+                                                <td class="text-end">
+                                                    <span t-field="appointment.start_datetime" 
+                                                          t-options="{'widget': 'datetime', 'format': 'EEEE, MMMM d, y \'at\' h:mm a'}"/>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td class="text-start"><strong>Barber:</strong></td>
+                                                <td class="text-end" t-esc="appointment.barber_id.name"></td>
+                                            </tr>
+                                            <tr>
+                                                <td class="text-start"><strong>Services:</strong></td>
+                                                <td class="text-end">
+                                                    <span t-esc="', '.join(appointment.service_ids.mapped('name'))"/>
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </div>
+                                    
+                                    <div class="sorry-note alert alert-light">
+                                        <p class="mb-0">
+                                            We're sorry to see this appointment cancelled. 
+                                            If you'd like to book again, we'd be happy to help you find another time.
+                                        </p>
+                                    </div>
+                                    
+                                    <div class="action-buttons mt-4">
+                                        <a href="/barber/booking" class="btn btn-success btn-lg">
+                                            <i class="fa fa-calendar-plus-o"></i> Book New Appointment
+                                        </a>
+                                        <br/><br/>
+                                        <small class="text-muted">
+                                            Questions? Please contact us directly and we'll be happy to help.
+                                        </small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </t>
+    </template>
+
+    <!-- Error Page Template -->
+    <template id="appt_error_page" name="Appointment Error">
+        <t t-call="website.layout">
+            <div id="wrap" class="oe_structure oe_empty">
+                <div class="container mt-5">
+                    <div class="row justify-content-center">
+                        <div class="col-lg-8">
+                            <div class="card border-danger">
+                                <div class="card-header bg-danger text-white text-center">
+                                    <h2><i class="fa fa-exclamation-triangle"></i> <span t-esc="error_title or 'Error'"/></h2>
+                                </div>
+                                <div class="card-body text-center">
+                                    <div class="alert alert-danger">
+                                        <p t-esc="error_message or 'An error occurred while processing your request.'"></p>
+                                    </div>
+                                    
+                                    <div t-if="appointment" class="appointment-details bg-light p-4 rounded mb-4">
+                                        <h5>Appointment Reference</h5>
+                                        <table class="table table-borderless">
+                                            <tr>
+                                                <td class="text-start"><strong>Appointment:</strong></td>
+                                                <td class="text-end" t-esc="appointment.name"></td>
+                                            </tr>
+                                            <tr>
+                                                <td class="text-start"><strong>Current Status:</strong></td>
+                                                <td class="text-end">
+                                                    <span class="badge" 
+                                                          t-attf-class="badge-#{appointment.state == 'confirmed' and 'success' or appointment.state == 'cancelled' and 'secondary' or appointment.state == 'done' and 'primary' or 'warning'}"
+                                                          t-esc="appointment.state.title()"/>
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </div>
+                                    
+                                    <div class="action-buttons mt-4">
+                                        <a href="/barber/booking" class="btn btn-primary">
+                                            <i class="fa fa-calendar"></i> Book New Appointment
+                                        </a>
+                                        <br/><br/>
+                                        <small class="text-muted">
+                                            If you continue to have problems, please contact us directly for assistance.
+                                        </small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </t>
+    </template>
+</odoo>

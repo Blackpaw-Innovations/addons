@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Product Category for Invoice Payments -->
+    <record id="product_category_invoice_payment" model="product.category">
+        <field name="name">Invoice Payment</field>
+        <field name="parent_id" ref="product.product_category_all"/>
+    </record>
+
+    <!-- Product for Invoice Payments -->
+    <record id="product_invoice_payment" model="product.product">
+        <field name="name">Invoice Payment</field>
+        <field name="type">service</field>
+        <field name="categ_id" ref="product_category_invoice_payment"/>
+        <field name="list_price">0.0</field>
+        <field name="standard_price">0.0</field>
+        <field name="default_code">INVOICE_PAYMENT</field>
+        <field name="available_in_pos">True</field>
+        <field name="sale_ok">False</field>
+        <field name="purchase_ok">False</field>
+        <field name="invoice_policy">order</field>
+        <field name="taxes_id" eval="[(5, 0, 0)]"/>
+        <field name="supplier_taxes_id" eval="[(5, 0, 0)]"/>
+    </record>
+</odoo>

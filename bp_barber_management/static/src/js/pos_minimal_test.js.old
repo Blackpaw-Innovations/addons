@@ -1,0 +1,39 @@
+// Minimal POS test for barber functionality
+console.log('BP Barber: MINIMAL TEST LOADED');
+
+// Wait for POS to be ready and test
+if (typeof odoo !== 'undefined') {
+    odoo.define('bp_barber_management.minimal_test', function (require) {
+        'use strict';
+
+        console.log('BP Barber: Minimal test module starting...');
+
+        // Try to access POS components
+        try {
+            const ProductScreen = require('point_of_sale.ProductScreen');
+            console.log('BP Barber: ProductScreen loaded successfully');
+
+            const Registries = require('point_of_sale.Registries');
+            console.log('BP Barber: Registries loaded successfully');
+
+            // Basic test extension
+            const TestProductScreen = (ProductScreen) => class extends ProductScreen {
+                async _clickProduct(event) {
+                    console.log('BP Barber: PRODUCT CLICKED!', event.detail);
+                    return super._clickProduct(event);
+                }
+            };
+
+            console.log('BP Barber: Attempting to extend ProductScreen...');
+            Registries.Component.extend(ProductScreen, TestProductScreen);
+            console.log('BP Barber: ProductScreen extended successfully!');
+
+        } catch (error) {
+            console.error('BP Barber: Error in minimal test:', error);
+        }
+
+        return {};
+    });
+} else {
+    console.error('BP Barber: Odoo not available');
+}

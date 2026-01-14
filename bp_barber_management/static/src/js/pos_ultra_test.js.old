@@ -1,0 +1,19 @@
+// Ultra minimal test for POS
+console.log('BARBER TEST: File loaded successfully');
+
+// Wait for POS to load
+setTimeout(function () {
+    console.log('BARBER TEST: Delayed log - 2 seconds');
+}, 2000);
+
+// Test if odoo is available
+console.log('BARBER TEST: Odoo available?', typeof odoo !== 'undefined');
+
+// Try to hook into any POS events
+if (typeof odoo !== 'undefined') {
+    odoo.define('bp_barber_management.ultra_test', function (require) {
+        'use strict';
+        console.log('BARBER TEST: Ultra test module started');
+        return {};
+    });
+}

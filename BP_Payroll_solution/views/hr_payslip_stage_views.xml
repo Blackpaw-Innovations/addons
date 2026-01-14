@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="hr_payslip_stage_view_tree" model="ir.ui.view">
+        <field name="name">hr.payslip.stage.tree</field>
+        <field name="model">hr.payslip.stage</field>
+        <field name="arch" type="xml">
+            <tree string="Payslip Stages" editable="bottom">
+                <field name="sequence" widget="handle"/>
+                <field name="name"/>
+                <field name="state"/>
+                <field name="responsible_user_ids" widget="many2many_tags"/>
+                <field name="company_id" groups="base.group_multi_company"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="hr_payslip_stage_view_form" model="ir.ui.view">
+        <field name="name">hr.payslip.stage.form</field>
+        <field name="model">hr.payslip.stage</field>
+        <field name="arch" type="xml">
+            <form string="Payslip Stage">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="name"/>
+                            <field name="state"/>
+                            <field name="sequence"/>
+                        </group>
+                        <group>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                            <field name="responsible_user_ids" widget="many2many_tags"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_hr_payslip_stage" model="ir.actions.act_window">
+        <field name="name">Payslip Stages</field>
+        <field name="res_model">hr.payslip.stage</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create a new payslip stage
+            </p>
+            <p>
+                Define the steps of your payroll workflow and assign responsible users for approval.
+            </p>
+        </field>
+    </record>
+
+    <menuitem
+        id="menu_hr_payslip_stage"
+        name="Payslip Stages"
+        parent="menu_bp_payroll_stages"
+        action="action_hr_payslip_stage"
+        sequence="1"
+    />
+</odoo>

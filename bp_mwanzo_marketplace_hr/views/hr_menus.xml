@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <menuitem
+        id="menu_mwanzo_marketplace_hr"
+        name="HR &amp; Performance"
+        parent="bp_mwanzo_marketplace.menu_mwanzo_marketplace_root"
+        sequence="50"
+        groups="bp_mwanzo_marketplace.group_mwanzo_manager"
+    />
+
+    <menuitem
+        id="menu_mwanzo_staff_commission_policy"
+        name="Staff Commission Policies"
+        parent="bp_mwanzo_marketplace_hr.menu_mwanzo_marketplace_hr"
+        action="bp_mwanzo_marketplace.action_mwanzo_staff_commission_policy"
+        sequence="10"
+        groups="bp_mwanzo_marketplace.group_mwanzo_manager"
+    />
+    <menuitem
+        id="menu_mwanzo_staff_commission_ledger"
+        name="Staff Commission Ledger"
+        parent="bp_mwanzo_marketplace_hr.menu_mwanzo_marketplace_hr"
+        action="bp_mwanzo_marketplace.action_mwanzo_staff_commission_ledger"
+        sequence="20"
+        groups="bp_mwanzo_marketplace.group_mwanzo_manager"
+    />
+</odoo>

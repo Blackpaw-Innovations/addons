@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Extend Settings Form -->
+    <record id="view_res_config_settings_bp_barber_kiosk" model="ir.ui.view">
+        <field name="name">res.config.settings.bp.barber.kiosk</field>
+        <field name="model">res.config.settings</field>
+        <field name="inherit_id" ref="base.res_config_settings_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//div[@class='settings']" position="inside">
+                <div class="app_settings_block" data-string="Barber Kiosk" string="Barber Kiosk" data-key="bp_barber_kiosk">
+                    <h2>Kiosk Display Settings</h2>
+                    <div class="row mt16 o_settings_container">
+                        <div class="col-12 col-lg-6 o_setting_box">
+                            <div class="o_setting_left_pane">
+                                <field name="bp_barber_kiosk_public_enabled" widget="boolean_toggle"/>
+                            </div>
+                            <div class="o_setting_right_pane">
+                                <label for="bp_barber_kiosk_public_enabled" string="Enable Public Kiosk"/>
+                                <div class="text-muted">
+                                    Allow public access to the barber kiosk screen for displaying current and upcoming appointments
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-12 col-lg-6 o_setting_box" attrs="{'invisible': [('bp_barber_kiosk_public_enabled', '=', False)]}">
+                            <div class="o_setting_left_pane">
+                            </div>
+                            <div class="o_setting_right_pane">
+                                <label for="bp_barber_kiosk_token" string="Access Token"/>
+                                <field name="bp_barber_kiosk_token" placeholder="Optional security token"/>
+                                <div class="text-muted">
+                                    If set, the token must be included in the kiosk URL (?token=your_token)
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-12 col-lg-6 o_setting_box" attrs="{'invisible': [('bp_barber_kiosk_public_enabled', '=', False)]}">
+                            <div class="o_setting_left_pane">
+                            </div>
+                            <div class="o_setting_right_pane">
+                                <label for="bp_barber_kiosk_refresh_seconds" string="Refresh Interval"/>
+                                <div class="d-flex">
+                                    <field name="bp_barber_kiosk_refresh_seconds" class="o_input_9"/>
+                                    <span class="ms-2">seconds</span>
+                                </div>
+                                <div class="text-muted">
+                                    How often the kiosk screen refreshes automatically (5-120 seconds)
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Kiosk URL Display -->
+                        <div class="col-12 o_setting_box" attrs="{'invisible': [('bp_barber_kiosk_public_enabled', '=', False)]}">
+                            <div class="alert alert-info">
+                                <h4><i class="fa fa-tv"></i> Kiosk Access</h4>
+                                <p>Access the kiosk screen at:</p>
+                                <code>/barber/kiosk<span attrs="{'invisible': [('bp_barber_kiosk_token', '=', False)]}">?token=YOUR_TOKEN</span></code>
+                                <p class="mt-2">
+                                    <small>
+                                        This URL displays a public, read-only view of current and upcoming appointments.
+                                        Perfect for TV displays in your waiting area.
+                                    </small>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </xpath>
+        </field>
+    </record>
+</odoo>

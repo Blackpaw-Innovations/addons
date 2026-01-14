@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<odoo>
+    <record id="res_config_settings_pre_print_form" model="ir.ui.view">
+        <field name="name">Pre Print Settings</field>
+        <field name="model">res.config.settings</field>
+        <field name="inherit_id" ref="point_of_sale.res_config_settings_view_form"/>
+        <field name="arch" type="xml">
+            <block id="restaurant_section" position="inside">
+                <h6>Post Pre Print Module</h6>
+                <setting string="Early Receipt Printing" help="Allow to print receipt before payment" id="iface_printbill2">
+                    <field name="pos_iface_printbill"/>
+                </setting>
+            </block>
+        </field>
+    </record>
+</odoo>

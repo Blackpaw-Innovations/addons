@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+    <!-- Demo Appointments -->
+    <record id="bp_appointment_confirmed" model="bp.barber.appointment">
+        <field name="partner_id" ref="base.partner_root"/>
+        <field name="phone">+1-555-0199</field>
+        <field name="email">admin@yourcompany.example.com</field>
+        <field name="barber_id" ref="bp_barber_mary"/>
+        <field name="chair_id" ref="bp_chair_2"/>
+        <field name="service_ids" eval="[(6, 0, [ref('bp_barber_management.bp_service_cut')])]"/>
+        <field name="start_datetime">2025-01-10 10:00:00</field>
+        <field name="state">confirmed</field>
+        <field name="discount_percent">0.0</field>
+        <field name="note">&lt;p&gt;Regular customer appointment&lt;/p&gt;</field>
+    </record>
+
+    <record id="bp_appointment_draft" model="bp.barber.appointment">
+        <field name="phone">+1-555-0299</field>
+        <field name="email">customer@example.com</field>
+        <field name="barber_id" ref="bp_barber_john"/>
+        <field name="chair_id" ref="bp_chair_1"/>
+        <field name="service_ids" eval="[(6, 0, [ref('bp_barber_management.bp_service_shave')])]"/>
+        <field name="start_datetime">2025-01-10 14:00:00</field>
+        <field name="state">draft</field>
+        <field name="discount_percent">0.0</field>
+        <field name="note">&lt;p&gt;Draft appointment for shave service&lt;/p&gt;</field>
+    </record>
+
+    <record id="bp_appointment_in_service" model="bp.barber.appointment">
+        <field name="phone">+1-555-0399</field>
+        <field name="email">service@example.com</field>
+        <field name="barber_id" ref="bp_barber_john"/>
+        <field name="chair_id" ref="bp_chair_1"/>
+        <field name="service_ids" eval="[(6, 0, [ref('bp_barber_management.bp_service_cut_shave')])]"/>
+        <field name="start_datetime">2025-01-10 11:00:00</field>
+        <field name="state">in_service</field>
+        <field name="discount_percent">0.0</field>
+        <field name="note">&lt;p&gt;Currently in progress - Cut + Shave combo&lt;/p&gt;</field>
+    </record>
+</odoo>

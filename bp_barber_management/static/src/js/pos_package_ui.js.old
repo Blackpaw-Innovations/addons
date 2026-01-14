@@ -1,0 +1,234 @@
+/** @odoo-module **/
+
+import { Component, useState } from "@odoo/owl";
+import { useService } from "@web/core/utils/hooks";
+import { Dialog } from "@web/core/dialog/dialog";
+import { _t } from "@web/core/l10n/translation";
+
+export class PackageDialog extends Component {
+    static template = "bp_barber_management.PackageDialog";
+    static components = { Dialog };
+
+    setup() {
+        this.pos = this.props.pos;
+        this.order = this.props.order;
+        this.wallets = this.pos.customerWallets || [];
+        this.state = useState({
+            selectedWallets: {},
+            appliedRedemptions: [],
+        });
+    }
+
+    get partner() {
+        return this.order.get_partner();
+    }
+
+    get hasWallets() {
+        return this.wallets && this.wallets.length > 0;
+    }
+
+    getServiceName(serviceId) {
+        // Find service name from package lines or services
+        for (const line of this.pos.package_lines) {
+            if (line.service_id && line.service_id[0] === serviceId) {
+                return line.service_id[1];
+            }
+        }
+        return 'Unknown Service';
+    }
+
+    formatCurrency(amount) {
+        return this.env.utils.formatCurrency(amount);
+    }
+
+    isWalletExpired(wallet) {
+        if (!wallet.expiry_date) return false;
+        const today = new Date();
+        const expiryDate = new Date(wallet.expiry_date);
+        return expiryDate < today;
+    }
+
+    canApplyServiceUnits(wallet, serviceId) {
+        if (wallet.package_type !== 'qty' && wallet.package_type !== 'bundle') {
+            return false;
+        }
+        return wallet.service_balances &&
+            wallet.service_balances[serviceId] &&
+            wallet.service_balances[serviceId].units > 0;
+    }
+
+    canApplyValue(wallet) {
+        return wallet.package_type === 'value' && wallet.balance_amount > 0;
+    }
+
+    applyServiceUnits(walletId, serviceId) {
+        const wallet = this.wallets.find(w => w.id === walletId);
+        if (!wallet || !this.canApplyServiceUnits(wallet, serviceId)) {
+            return;
+        }
+
+        // Find matching order lines for this service
+        const orderLines = this.order.get_orderlines().filter(line => {
+            // Check if line product corresponds to the service
+            const service = this.pos.services?.find(s =>
+                s.product_id && s.product_id[0] === line.product.id
+            );
+            return service && service.id === serviceId;
+        });
+
+        if (orderLines.length === 0) {
+            this.showPopup('ErrorPopup', {
+                title: _t('No Matching Service'),
+                body: _t('No order lines found for this service.'),
+            });
+            return;
+        }
+
+        // Apply to the first available line
+        const line = orderLines[0];
+        const availableUnits = wallet.service_balances[serviceId].units;
+        const unitsToApply = Math.min(1, availableUnits, line.quantity);
+
+        if (unitsToApply > 0) {
+            // Store redemption info
+            const redemption = {
+                wallet_id: walletId,
+                service_id: serviceId,
+                qty: unitsToApply,
+                line_uid: line.uid,
+                wallet_name: wallet.name,
+                service_name: wallet.service_balances[serviceId].service_name
+            };
+
+            this.state.appliedRedemptions.push(redemption);
+
+            // Update wallet balance locally
+            wallet.service_balances[serviceId].units -= unitsToApply;
+
+            // Mark line as having package coverage
+            line.set_package_coverage(unitsToApply, wallet.name);
+        }
+    }
+
+    applyValue(walletId, amount) {
+        const wallet = this.wallets.find(w => w.id === walletId);
+        if (!wallet || !this.canApplyValue(wallet)) {
+            return;
+        }
+
+        const maxAmount = Math.min(amount, wallet.balance_amount, this.order.get_total_with_tax());
+
+        if (maxAmount > 0) {
+            const redemption = {
+                wallet_id: walletId,
+                amount: maxAmount,
+                wallet_name: wallet.name
+            };
+
+            this.state.appliedRedemptions.push(redemption);
+
+            // Update wallet balance locally
+            wallet.balance_amount -= maxAmount;
+
+            // Apply as order-level discount
+            this.order.add_package_value_redemption(maxAmount, wallet.name);
+        }
+    }
+
+    removeRedemption(index) {
+        const redemption = this.state.appliedRedemptions[index];
+
+        // Restore wallet balance
+        const wallet = this.wallets.find(w => w.id === redemption.wallet_id);
+        if (wallet) {
+            if (redemption.service_id && wallet.service_balances[redemption.service_id]) {
+                wallet.service_balances[redemption.service_id].units += redemption.qty;
+            } else if (redemption.amount) {
+                wallet.balance_amount += redemption.amount;
+            }
+        }
+
+        // Remove line coverage or order discount
+        if (redemption.line_uid) {
+            const line = this.order.get_orderlines().find(l => l.uid === redemption.line_uid);
+            if (line) {
+                line.clear_package_coverage();
+            }
+        } else if (redemption.amount) {
+            this.order.remove_package_value_redemption(redemption.amount);
+        }
+
+        this.state.appliedRedemptions.splice(index, 1);
+    }
+
+    confirm() {
+        // Store redemptions data in order for backend processing
+        if (this.state.appliedRedemptions.length > 0) {
+            this.order.set_package_redemptions(this.state.appliedRedemptions);
+        }
+
+        this.props.close();
+    }
+
+    cancel() {
+        // Restore all changes
+        this.state.appliedRedemptions.forEach((redemption, index) => {
+            this.removeRedemption(index);
+        });
+
+        this.props.close();
+    }
+}
+
+// Extend ProductScreen to add Packages button
+import { ProductScreen } from "@point_of_sale/app/screens/product_screen/product_screen";
+import { useService } from "@web/core/utils/hooks";
+
+patch(ProductScreen.prototype, {
+    setup() {
+        super.setup();
+        this.dialog = useService("dialog");
+    },
+
+    get showPackagesButton() {
+        return this.pos.config.enable_packages && this.currentOrder.get_partner();
+    },
+
+    async openPackageDialog() {
+        const partner = this.currentOrder.get_partner();
+        if (!partner) {
+            this.popup.add('ErrorPopup', {
+                title: _t('No Customer Selected'),
+                body: _t('Please select a customer to use packages.'),
+            });
+            return;
+        }
+
+        // Load customer wallets if not already loaded
+        await this.pos.loadCustomerWallets(partner.id);
+
+        this.dialog.add(PackageDialog, {
+            pos: this.pos,
+            order: this.currentOrder,
+        });
+    }
+});
+
+// Add Packages button template extension
+import { patch } from "@web/core/utils/patch";
+
+const ProductScreenTemplate = `
+    <t t-inherit="point_of_sale.ProductScreen" t-inherit-mode="extension" owl="1">
+        <xpath expr="//div[hasclass('pads')]" position="before">
+            <div t-if="showPackagesButton" class="control-buttons">
+                <button class="btn btn-secondary packages-button" t-on-click="openPackageDialog">
+                    <i class="fa fa-gift"/> Packages
+                </button>
+            </div>
+        </xpath>
+    </t>
+`;
+
+// Register template
+import { registry } from "@web/core/registry";
+registry.category("templates").add("bp_barber_management.ProductScreenExtension", ProductScreenTemplate);

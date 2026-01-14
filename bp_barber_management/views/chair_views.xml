@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Chair Tree View -->
+    <record id="view_bp_chair_tree" model="ir.ui.view">
+        <field name="name">bp.barber.chair.tree</field>
+        <field name="model">bp.barber.chair</field>
+        <field name="arch" type="xml">
+            <tree string="Chairs">
+                <field name="name"/>
+                <field name="code"/>
+                <field name="is_available"/>
+                <field name="active"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Chair Form View -->
+    <record id="view_bp_chair_form" model="ir.ui.view">
+        <field name="name">bp.barber.chair.form</field>
+        <field name="model">bp.barber.chair</field>
+        <field name="arch" type="xml">
+            <form string="Chair">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="name"/>
+                            <field name="code"/>
+                        </group>
+                        <group>
+                            <field name="is_available"/>
+                            <field name="active"/>
+                            <field name="company_id" readonly="1" groups="base.group_multi_company"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Notes" name="notes">
+                            <field name="note"/>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Chair Search View -->
+    <record id="view_bp_chair_search" model="ir.ui.view">
+        <field name="name">bp.barber.chair.search</field>
+        <field name="model">bp.barber.chair</field>
+        <field name="arch" type="xml">
+            <search string="Search Chairs">
+                <field name="name" string="Name or Code" filter_domain="['|', ('name', 'ilike', self), ('code', 'ilike', self)]"/>
+                <separator/>
+                <filter string="Available" name="available" domain="[('is_available', '=', True)]"/>
+                <filter string="Active" name="active" domain="[('active', '=', True)]"/>
+                <filter string="Archived" name="inactive" domain="[('active', '=', False)]"/>
+                <separator/>
+                <group expand="0" string="Group By">
+                    <filter string="Availability" name="group_availability" context="{'group_by': 'is_available'}"/>
+                    <filter string="Company" name="group_company" context="{'group_by': 'company_id'}" groups="base.group_multi_company"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Chair Kanban View -->
+    <record id="view_bp_chair_kanban" model="ir.ui.view">
+        <field name="name">bp.barber.chair.kanban</field>
+        <field name="model">bp.barber.chair</field>
+        <field name="arch" type="xml">
+            <kanban default_group_by="is_available" class="o_kanban_small_column bp-kanban">
+                <field name="id"/>
+                <field name="name"/>
+                <field name="code"/>
+                <field name="is_available"/>
+                <field name="active"/>
+                <templates>
+                    <t t-name="kanban-box">
+                        <div class="bp-kanban-card oe_kanban_global_click">
+                            <!-- Card Header -->
+                            <div class="bp-card-header">
+                                <div class="bp-header-content">
+                                    <div class="bp-title-section">
+                                        <div class="bp-heading">
+                                            <field name="name"/>
+                                        </div>
+                                        <div class="bp-subtitle">
+                                            [<field name="code"/>]
+                                        </div>
+                                    </div>
+                                    <div class="bp-actions-section">
+                                        <div class="o_dropdown_kanban dropdown">
+                                            <a class="dropdown-toggle o-no-caret btn" role="button" data-bs-toggle="dropdown" href="#" aria-label="Dropdown menu">
+                                                <span class="fa fa-ellipsis-v"/>
+                                            </a>
+                                            <div class="dropdown-menu" role="menu">
+                                                <t t-if="widget.editable"><a role="menuitem" type="edit" class="dropdown-item">Edit</a></t>
+                                                <t t-if="widget.deletable"><a role="menuitem" type="delete" class="dropdown-item">Delete</a></t>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Card Body -->
+                            <div class="bp-card-body">
+                                <!-- Availability Status -->
+                                <div class="bp-info-row">
+                                    <i class="fa fa-circle bp-icon" t-att-class="record.is_available.raw_value ? 'success' : 'danger'" title="Availability Status"/>
+                                    <div class="bp-content bp-body">
+                                        <t t-if="record.is_available.raw_value">Available for Service</t>
+                                        <t t-else="">Out of Service</t>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Card Footer -->
+                            <div class="bp-card-footer">
+                                <div class="bp-footer-content">
+                                    <div class="bp-footer-left">
+                                        <div class="d-flex align-items-center">
+                                            <i class="fa fa-cube bp-icon" title="Chair Station"/>
+                                            <span class="bp-caption">Station</span>
+                                        </div>
+                                    </div>
+                                    <div class="bp-footer-right">
+                                        <div class="bp-status-badge" t-att-class="record.active.raw_value ? 'active' : 'inactive'">
+                                            <t t-if="record.active.raw_value">Active</t>
+                                            <t t-else="">Inactive</t>
+                                        </div>
+                                        <div class="bp-status-badge" t-att-class="record.is_available.raw_value ? 'confirmed' : 'cancelled'" style="margin-left: 8px;">
+                                            <t t-if="record.is_available.raw_value">Available</t>
+                                            <t t-else="">Out of Service</t>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <!-- Chair Action -->
+    <record id="action_bp_barber_chairs" model="ir.actions.act_window">
+        <field name="name">Chairs</field>
+        <field name="res_model">bp.barber.chair</field>
+        <field name="view_mode">kanban,tree,form</field>
+        <field name="search_view_id" ref="view_bp_chair_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create your first chair
+            </p>
+            <p>
+                Set up barber chairs to organize your workspace and assign barbers to specific stations.
+            </p>
+        </field>
+    </record>
+
+
+</odoo>

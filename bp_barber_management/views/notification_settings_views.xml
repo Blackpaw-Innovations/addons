@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <!-- Notification Settings Form View -->
+        <record id="bp_barber_notification_settings_form" model="ir.ui.view">
+            <field name="name">res.config.settings.notification.form</field>
+            <field name="model">res.config.settings</field>
+            <field name="priority">100</field>
+            <field name="inherit_id" ref="base.res_config_settings_view_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//form" position="inside">
+                    <div class="app_settings_block" data-string="Barber Notifications" string="Barber Notifications" data-key="bp_barber_notifications">
+                        <h2>Email Notifications</h2>
+                        
+                        <div class="row mt16 o_settings_container">
+                            <!-- Appointment Confirmation -->
+                            <div class="col-12 col-lg-6 o_setting_box">
+                                <div class="o_setting_left_pane">
+                                    <field name="bp_barber_notify_on_confirm"/>
+                                </div>
+                                <div class="o_setting_right_pane">
+                                    <label for="bp_barber_notify_on_confirm"/>
+                                    <div class="text-muted">
+                                        Send confirmation email when appointment is confirmed
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Include ICS Calendar -->
+                            <div class="col-12 col-lg-6 o_setting_box">
+                                <div class="o_setting_left_pane">
+                                    <field name="bp_barber_notify_send_ics"/>
+                                </div>
+                                <div class="o_setting_right_pane">
+                                    <label for="bp_barber_notify_send_ics"/>
+                                    <div class="text-muted">
+                                        Include calendar invite (ICS file) in emails
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <h2>Reminder Notifications</h2>
+                        
+                        <div class="row mt16 o_settings_container">
+                            <!-- Enable Reminders -->
+                            <div class="col-12 col-lg-6 o_setting_box">
+                                <div class="o_setting_left_pane">
+                                    <field name="bp_barber_notify_reminder_enabled"/>
+                                </div>
+                                <div class="o_setting_right_pane">
+                                    <label for="bp_barber_notify_reminder_enabled"/>
+                                    <div class="text-muted">
+                                        Send automatic reminder emails before appointments
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Reminder Timing -->
+                        <div class="row mt16 o_settings_container" invisible="bp_barber_notify_reminder_enabled == False">
+                            <div class="col-12 col-lg-6 o_setting_box">
+                                <div class="o_setting_right_pane">
+                                    <label for="bp_barber_notify_reminder_hours_primary" string="Primary Reminder"/>
+                                    <div class="content-group">
+                                        <div class="mt16">
+                                            <field name="bp_barber_notify_reminder_hours_primary" class="oe_inline"/> hours before appointment
+                                        </div>
+                                        <div class="text-muted">
+                                            First reminder notification timing
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-12 col-lg-6 o_setting_box">
+                                <div class="o_setting_right_pane">
+                                    <label for="bp_barber_notify_reminder_hours_secondary" string="Secondary Reminder"/>
+                                    <div class="content-group">
+                                        <div class="mt16">
+                                            <field name="bp_barber_notify_reminder_hours_secondary" class="oe_inline"/> hours before appointment
+                                        </div>
+                                        <div class="text-muted">
+                                            Final reminder notification timing
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <h2>Follow-up Notifications</h2>
+                        
+                        <div class="row mt16 o_settings_container">
+                            <!-- No-show Follow-up -->
+                            <div class="col-12 col-lg-6 o_setting_box">
+                                <div class="o_setting_left_pane">
+                                    <field name="bp_barber_notify_followup_noshow"/>
+                                </div>
+                                <div class="o_setting_right_pane">
+                                    <label for="bp_barber_notify_followup_noshow"/>
+                                    <div class="text-muted">
+                                        Send follow-up email for no-show appointments and create activity
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </xpath>
+            </field>
+        </record>
+
+        <!-- Menu Item for Notification Settings -->
+        <record id="bp_barber_notification_config_action" model="ir.actions.act_window">
+            <field name="name">Notification Settings</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">res.config.settings</field>
+            <field name="view_mode">form</field>
+            <field name="target">inline</field>
+            <field name="context">{'module': 'bp_barber_management'}</field>
+        </record>
+
+    </data>
+</odoo>

@@ -1,0 +1,226 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Barber Tree View -->
+    <record id="view_bp_barber_tree" model="ir.ui.view">
+        <field name="name">bp.barber.barber.tree</field>
+        <field name="model">bp.barber.barber</field>
+        <field name="arch" type="xml">
+            <tree string="Barbers">
+                <field name="color" widget="color_picker" optional="hide"/>
+                <field name="name"/>
+                <field name="barber_code"/>
+                <field name="skill_level"/>
+                <field name="chair_id"/>
+                <field name="phone"/>
+                <field name="email"/>
+                <field name="active"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Barber Form View -->
+    <record id="view_bp_barber_form" model="ir.ui.view">
+        <field name="name">bp.barber.barber.form</field>
+        <field name="model">bp.barber.barber</field>
+        <field name="arch" type="xml">
+            <form string="Barber">
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <!-- POS Service Statistics -->
+                        <button name="action_view_pos_orders" type="object" 
+                                class="oe_stat_button" icon="fa-shopping-bag">
+                            <field name="pos_orders_count" widget="statinfo" string="POS Orders"/>
+                        </button>
+                        <button name="action_view_services_today" type="object" 
+                                class="oe_stat_button" icon="fa-calendar-o">
+                            <div class="o_field_widget o_stat_info">
+                                <span class="o_stat_value">
+                                    <field name="services_today_count" nolabel="1"/>
+                                </span>
+                                <span class="o_stat_text">Services Today</span>
+                            </div>
+                        </button>
+                        <button name="action_view_pos_orders" type="object" 
+                                class="oe_stat_button" icon="fa-line-chart">
+                            <div class="o_field_widget o_stat_info">
+                                <span class="o_stat_value">
+                                    <field name="services_week_count" nolabel="1"/>
+                                </span>
+                                <span class="o_stat_text">This Week</span>
+                            </div>
+                        </button>
+                        <!-- Usage -->
+                        <button name="action_view_usage_logs" type="object" 
+                                class="oe_stat_button" icon="fa-shopping-cart">
+                            <field name="usage_log_count" widget="statinfo" string="Usage Logs"/>
+                        </button>
+                        <button name="action_issue_consumables" type="object" 
+                                class="oe_stat_button" icon="fa-plus-square"
+                                string="Issue Consumables"/>
+                        <button name="toggle_active" type="object" class="oe_stat_button" icon="fa-archive">
+                            <field name="active" widget="boolean_button" options='{"terminology": "archive"}'/>
+                        </button>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="name"/>
+                            <field name="barber_code"/>
+                            <field name="skill_level" widget="selection"/>
+                            <field name="chair_id"/>
+                            <field name="color" widget="color_picker"/>
+                        </group>
+                        <group>
+                            <field name="company_id" readonly="1" groups="base.group_multi_company"/>
+                        </group>
+                    </group>
+                    <group string="Contact Information">
+                        <group>
+                            <field name="partner_id" options="{'quick_create': True}"/>
+                            <field name="user_id"/>
+                        </group>
+                        <group>
+                            <field name="phone"/>
+                            <field name="email"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Performance" name="performance">
+                            <group string="Service Statistics">
+                                <group string="Current Period">
+                                    <field name="services_today_count" readonly="1"/>
+                                    <field name="services_week_count" readonly="1"/>
+                                    <field name="services_month_count" readonly="1"/>
+                                </group>
+                                <group string="Revenue">
+                                    <field name="revenue_today" readonly="1"/>
+                                    <field name="revenue_week" readonly="1"/>
+                                    <field name="revenue_month" readonly="1"/>
+                                    <field name="company_currency_id" invisible="1"/>
+                                </group>
+                            </group>
+                            <div class="oe_clear"/>
+                            <group>
+                                <button name="action_view_pos_orders" 
+                                        string="View POS Orders" 
+                                        type="object" 
+                                        class="btn-primary"
+                                        icon="fa-shopping-bag"/>
+                                <button name="action_view_services_today" 
+                                        string="View Today's Services" 
+                                        type="object" 
+                                        class="btn-secondary"
+                                        icon="fa-calendar"/>
+                            </group>
+                        </page>
+                        <page string="Notes" name="notes">
+                            <field name="note"/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <!-- Barber Kanban View -->
+        <!-- Barber Kanban View -->
+    <record id="view_bp_barber_kanban" model="ir.ui.view">
+        <field name="name">bp.barber.barber.kanban</field>
+        <field name="model">bp.barber.barber</field>
+        <field name="arch" type="xml">
+            <kanban default_group_by="active" class="o_kanban_small_column">
+                <field name="id"/>
+                <field name="name"/>
+                <field name="active"/>
+                <field name="barber_code"/>
+                <field name="skill_level"/>
+                <templates>
+                    <t t-name="kanban-box">
+                        <div class="oe_kanban_card oe_kanban_global_click">
+                            <div class="oe_kanban_content">
+                                <div class="o_kanban_record_top">
+                                    <div class="o_kanban_record_headings">
+                                        <strong class="o_kanban_record_title">
+                                            <t t-esc="record.name.value"/>
+                                        </strong>
+                                        <div class="o_kanban_record_subtitle">
+                                            Code: <t t-esc="record.barber_code.value"/>
+                                        </div>
+                                    </div>
+                                    <div class="o_dropdown_kanban dropdown">
+                                        <a class="dropdown-toggle o-no-caret btn" role="button" data-bs-toggle="dropdown" href="#" aria-label="Dropdown menu">
+                                            <span class="fa fa-ellipsis-v"/>
+                                        </a>
+                                        <div class="dropdown-menu" role="menu">
+                                            <t t-if="widget.editable"><a role="menuitem" type="edit" class="dropdown-item">Edit</a></t>
+                                            <t t-if="widget.deletable"><a role="menuitem" type="delete" class="dropdown-item">Delete</a></t>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="o_kanban_record_bottom">
+                                    <div class="oe_kanban_bottom_left">
+                                        <div class="o_kanban_record_subtitle">
+                                            <i class="fa fa-scissors"/> Skill: <t t-esc="record.skill_level.value"/>
+                                        </div>
+                                    </div>
+                                    <div class="oe_kanban_bottom_right">
+                                        <span class="badge" t-att-class="record.active.raw_value ? 'badge-success' : 'badge-secondary'">
+                                            <t t-if="record.active.raw_value">Active</t>
+                                            <t t-else="">Inactive</t>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <!-- Barber Search View -->
+    <record id="view_bp_barber_search" model="ir.ui.view">
+        <field name="name">bp.barber.barber.search</field>
+        <field name="model">bp.barber.barber</field>
+        <field name="arch" type="xml">
+            <search string="Search Barbers">
+                <field name="name" string="Name or Code" filter_domain="['|', '|', '|', ('name', 'ilike', self), ('barber_code', 'ilike', self), ('phone', 'ilike', self), ('email', 'ilike', self)]"/>
+                <separator/>
+                <filter string="Junior" name="junior" domain="[('skill_level', '=', 'junior')]"/>
+                <filter string="Mid" name="mid" domain="[('skill_level', '=', 'mid')]"/>
+                <filter string="Senior" name="senior" domain="[('skill_level', '=', 'senior')]"/>
+                <separator/>
+                <filter string="Active" name="active" domain="[('active', '=', True)]"/>
+                <filter string="Archived" name="inactive" domain="[('active', '=', False)]"/>
+                <separator/>
+                <group expand="0" string="Group By">
+                    <filter string="Skill Level" name="group_skill_level" context="{'group_by': 'skill_level'}"/>
+                    <filter string="Chair" name="group_chair" context="{'group_by': 'chair_id'}"/>
+                    <filter string="Company" name="group_company" context="{'group_by': 'company_id'}" groups="base.group_multi_company"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Barber Action -->
+    <record id="action_bp_barber_barbers" model="ir.actions.act_window">
+        <field name="name">Barbers</field>
+        <field name="res_model">bp.barber.barber</field>
+        <field name="view_mode">kanban,tree,form</field>
+        <field name="search_view_id" ref="view_bp_barber_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Add your first barber
+            </p>
+            <p>
+                Create barber profiles to manage your staff, assign chairs, and track their skills and contact information.
+            </p>
+        </field>
+    </record>
+
+
+</odoo>

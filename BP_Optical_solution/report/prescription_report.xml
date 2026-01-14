@@ -1,0 +1,205 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Report Action -->
+    <record id="action_report_optical_prescription" model="ir.actions.report">
+        <field name="name">Optical Prescription</field>
+        <field name="model">optical.test</field>
+        <field name="report_type">qweb-html</field>
+        <field name="report_name">BP_Optical_solution.report_optical_prescription</field>
+        <field name="report_file">BP_Optical_solution.report_optical_prescription</field>
+        <field name="binding_model_id" ref="model_optical_test"/>
+        <field name="binding_type">report</field>
+    </record>
+
+    <!-- Report Template -->
+    <template id="report_optical_prescription">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="o">
+                <t t-call="web.external_layout">
+                    <div class="page" style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; padding: 15px 16px; color: #1a1a1a; font-size: 12px;">
+                        <!-- Get company colors -->
+                        <t t-set="primary_color" t-value="o.company_id.primary_color or '#1a1a1a'"/>
+                        
+                        <!-- Header -->
+                        <div style="text-align: center; margin-bottom: 20px; padding-bottom: 15px; border-bottom: 1px solid #e0e0e0;">
+                            <h1 t-attf-style="margin: 0 0 10px 0; font-size: 24px; font-weight: 300; letter-spacing: 2px; color: {{primary_color}}; text-transform: uppercase;">OPTICAL PRESCRIPTION</h1>
+                            <div style="display: inline-block; text-align: left; font-size: 11px; color: #666;">
+                                <span style="margin-right: 20px;">Date: <strong><span t-field="o.test_date" t-options-widget="'date'"/></strong></span>
+                                <span>Rx #: <strong><span t-field="o.name"/></strong></span>
+                            </div>
+                        </div>
+
+                        <!-- Patient Information -->
+                        <div style="margin-bottom: 15px;">
+                            <h2 t-attf-style="font-size: 10px; font-weight: 600; color: {{primary_color}}; margin: 0 0 8px 0; text-transform: uppercase; letter-spacing: 1.5px;">Patient Information</h2>
+                            <div style="display: flex; flex-wrap: wrap; margin: 0 -8px;">
+                                <t t-if="o.patient_id.name">
+                                    <div style="flex: 0 0 50%; max-width: 50%; padding: 0 8px; margin-bottom: 16px; box-sizing: border-box;">
+                                        <label style="display: block; font-size: 10px; font-weight: 500; color: #999; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px;">Full Name</label>
+                                        <div style="border: 1px solid #d0d0d0; border-radius: 4px; padding: 10px 12px; font-size: 14px; color: #333; background-color: #fafafa;"><t t-esc="o.patient_id.name"/></div>
+                                    </div>
+                                </t>
+                                <t t-if="o.patient_id.date_of_birth">
+                                    <div style="flex: 0 0 50%; max-width: 50%; padding: 0 8px; margin-bottom: 16px; box-sizing: border-box;">
+                                        <label style="display: block; font-size: 10px; font-weight: 500; color: #999; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px;">Date of Birth</label>
+                                        <div style="border: 1px solid #d0d0d0; border-radius: 4px; padding: 10px 12px; font-size: 14px; color: #333; background-color: #fafafa;"><t t-esc="o.patient_id.date_of_birth.strftime('%m/%d/%Y')"/></div>
+                                    </div>
+                                </t>
+                                <t t-if="o.patient_id.phone">
+                                    <div style="flex: 0 0 50%; max-width: 50%; padding: 0 8px; margin-bottom: 16px; box-sizing: border-box;">
+                                        <label style="display: block; font-size: 10px; font-weight: 500; color: #999; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px;">Phone Number</label>
+                                        <div style="border: 1px solid #d0d0d0; border-radius: 4px; padding: 10px 12px; font-size: 14px; color: #333; background-color: #fafafa;"><t t-esc="o.patient_id.phone"/></div>
+                                    </div>
+                                </t>
+                                <t t-if="o.patient_id.email">
+                                    <div style="flex: 0 0 50%; max-width: 50%; padding: 0 8px; margin-bottom: 16px; box-sizing: border-box;">
+                                        <label style="display: block; font-size: 10px; font-weight: 500; color: #999; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px;">Email</label>
+                                        <div style="border: 1px solid #d0d0d0; border-radius: 4px; padding: 10px 12px; font-size: 14px; color: #333; background-color: #fafafa;"><t t-esc="o.patient_id.email"/></div>
+                                    </div>
+                                </t>
+                            </div>
+                        </div>
+
+                        <!-- Prescription Details -->
+                        <div style="margin-bottom: 15px;">
+                            <h2 t-attf-style="font-size: 10px; font-weight: 600; color: {{primary_color}}; margin: 0 0 8px 0; text-transform: uppercase; letter-spacing: 1.5px;">Prescription Details</h2>
+                            
+                            <!-- Right Eye -->
+                            <h3 t-attf-style="font-size: 10px; font-weight: 600; color: {{primary_color}}; margin: 15px 0 8px 0; text-transform: uppercase; letter-spacing: 1.5px;">Right Eye</h3>
+                            <div style="display: flex; flex-wrap: wrap; margin: 0 -8px;">
+                                <t t-if="o.sphere_od">
+                                    <div style="flex: 0 0 25%; max-width: 25%; padding: 0 8px; margin-bottom: 16px; box-sizing: border-box;">
+                                        <label style="display: block; font-size: 10px; font-weight: 500; color: #999; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px;">Sphere</label>
+                                        <div style="border: 1px solid #d0d0d0; border-radius: 4px; padding: 10px 12px; font-size: 14px; color: #333; background-color: #fafafa;"><t t-esc="o.sphere_od"/></div>
+                                    </div>
+                                </t>
+                                <t t-if="o.cylinder_od">
+                                    <div style="flex: 0 0 25%; max-width: 25%; padding: 0 8px; margin-bottom: 16px; box-sizing: border-box;">
+                                        <label style="display: block; font-size: 10px; font-weight: 500; color: #999; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px;">Cylinder</label>
+                                        <div style="border: 1px solid #d0d0d0; border-radius: 4px; padding: 10px 12px; font-size: 14px; color: #333; background-color: #fafafa;"><t t-esc="o.cylinder_od"/></div>
+                                    </div>
+                                </t>
+                                <t t-if="o.axis_od">
+                                    <div style="flex: 0 0 25%; max-width: 25%; padding: 0 8px; margin-bottom: 16px; box-sizing: border-box;">
+                                        <label style="display: block; font-size: 10px; font-weight: 500; color: #999; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px;">Axis</label>
+                                        <div style="border: 1px solid #d0d0d0; border-radius: 4px; padding: 10px 12px; font-size: 14px; color: #333; background-color: #fafafa;"><t t-esc="o.axis_od"/></div>
+                                    </div>
+                                </t>
+                                <t t-if="o.add_od">
+                                    <div style="flex: 0 0 25%; max-width: 25%; padding: 0 8px; margin-bottom: 16px; box-sizing: border-box;">
+                                        <label style="display: block; font-size: 10px; font-weight: 500; color: #999; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px;">Add</label>
+                                        <div style="border: 1px solid #d0d0d0; border-radius: 4px; padding: 10px 12px; font-size: 14px; color: #333; background-color: #fafafa;"><t t-esc="o.add_od"/></div>
+                                    </div>
+                                </t>
+                            </div>
+
+                            <!-- Left Eye -->
+                            <h3 t-attf-style="font-size: 10px; font-weight: 600; color: {{primary_color}}; margin: 15px 0 8px 0; text-transform: uppercase; letter-spacing: 1.5px;">Left Eye</h3>
+                            <div style="display: flex; flex-wrap: wrap; margin: 0 -8px;">
+                                <t t-if="o.sphere_os">
+                                    <div style="flex: 0 0 25%; max-width: 25%; padding: 0 8px; margin-bottom: 16px; box-sizing: border-box;">
+                                        <label style="display: block; font-size: 10px; font-weight: 500; color: #999; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px;">Sphere</label>
+                                        <div style="border: 1px solid #d0d0d0; border-radius: 4px; padding: 10px 12px; font-size: 14px; color: #333; background-color: #fafafa;"><t t-esc="o.sphere_os"/></div>
+                                    </div>
+                                </t>
+                                <t t-if="o.cylinder_os">
+                                    <div style="flex: 0 0 25%; max-width: 25%; padding: 0 8px; margin-bottom: 16px; box-sizing: border-box;">
+                                        <label style="display: block; font-size: 10px; font-weight: 500; color: #999; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px;">Cylinder</label>
+                                        <div style="border: 1px solid #d0d0d0; border-radius: 4px; padding: 10px 12px; font-size: 14px; color: #333; background-color: #fafafa;"><t t-esc="o.cylinder_os"/></div>
+                                    </div>
+                                </t>
+                                <t t-if="o.axis_os">
+                                    <div style="flex: 0 0 25%; max-width: 25%; padding: 0 8px; margin-bottom: 16px; box-sizing: border-box;">
+                                        <label style="display: block; font-size: 10px; font-weight: 500; color: #999; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px;">Axis</label>
+                                        <div style="border: 1px solid #d0d0d0; border-radius: 4px; padding: 10px 12px; font-size: 14px; color: #333; background-color: #fafafa;"><t t-esc="o.axis_os"/></div>
+                                    </div>
+                                </t>
+                                <t t-if="o.add_os">
+                                    <div style="flex: 0 0 25%; max-width: 25%; padding: 0 8px; margin-bottom: 16px; box-sizing: border-box;">
+                                        <label style="display: block; font-size: 10px; font-weight: 500; color: #999; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px;">Add</label>
+                                        <div style="border: 1px solid #d0d0d0; border-radius: 4px; padding: 10px 12px; font-size: 14px; color: #333; background-color: #fafafa;"><t t-esc="o.add_os"/></div>
+                                    </div>
+                                </t>
+                            </div>
+
+                            <!-- Additional Fields (PD and Expiration) -->
+                            <div style="display: flex; flex-wrap: wrap; margin: 15px -8px 0;">
+                                <t t-if="o.pd_od or o.pd_os">
+                                    <div style="flex: 0 0 40%; max-width: 40%; padding: 0 8px; margin-bottom: 16px; box-sizing: border-box;">
+                                        <label style="display: block; font-size: 10px; font-weight: 500; color: #999; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.5px;">PD (Pupillary Distance)</label>
+                                        <div style="border: 1px solid #d0d0d0; border-radius: 4px; padding: 10px 12px; font-size: 14px; color: #333; background-color: #fafafa;"><t t-esc="(str(o.pd_od or '') + ' / ' + str(o.pd_os or '')).strip(' /')"/></div>
+                                    </div>
+                                </t>
+                                <t t-if="o.validity_until">
+                                    <div style="flex: 0 0 60%; max-width: 60%; padding: 0 8px; margin-bottom: 16px; box-sizing: border-box;">
+                                        <label style="display: block; font-size: 10px; font-weight: 500; color: #999; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.5px;">Expiration Date</label>
+                                        <div style="border: 1px solid #d0d0d0; border-radius: 4px; padding: 10px 12px; font-size: 14px; color: #333; background-color: #fafafa;"><t t-esc="o.validity_until.strftime('%m/%d/%Y')"/></div>
+                                    </div>
+                                </t>
+                            </div>
+                        </div>
+
+                        <!-- Lens Details -->
+                        <div style="margin-bottom: 15px;">
+                            <h2 t-attf-style="font-size: 10px; font-weight: 600; color: {{primary_color}}; margin: 0 0 8px 0; text-transform: uppercase; letter-spacing: 1.5px;">Lens Details</h2>
+                            <div style="display: flex; flex-wrap: wrap; margin: 0 -8px;">
+                                <t t-if="o.lens_type_id">
+                                    <div style="flex: 0 0 25%; max-width: 25%; padding: 0 8px; margin-bottom: 16px; box-sizing: border-box;">
+                                        <label style="display: block; font-size: 10px; font-weight: 500; color: #999; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px;">Lens Type</label>
+                                        <div style="border: 1px solid #d0d0d0; border-radius: 4px; padding: 10px 12px; font-size: 14px; color: #333; background-color: #fafafa;"><t t-esc="o.lens_type_id.name"/></div>
+                                    </div>
+                                </t>
+                                <t t-if="o.coating_id">
+                                    <div style="flex: 0 0 25%; max-width: 25%; padding: 0 8px; margin-bottom: 16px; box-sizing: border-box;">
+                                        <label style="display: block; font-size: 10px; font-weight: 500; color: #999; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px;">Coating</label>
+                                        <div style="border: 1px solid #d0d0d0; border-radius: 4px; padding: 10px 12px; font-size: 14px; color: #333; background-color: #fafafa;"><t t-esc="o.coating_id.name"/></div>
+                                    </div>
+                                </t>
+                                <t t-if="o.index_id">
+                                    <div style="flex: 0 0 25%; max-width: 25%; padding: 0 8px; margin-bottom: 16px; box-sizing: border-box;">
+                                        <label style="display: block; font-size: 10px; font-weight: 500; color: #999; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px;">Index</label>
+                                        <div style="border: 1px solid #d0d0d0; border-radius: 4px; padding: 10px 12px; font-size: 14px; color: #333; background-color: #fafafa;"><t t-esc="o.index_id.name"/></div>
+                                    </div>
+                                </t>
+                                <t t-if="o.material_id">
+                                    <div style="flex: 0 0 25%; max-width: 25%; padding: 0 8px; margin-bottom: 16px; box-sizing: border-box;">
+                                        <label style="display: block; font-size: 10px; font-weight: 500; color: #999; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px;">Material</label>
+                                        <div style="border: 1px solid #d0d0d0; border-radius: 4px; padding: 10px 12px; font-size: 14px; color: #333; background-color: #fafafa;"><t t-esc="o.material_id.name"/></div>
+                                    </div>
+                                </t>
+                            </div>
+                        </div>
+
+                        <!-- Additional Information (Notes only if present) -->
+                        <t t-if="o.notes">
+                            <div style="margin-bottom: 20px;">
+                                <h2 t-attf-style="font-size: 10px; font-weight: 600; color: {{primary_color}}; margin: 0 0 8px 0; text-transform: uppercase; letter-spacing: 1.5px;">Additional Information</h2>
+                                <label style="display: block; font-size: 10px; font-weight: 500; color: #999; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px;">Notes</label>
+                                <div style="border: 1px solid #e0e0e0; border-radius: 4px; padding: 12px; font-size: 13px; color: #555; white-space: pre-wrap; background-color: #fafafa; min-height: 60px; line-height: 1.6;"><t t-esc="o.notes"/></div>
+                            </div>
+                        </t>
+
+                        <!-- Prescribing Doctor -->
+                        <div style="margin-bottom: 50px;">
+                            <h2 t-attf-style="font-size: 10px; font-weight: 600; color: {{primary_color}}; margin: 0 0 8px 0; text-transform: uppercase; letter-spacing: 1.5px;">Prescribing Doctor</h2>
+                            <div style="display: flex; flex-wrap: wrap; margin: 0 -8px;">
+                                <t t-if="o.optician_id">
+                                    <div style="flex: 0 0 50%; max-width: 50%; padding: 0 8px; margin-bottom: 16px; box-sizing: border-box;">
+                                        <label style="display: block; font-size: 10px; font-weight: 500; color: #999; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px;">Optician</label>
+                                        <div style="border: 1px solid #d0d0d0; border-radius: 4px; padding: 10px 12px; font-size: 14px; color: #333; background-color: #fafafa;"><t t-esc="o.optician_id.name"/></div>
+                                    </div>
+                                </t>
+                                <t t-if="o.company_id.phone">
+                                    <div style="flex: 0 0 50%; max-width: 50%; padding: 0 8px; margin-bottom: 16px; box-sizing: border-box;">
+                                        <label style="display: block; font-size: 10px; font-weight: 500; color: #999; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px;">Phone Number</label>
+                                        <div style="border: 1px solid #d0d0d0; border-radius: 4px; padding: 10px 12px; font-size: 14px; color: #333; background-color: #fafafa;"><t t-esc="o.company_id.phone"/></div>
+                                    </div>
+                                </t>
+                            </div>
+                        </div>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+</odoo>

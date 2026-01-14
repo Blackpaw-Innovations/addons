@@ -1,0 +1,682 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo noupdate="0">
+    <!-- Categories -->
+    <!-- Structure -->
+    <record id="bp_ke_structure" model="hr.payroll.structure">
+        <field name="name">Kenya Basic Payroll Structure</field>
+        <field name="code">KE_BASIC_STRUCTURE</field>
+    </record>
+
+    <!-- EARNINGS -->
+    <record id="bp_ke_rule_section_earnings" model="hr.salary.rule">
+        <field name="name">Earnings</field>
+        <field name="code">SEC_EARN</field>
+        <field name="sequence">1</field>
+        <field name="category_id" ref="BP_Payroll_solution.bp_cat_earn"/>
+        <field name="amount_select">fixed</field>
+        <field name="amount">0.0</field>
+        <field name="display_type">line_section</field>
+        <field name="condition_country_code">KE</field>
+        <field name="struct_ids" eval="[(4, ref('bp_ke_structure'))]"/>
+    </record>
+
+    <record id="bp_ke_rule_basic" model="hr.salary.rule">
+        <field name="name">BASIC</field>
+        <field name="code">BASIC</field>
+        <field name="sequence">5</field>
+        <field name="category_id" ref="BP_Payroll_solution.bp_cat_earn"/>
+        <field name="amount_select">code</field>
+        <field name="python_code"><![CDATA[
+result = contract.wage if contract and contract.wage else 0.0
+]]></field>
+        <field name="condition_country_code">KE</field>
+        <field name="struct_ids" eval="[(4, ref('bp_ke_structure'))]"/>
+    </record>
+
+    <!-- Allowances (Hidden if 0, but part of Gross) -->
+    <record id="bp_ke_rule_overtime" model="hr.salary.rule">
+        <field name="name">Overtime</field>
+        <field name="code">OVERTIME</field>
+        <field name="sequence">11</field>
+        <field name="category_id" ref="BP_Payroll_solution.bp_cat_earn"/>
+        <field name="amount_select">code</field>
+        <field name="python_code"><![CDATA[
+result = inputs.get('OVERTIME', 0.0)
+]]></field>
+        <field name="condition_country_code">KE</field>
+        <field name="struct_ids" eval="[(4, ref('bp_ke_structure'))]"/>
+    </record>
+
+    <record id="bp_ke_rule_house" model="hr.salary.rule">
+        <field name="name">House Allowance</field>
+        <field name="code">HOUSE</field>
+        <field name="sequence">12</field>
+        <field name="category_id" ref="BP_Payroll_solution.bp_cat_earn"/>
+        <field name="amount_select">code</field>
+        <field name="python_code"><![CDATA[
+result = inputs.get('HOUSE', 0.0)
+]]></field>
+        <field name="condition_country_code">KE</field>
+        <field name="struct_ids" eval="[(4, ref('bp_ke_structure'))]"/>
+    </record>
+
+    <record id="bp_ke_rule_other_allowance" model="hr.salary.rule">
+        <field name="name">Other Allowance</field>
+        <field name="code">OTHER_ALLOWANCE</field>
+        <field name="sequence">13</field>
+        <field name="category_id" ref="BP_Payroll_solution.bp_cat_earn"/>
+        <field name="amount_select">code</field>
+        <field name="python_code"><![CDATA[
+result = inputs.get('OTHER_ALLOWANCE', 0.0)
+]]></field>
+        <field name="condition_country_code">KE</field>
+        <field name="struct_ids" eval="[(4, ref('bp_ke_structure'))]"/>
+    </record>
+
+    <record id="bp_ke_rule_food" model="hr.salary.rule">
+        <field name="name">Food Allowance</field>
+        <field name="code">FOOD</field>
+        <field name="sequence">14</field>
+        <field name="category_id" ref="BP_Payroll_solution.bp_cat_earn"/>
+        <field name="amount_select">code</field>
+        <field name="python_code"><![CDATA[
+result = inputs.get('FOOD', 0.0)
+]]></field>
+        <field name="condition_country_code">KE</field>
+        <field name="struct_ids" eval="[(4, ref('bp_ke_structure'))]"/>
+    </record>
+
+    <record id="bp_ke_rule_airtime" model="hr.salary.rule">
+        <field name="name">Airtime Allowance</field>
+        <field name="code">AIRTIME</field>
+        <field name="sequence">15</field>
+        <field name="category_id" ref="BP_Payroll_solution.bp_cat_earn"/>
+        <field name="amount_select">code</field>
+        <field name="python_code"><![CDATA[
+result = inputs.get('AIRTIME', 0.0)
+]]></field>
+        <field name="condition_country_code">KE</field>
+        <field name="struct_ids" eval="[(4, ref('bp_ke_structure'))]"/>
+    </record>
+
+    <record id="bp_ke_rule_education" model="hr.salary.rule">
+        <field name="name">Education Benefit</field>
+        <field name="code">EDUCATION</field>
+        <field name="sequence">16</field>
+        <field name="category_id" ref="BP_Payroll_solution.bp_cat_earn"/>
+        <field name="amount_select">code</field>
+        <field name="python_code"><![CDATA[
+result = inputs.get('EDUCATION', 0.0)
+]]></field>
+        <field name="condition_country_code">KE</field>
+        <field name="struct_ids" eval="[(4, ref('bp_ke_structure'))]"/>
+    </record>
+
+    <record id="bp_ke_rule_pension_allowance" model="hr.salary.rule">
+        <field name="name">Pension Allowance</field>
+        <field name="code">PENSION_ALLOWANCE</field>
+        <field name="sequence">17</field>
+        <field name="category_id" ref="BP_Payroll_solution.bp_cat_earn"/>
+        <field name="amount_select">code</field>
+        <field name="python_code"><![CDATA[
+result = inputs.get('PENSION_ALLOWANCE', 0.0)
+]]></field>
+        <field name="condition_country_code">KE</field>
+        <field name="struct_ids" eval="[(4, ref('bp_ke_structure'))]"/>
+    </record>
+
+    <record id="bp_ke_rule_gross" model="hr.salary.rule">
+        <field name="name">GROSS</field>
+        <field name="code">GROSS</field>
+        <field name="sequence">20</field>
+        <field name="category_id" ref="BP_Payroll_solution.bp_cat_earn"/>
+        <field name="amount_select">code</field>
+        <field name="python_code"><![CDATA[
+result = (
+    results.get('BASIC', 0.0) +
+    results.get('OVERTIME', 0.0) +
+    results.get('HOUSE', 0.0) +
+    results.get('OTHER_ALLOWANCE', 0.0) +
+    results.get('FOOD', 0.0) +
+    results.get('AIRTIME', 0.0) +
+    results.get('EDUCATION', 0.0) +
+    results.get('PENSION_ALLOWANCE', 0.0)
+)
+]]></field>
+        <field name="condition_country_code">KE</field>
+        <field name="struct_ids" eval="[(4, ref('bp_ke_structure'))]"/>
+    </record>
+
+    <!-- STATUTORY DEDUCTIONS -->
+    <record id="bp_ke_rule_section_stat_ded" model="hr.salary.rule">
+        <field name="name">Statutory deductions</field>
+        <field name="code">SEC_STAT_DED</field>
+        <field name="sequence">29</field>
+        <field name="category_id" ref="BP_Payroll_solution.bp_cat_stat_ded"/>
+        <field name="amount_select">fixed</field>
+        <field name="amount">0.0</field>
+        <field name="display_type">line_section</field>
+        <field name="condition_country_code">KE</field>
+        <field name="struct_ids" eval="[(4, ref('bp_ke_structure'))]"/>
+    </record>
+
+    <record id="bp_ke_rule_nssf_t1_emp" model="hr.salary.rule">
+        <field name="name">NSSF Tier 1 (employee)</field>
+        <field name="code">NSSF_T1_EMP</field>
+        <field name="sequence">30</field>
+        <field name="category_id" ref="BP_Payroll_solution.bp_cat_stat_ded"/>
+        <field name="appears_on_payslip" eval="True"/>
+        <field name="amount_select">code</field>
+        <field name="python_code"><![CDATA[
+config = payslip._bp_ke_get_config()
+gross = results.get('GROSS', 0.0)
+tiers = payslip._bp_ke_compute_nssf_tiers(gross, config)
+result = tiers.get('tier1_emp', 0.0)
+]]></field>
+        <field name="condition_country_code">KE</field>
+        <field name="struct_ids" eval="[(4, ref('bp_ke_structure'))]"/>
+    </record>
+
+    <record id="bp_ke_rule_nssf_t2_emp" model="hr.salary.rule">
+        <field name="name">NSSF Tier 2 (employee)</field>
+        <field name="code">NSSF_T2_EMP</field>
+        <field name="sequence">31</field>
+        <field name="category_id" ref="BP_Payroll_solution.bp_cat_stat_ded"/>
+        <field name="appears_on_payslip" eval="True"/>
+        <field name="amount_select">code</field>
+        <field name="python_code"><![CDATA[
+config = payslip._bp_ke_get_config()
+gross = results.get('GROSS', 0.0)
+tiers = payslip._bp_ke_compute_nssf_tiers(gross, config)
+result = tiers.get('tier2_emp', 0.0)
+]]></field>
+        <field name="condition_country_code">KE</field>
+        <field name="struct_ids" eval="[(4, ref('bp_ke_structure'))]"/>
+    </record>
+
+    <record id="bp_ke_rule_nssf_emp" model="hr.salary.rule">
+        <field name="name">NSSF (employee total)</field>
+        <field name="code">NSSF_EMP</field>
+        <field name="sequence">32</field>
+        <field name="category_id" ref="BP_Payroll_solution.bp_cat_stat_ded"/>
+        <field name="amount_select">code</field>
+        <field name="python_code"><![CDATA[
+result = results.get('NSSF_T1_EMP', 0.0) + results.get('NSSF_T2_EMP', 0.0)
+]]></field>
+        <field name="condition_country_code">KE</field>
+        <field name="struct_ids" eval="[(4, ref('bp_ke_structure'))]"/>
+    </record>
+
+    <record id="bp_ke_rule_shif" model="hr.salary.rule">
+        <field name="name">SHIF</field>
+        <field name="code">SHIF</field>
+        <field name="sequence">33</field>
+        <field name="category_id" ref="BP_Payroll_solution.bp_cat_stat_ded"/>
+        <field name="amount_select">code</field>
+        <field name="python_code"><![CDATA[
+config = payslip._bp_ke_get_config()
+gross = results.get('GROSS', 0.0)
+result = payslip._bp_ke_compute_shif(gross, config)
+]]></field>
+        <field name="condition_country_code">KE</field>
+        <field name="struct_ids" eval="[(4, ref('bp_ke_structure'))]"/>
+    </record>
+
+    <record id="bp_ke_rule_ahl_emp" model="hr.salary.rule">
+        <field name="name">Housing Levy (employee)</field>
+        <field name="code">AHL_EMP</field>
+        <field name="sequence">34</field>
+        <field name="category_id" ref="BP_Payroll_solution.bp_cat_stat_ded"/>
+        <field name="amount_select">code</field>
+        <field name="python_code"><![CDATA[
+config = payslip._bp_ke_get_config()
+result = payslip._bp_ke_compute_housing_levy(results, config)
+]]></field>
+        <field name="condition_country_code">KE</field>
+        <field name="struct_ids" eval="[(4, ref('bp_ke_structure'))]"/>
+    </record>
+
+    <!-- Inputs for Reliefs/Deductions (Hidden from Statutory, used in Taxable) -->
+    <record id="bp_ke_rule_pension" model="hr.salary.rule">
+        <field name="name">Pension Contribution</field>
+        <field name="code">PENSION</field>
+        <field name="sequence">35</field>
+        <field name="category_id" ref="BP_Payroll_solution.bp_cat_stat_ded"/>
+        <field name="appears_on_payslip" eval="False"/>
+        <field name="amount_select">code</field>
+        <field name="python_code"><![CDATA[
+result = inputs.get('PENSION', 0.0)
+]]></field>
+        <field name="condition_country_code">KE</field>
+        <field name="struct_ids" eval="[(4, ref('bp_ke_structure'))]"/>
+    </record>
+
+    <record id="bp_ke_rule_mortgage" model="hr.salary.rule">
+        <field name="name">Mortgage Interest</field>
+        <field name="code">MORTGAGE</field>
+        <field name="sequence">36</field>
+        <field name="category_id" ref="BP_Payroll_solution.bp_cat_stat_ded"/>
+        <field name="appears_on_payslip" eval="False"/>
+        <field name="amount_select">code</field>
+        <field name="python_code"><![CDATA[
+result = inputs.get('MORTGAGE', 0.0)
+]]></field>
+        <field name="condition_country_code">KE</field>
+        <field name="struct_ids" eval="[(4, ref('bp_ke_structure'))]"/>
+    </record>
+
+    <record id="bp_ke_rule_insurance" model="hr.salary.rule">
+        <field name="name">Insurance Premium</field>
+        <field name="code">INSURANCE</field>
+        <field name="sequence">37</field>
+        <field name="category_id" ref="BP_Payroll_solution.bp_cat_stat_ded"/>
+        <field name="appears_on_payslip" eval="False"/>
+        <field name="amount_select">code</field>
+        <field name="python_code"><![CDATA[
+result = inputs.get('INSURANCE', 0.0)
+]]></field>
+        <field name="condition_country_code">KE</field>
+        <field name="struct_ids" eval="[(4, ref('bp_ke_structure'))]"/>
+    </record>
+
+    <!-- TAX BASE -->
+    <record id="bp_ke_rule_section_tax_base" model="hr.salary.rule">
+        <field name="name">Tax base</field>
+        <field name="code">SEC_TAX_BASE</field>
+        <field name="sequence">39</field>
+        <field name="category_id" ref="BP_Payroll_solution.bp_cat_tax_base"/>
+        <field name="amount_select">fixed</field>
+        <field name="amount">0.0</field>
+        <field name="display_type">line_section</field>
+        <field name="condition_country_code">KE</field>
+        <field name="struct_ids" eval="[(4, ref('bp_ke_structure'))]"/>
+    </record>
+
+    <record id="bp_ke_rule_taxable" model="hr.salary.rule">
+        <field name="name">Taxable income</field>
+        <field name="code">TAXABLE</field>
+        <field name="sequence">40</field>
+        <field name="category_id" ref="BP_Payroll_solution.bp_cat_tax_base"/>
+        <field name="amount_select">code</field>
+        <field name="python_code"><![CDATA[
+config = payslip._bp_ke_get_config()
+result = payslip._bp_ke_get_taxable_income(
+    {
+        "GROSS": results.get('GROSS', 0.0),
+        "NSSF_T1_EMP": results.get('NSSF_T1_EMP', 0.0),
+        "NSSF_T2_EMP": results.get('NSSF_T2_EMP', 0.0),
+        "SHIF": results.get('SHIF', 0.0),
+        "AHL_EMP": results.get('AHL_EMP', 0.0),
+        "PENSION": results.get('PENSION', 0.0),
+        "MORTGAGE": results.get('MORTGAGE', 0.0),
+    },
+    config,
+)
+]]></field>
+        <field name="condition_country_code">KE</field>
+        <field name="struct_ids" eval="[(4, ref('bp_ke_structure'))]"/>
+    </record>
+
+    <!-- PAYE CALCULATION -->
+    <record id="bp_ke_rule_section_paye_calc" model="hr.salary.rule">
+        <field name="name">PAYE (gross before relief)</field>
+        <field name="code">SEC_PAYE_CALC</field>
+        <field name="sequence">41</field>
+        <field name="category_id" ref="BP_Payroll_solution.bp_cat_paye_calc"/>
+        <field name="amount_select">fixed</field>
+        <field name="amount">0.0</field>
+        <field name="display_type">line_section</field>
+        <field name="condition_country_code">KE</field>
+        <field name="struct_ids" eval="[(4, ref('bp_ke_structure'))]"/>
+    </record>
+
+    <record id="bp_ke_rule_paye_band_1" model="hr.salary.rule">
+        <field name="name">Band 1</field>
+        <field name="code">PAYE_BAND_1</field>
+        <field name="sequence">42</field>
+        <field name="category_id" ref="BP_Payroll_solution.bp_cat_paye_calc"/>
+        <field name="amount_select">code</field>
+        <field name="python_code"><![CDATA[
+config = payslip._bp_ke_get_config()
+taxable = results.get('TAXABLE', 0.0)
+result = payslip._bp_ke_compute_paye_band(taxable, config, 1)
+]]></field>
+        <field name="condition_country_code">KE</field>
+        <field name="struct_ids" eval="[(4, ref('bp_ke_structure'))]"/>
+    </record>
+
+    <record id="bp_ke_rule_paye_band_2" model="hr.salary.rule">
+        <field name="name">Band 2</field>
+        <field name="code">PAYE_BAND_2</field>
+        <field name="sequence">43</field>
+        <field name="category_id" ref="BP_Payroll_solution.bp_cat_paye_calc"/>
+        <field name="amount_select">code</field>
+        <field name="python_code"><![CDATA[
+config = payslip._bp_ke_get_config()
+taxable = results.get('TAXABLE', 0.0)
+result = payslip._bp_ke_compute_paye_band(taxable, config, 2)
+]]></field>
+        <field name="condition_country_code">KE</field>
+        <field name="struct_ids" eval="[(4, ref('bp_ke_structure'))]"/>
+    </record>
+
+    <record id="bp_ke_rule_paye_band_3" model="hr.salary.rule">
+        <field name="name">Band 3</field>
+        <field name="code">PAYE_BAND_3</field>
+        <field name="sequence">44</field>
+        <field name="category_id" ref="BP_Payroll_solution.bp_cat_paye_calc"/>
+        <field name="amount_select">code</field>
+        <field name="python_code"><![CDATA[
+config = payslip._bp_ke_get_config()
+taxable = results.get('TAXABLE', 0.0)
+result = payslip._bp_ke_compute_paye_band(taxable, config, 3)
+]]></field>
+        <field name="condition_country_code">KE</field>
+        <field name="struct_ids" eval="[(4, ref('bp_ke_structure'))]"/>
+    </record>
+
+    <record id="bp_ke_rule_paye_band_4" model="hr.salary.rule">
+        <field name="name">Band 4</field>
+        <field name="code">PAYE_BAND_4</field>
+        <field name="sequence">45</field>
+        <field name="category_id" ref="BP_Payroll_solution.bp_cat_paye_calc"/>
+        <field name="amount_select">code</field>
+        <field name="python_code"><![CDATA[
+config = payslip._bp_ke_get_config()
+taxable = results.get('TAXABLE', 0.0)
+result = payslip._bp_ke_compute_paye_band(taxable, config, 4)
+]]></field>
+        <field name="condition_country_code">KE</field>
+        <field name="struct_ids" eval="[(4, ref('bp_ke_structure'))]"/>
+    </record>
+
+    <record id="bp_ke_rule_paye_band_5" model="hr.salary.rule">
+        <field name="name">Band 5</field>
+        <field name="code">PAYE_BAND_5</field>
+        <field name="sequence">46</field>
+        <field name="category_id" ref="BP_Payroll_solution.bp_cat_paye_calc"/>
+        <field name="amount_select">code</field>
+        <field name="python_code"><![CDATA[
+config = payslip._bp_ke_get_config()
+taxable = results.get('TAXABLE', 0.0)
+result = payslip._bp_ke_compute_paye_band(taxable, config, 5)
+]]></field>
+        <field name="condition_country_code">KE</field>
+        <field name="struct_ids" eval="[(4, ref('bp_ke_structure'))]"/>
+    </record>
+
+    <record id="bp_ke_rule_paye_gross" model="hr.salary.rule">
+        <field name="name">PAYE_GROSS subtotal</field>
+        <field name="code">PAYE_GROSS</field>
+        <field name="sequence">47</field>
+        <field name="category_id" ref="BP_Payroll_solution.bp_cat_paye_calc"/>
+        <field name="amount_select">code</field>
+        <field name="python_code"><![CDATA[
+result = (
+    results.get('PAYE_BAND_1', 0.0) +
+    results.get('PAYE_BAND_2', 0.0) +
+    results.get('PAYE_BAND_3', 0.0) +
+    results.get('PAYE_BAND_4', 0.0) +
+    results.get('PAYE_BAND_5', 0.0)
+)
+]]></field>
+        <field name="condition_country_code">KE</field>
+        <field name="struct_ids" eval="[(4, ref('bp_ke_structure'))]"/>
+    </record>
+
+    <!-- RELIEFS -->
+    <record id="bp_ke_rule_section_reliefs" model="hr.salary.rule">
+        <field name="name">Reliefs and Net PAYE</field>
+        <field name="code">SEC_RELIEFS</field>
+        <field name="sequence">49</field>
+        <field name="category_id" ref="BP_Payroll_solution.bp_cat_reliefs"/>
+        <field name="amount_select">fixed</field>
+        <field name="amount">0.0</field>
+        <field name="display_type">line_section</field>
+        <field name="condition_country_code">KE</field>
+        <field name="struct_ids" eval="[(4, ref('bp_ke_structure'))]"/>
+    </record>
+
+    <record id="bp_ke_rule_relief_personal" model="hr.salary.rule">
+        <field name="name">Personal relief</field>
+        <field name="code">RELIEF_PERSONAL</field>
+        <field name="sequence">50</field>
+        <field name="category_id" ref="BP_Payroll_solution.bp_cat_reliefs"/>
+        <field name="amount_select">code</field>
+        <field name="python_code"><![CDATA[
+config = payslip._bp_ke_get_config()
+result = config.personal_relief
+]]></field>
+        <field name="condition_country_code">KE</field>
+        <field name="struct_ids" eval="[(4, ref('bp_ke_structure'))]"/>
+    </record>
+
+    <record id="bp_ke_rule_relief_additional" model="hr.salary.rule">
+        <field name="name">Additional relief</field>
+        <field name="code">RELIEF_ADDITIONAL</field>
+        <field name="sequence">51</field>
+        <field name="category_id" ref="BP_Payroll_solution.bp_cat_reliefs"/>
+        <field name="amount_select">code</field>
+        <field name="python_code"><![CDATA[
+config = payslip._bp_ke_get_config()
+result = config.paye_additional_relief or 0.0
+]]></field>
+        <field name="condition_country_code">KE</field>
+        <field name="struct_ids" eval="[(4, ref('bp_ke_structure'))]"/>
+    </record>
+
+    <record id="bp_ke_rule_relief_insurance" model="hr.salary.rule">
+        <field name="name">Insurance relief</field>
+        <field name="code">RELIEF_INSURANCE</field>
+        <field name="sequence">52</field>
+        <field name="category_id" ref="BP_Payroll_solution.bp_cat_reliefs"/>
+        <field name="amount_select">code</field>
+        <field name="python_code"><![CDATA[
+config = payslip._bp_ke_get_config()
+insurance = results.get('INSURANCE', inputs.get('INSURANCE', 0.0))
+# fallback to contract monthly insurance premium
+if not insurance:
+    insurance = contract and contract.insurance_premium or 0.0
+insurance = abs(insurance or 0.0)
+# Relief is 15% of insurance premium (no cap)
+result = insurance * 0.15
+]]></field>
+        <field name="condition_country_code">KE</field>
+        <field name="struct_ids" eval="[(4, ref('bp_ke_structure'))]"/>
+    </record>
+
+    <record id="bp_ke_rule_paye" model="hr.salary.rule">
+        <field name="name">Net PAYE</field>
+        <field name="code">PAYE</field>
+        <field name="sequence">55</field>
+        <field name="category_id" ref="BP_Payroll_solution.bp_cat_reliefs"/>
+        <field name="amount_select">code</field>
+        <field name="python_code"><![CDATA[
+config = payslip._bp_ke_get_config() if hasattr(payslip, '_bp_ke_get_config') else False
+taxable = results.get('TAXABLE', 0.0)
+insurance_premium = results.get('INSURANCE', 0.0)
+result = payslip._bp_ke_compute_paye(taxable, config, insurance_premium) if hasattr(payslip, '_bp_ke_compute_paye') else 0.0
+]]></field>
+        <field name="condition_country_code">KE</field>
+        <field name="struct_ids" eval="[(4, ref('bp_ke_structure'))]"/>
+    </record>
+
+    <!-- TOTAL DEDUCTIONS -->
+    <record id="bp_ke_rule_section_tot_ded" model="hr.salary.rule">
+        <field name="name">Total deductions (employee)</field>
+        <field name="code">SEC_TOT_DED</field>
+        <field name="sequence">59</field>
+        <field name="category_id" ref="BP_Payroll_solution.bp_cat_tot_ded"/>
+        <field name="amount_select">fixed</field>
+        <field name="amount">0.0</field>
+        <field name="display_type">line_section</field>
+        <field name="condition_country_code">KE</field>
+        <field name="struct_ids" eval="[(4, ref('bp_ke_structure'))]"/>
+    </record>
+
+    <record id="bp_ke_rule_report_paye" model="hr.salary.rule">
+        <field name="name">PAYE</field>
+        <field name="code">REPORT_PAYE</field>
+        <field name="sequence">60</field>
+        <field name="category_id" ref="BP_Payroll_solution.bp_cat_tot_ded"/>
+        <field name="amount_select">code</field>
+        <field name="python_code"><![CDATA[
+result = results.get('PAYE', 0.0)
+]]></field>
+        <field name="condition_country_code">KE</field>
+        <field name="struct_ids" eval="[(4, ref('bp_ke_structure'))]"/>
+    </record>
+
+    <record id="bp_ke_rule_report_ahl" model="hr.salary.rule">
+        <field name="name">Housing Levy</field>
+        <field name="code">REPORT_AHL</field>
+        <field name="sequence">61</field>
+        <field name="category_id" ref="BP_Payroll_solution.bp_cat_tot_ded"/>
+        <field name="amount_select">code</field>
+        <field name="python_code"><![CDATA[
+result = results.get('AHL_EMP', 0.0)
+]]></field>
+        <field name="condition_country_code">KE</field>
+        <field name="struct_ids" eval="[(4, ref('bp_ke_structure'))]"/>
+    </record>
+
+    <record id="bp_ke_rule_report_nssf" model="hr.salary.rule">
+        <field name="name">NSSF</field>
+        <field name="code">REPORT_NSSF</field>
+        <field name="sequence">62</field>
+        <field name="category_id" ref="BP_Payroll_solution.bp_cat_tot_ded"/>
+        <field name="amount_select">code</field>
+        <field name="python_code"><![CDATA[
+result = results.get('NSSF_EMP', 0.0)
+]]></field>
+        <field name="condition_country_code">KE</field>
+        <field name="struct_ids" eval="[(4, ref('bp_ke_structure'))]"/>
+    </record>
+
+    <record id="bp_ke_rule_report_shif" model="hr.salary.rule">
+        <field name="name">SHIF</field>
+        <field name="code">REPORT_SHIF</field>
+        <field name="sequence">63</field>
+        <field name="category_id" ref="BP_Payroll_solution.bp_cat_tot_ded"/>
+        <field name="amount_select">code</field>
+        <field name="python_code"><![CDATA[
+result = results.get('SHIF', 0.0)
+]]></field>
+        <field name="condition_country_code">KE</field>
+        <field name="struct_ids" eval="[(4, ref('bp_ke_structure'))]"/>
+    </record>
+
+    <record id="bp_ke_rule_total_ded" model="hr.salary.rule">
+        <field name="name">Total deductions</field>
+        <field name="code">TOTAL_DED</field>
+        <field name="sequence">65</field>
+        <field name="category_id" ref="BP_Payroll_solution.bp_cat_tot_ded"/>
+        <field name="amount_select">code</field>
+        <field name="python_code"><![CDATA[
+result = (
+    results.get('REPORT_PAYE', 0.0) +
+    results.get('REPORT_AHL', 0.0) +
+    results.get('REPORT_NSSF', 0.0) +
+    results.get('REPORT_SHIF', 0.0)
+)
+]]></field>
+        <field name="condition_country_code">KE</field>
+        <field name="struct_ids" eval="[(4, ref('bp_ke_structure'))]"/>
+    </record>
+
+    <!-- NET PAY -->
+    <record id="bp_ke_rule_section_net" model="hr.salary.rule">
+        <field name="name">Net pay</field>
+        <field name="code">SEC_NET</field>
+        <field name="sequence">150</field>
+        <field name="category_id" ref="BP_Payroll_solution.bp_cat_net"/>
+        <field name="amount_select">fixed</field>
+        <field name="amount">0.0</field>
+        <field name="display_type">line_section</field>
+        <field name="condition_country_code">KE</field>
+        <field name="struct_ids" eval="[(4, ref('bp_ke_structure'))]"/>
+    </record>
+
+    <record id="bp_ke_rule_net" model="hr.salary.rule">
+        <field name="name">NET</field>
+        <field name="code">NET</field>
+        <field name="sequence">151</field>
+        <field name="category_id" ref="BP_Payroll_solution.bp_cat_net"/>
+        <field name="amount_select">code</field>
+        <field name="python_code"><![CDATA[
+result = results.get('GROSS', 0.0) - results.get('TOTAL_DED', 0.0)
+]]></field>
+        <field name="condition_country_code">KE</field>
+        <field name="struct_ids" eval="[(4, ref('bp_ke_structure'))]"/>
+    </record>
+
+    <!-- EMPLOYER COSTS -->
+    <record id="bp_ke_rule_section_employer" model="hr.salary.rule">
+        <field name="name">Employer costs (if you post them)</field>
+        <field name="code">SEC_EMP</field>
+        <field name="sequence">99</field>
+        <field name="category_id" ref="BP_Payroll_solution.bp_cat_emp"/>
+        <field name="amount_select">fixed</field>
+        <field name="amount">0.0</field>
+        <field name="display_type">line_section</field>
+        <field name="condition_country_code">KE</field>
+        <field name="struct_ids" eval="[(4, ref('bp_ke_structure'))]"/>
+    </record>
+
+    <record id="bp_ke_rule_nssf_empr" model="hr.salary.rule">
+        <field name="name">NSSF Employer</field>
+        <field name="code">NSSF_EMPR</field>
+        <field name="sequence">100</field>
+        <field name="category_id" ref="BP_Payroll_solution.bp_cat_emp"/>
+        <field name="amount_select">code</field>
+        <field name="python_code"><![CDATA[
+config = payslip._bp_ke_get_config()
+gross = results.get('GROSS', 0.0)
+result = payslip._bp_ke_compute_nssf(gross, config, employer=True)
+]]></field>
+        <field name="condition_country_code">KE</field>
+        <field name="struct_ids" eval="[(4, ref('bp_ke_structure'))]"/>
+    </record>
+
+    <record id="bp_ke_rule_ahl_empr" model="hr.salary.rule">
+        <field name="name">Housing Levy Employer</field>
+        <field name="code">AHL_EMPR</field>
+        <field name="sequence">101</field>
+        <field name="category_id" ref="BP_Payroll_solution.bp_cat_emp"/>
+        <field name="amount_select">code</field>
+        <field name="python_code"><![CDATA[
+config = payslip._bp_ke_get_config()
+result = payslip._bp_ke_compute_housing_levy(results, config)
+]]></field>
+        <field name="condition_country_code">KE</field>
+        <field name="struct_ids" eval="[(4, ref('bp_ke_structure'))]"/>
+    </record>
+
+    <record id="bp_ke_rule_nita_empr" model="hr.salary.rule">
+        <field name="name">NITA Employer</field>
+        <field name="code">NITA_EMPR</field>
+        <field name="sequence">102</field>
+        <field name="category_id" ref="BP_Payroll_solution.bp_cat_emp"/>
+        <field name="amount_select">fixed</field>
+        <field name="amount">50.0</field>
+        <field name="condition_country_code">KE</field>
+        <field name="struct_ids" eval="[(4, ref('bp_ke_structure'))]"/>
+    </record>
+
+    <record id="bp_ke_rule_total_employer" model="hr.salary.rule">
+        <field name="name">Total employer cost</field>
+        <field name="code">TOTAL_EMP</field>
+        <field name="sequence">105</field>
+        <field name="category_id" ref="BP_Payroll_solution.bp_cat_emp"/>
+        <field name="amount_select">code</field>
+        <field name="python_code"><![CDATA[
+result = (
+    results.get('NSSF_EMPR', 0.0) +
+    results.get('AHL_EMPR', 0.0) +
+    results.get('NITA_EMPR', 0.0)
+)
+]]></field>
+        <field name="condition_country_code">KE</field>
+        <field name="struct_ids" eval="[(4, ref('bp_ke_structure'))]"/>
+    </record>
+</odoo>

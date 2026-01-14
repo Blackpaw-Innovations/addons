@@ -1,0 +1,231 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Website Menu Item -->
+    <record id="website_menu_bp_book" model="website.menu">
+        <field name="name">Book an Appointment</field>
+        <field name="url">/barber/booking</field>
+        <field name="parent_id" ref="website.main_menu"/>
+        <field name="sequence">50</field>
+    </record>
+
+    <!-- Booking Page Template -->
+    <template id="booking_page" name="Book an Appointment">
+        <t t-call="website.layout">
+            <div id="wrap" class="oe_structure oe_empty">
+                <div class="container mt-4">
+                    <div class="row justify-content-center">
+                        <div class="col-lg-8">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h2 class="card-title mb-0">
+                                        <i class="fa fa-scissors me-2"/>
+                                        Book an Appointment
+                                    </h2>
+                                </div>
+                                <div class="card-body">
+                                    <t t-if="error">
+                                        <div class="alert alert-danger" role="alert">
+                                            <i class="fa fa-exclamation-triangle me-2"/>
+                                            <t t-esc="error"/>
+                                        </div>
+                                    </t>
+                                    
+                                    <form action="/barber/booking/confirm" method="post" id="booking-form">
+                                        <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                                        <input type="hidden" name="slot_start" id="slot_start"/>
+                                        <input type="hidden" name="service_ids" id="service_ids"/>
+                                        
+                                        <!-- Service Selection -->
+                                        <div class="mb-4">
+                                            <label class="form-label fw-bold">Select Services *</label>
+                                            <div class="row">
+                                                <t t-foreach="services" t-as="service">
+                                                    <div class="col-md-6 mb-2">
+                                                        <div class="form-check">
+                                                            <input class="form-check-input service-checkbox" 
+                                                                   type="checkbox" 
+                                                                   t-att-value="service.id" 
+                                                                   t-att-id="'service_' + str(service.id)"
+                                                                   t-att-data-duration="service.duration_minutes"
+                                                                   t-att-data-price="service.list_price"/>
+                                                            <label class="form-check-label" t-att-for="'service_' + str(service.id)">
+                                                                <strong t-esc="service.name"/>
+                                                                <br/>
+                                                                <small class="text-muted">
+                                                                    <t t-esc="service.duration_minutes"/> min - 
+                                                                    <span t-field="service.list_price" t-options="{'widget': 'monetary', 'display_currency': service.currency_id}"/>
+                                                                </small>
+                                                            </label>
+                                                        </div>
+                                                    </div>
+                                                </t>
+                                            </div>
+                                        </div>
+
+                                        <!-- Barber Selection -->
+                                        <div class="mb-4">
+                                            <label for="barber_id" class="form-label fw-bold">Select Barber *</label>
+                                            <select class="form-select" name="barber_id" id="barber_id" required="required">
+                                                <option value="">-- Choose a Barber --</option>
+                                                <t t-foreach="barbers" t-as="barber">
+                                                    <option t-att-value="barber.id" 
+                                                            t-att-selected="'selected' if form_data.get('barber_id') == str(barber.id) else None">
+                                                        <t t-esc="barber.name"/> 
+                                                        <t t-if="barber.skill_level">(<t t-esc="barber.skill_level.title()"/>)</t>
+                                                    </option>
+                                                </t>
+                                            </select>
+                                        </div>
+
+                                        <!-- Date Selection -->
+                                        <div class="mb-4">
+                                            <label for="booking_date" class="form-label fw-bold">Select Date *</label>
+                                            <input type="date" class="form-control" id="booking_date" name="booking_date" required="required"
+                                                   t-att-value="form_data.get('booking_date', '')"
+                                                   t-att-min="datetime.date.today().strftime('%Y-%m-%d')"
+                                                   t-att-max="(datetime.date.today() + datetime.timedelta(days=30)).strftime('%Y-%m-%d')"/>
+                                        </div>
+
+                                        <!-- Check Availability Button -->
+                                        <div class="mb-4">
+                                            <button type="button" class="btn btn-info btn-lg" id="check-availability">
+                                                <i class="fa fa-search me-2"/>Check Available Times
+                                            </button>
+                                            <div class="mt-2">
+                                                <small class="text-muted">
+                                                    <i class="fa fa-info-circle me-1"/>Click to see available time slots for your selected barber and date
+                                                </small>
+                                            </div>
+                                        </div>
+
+                                        <!-- Available Slots -->
+                                        <div id="slots-container" class="mb-4" style="display: none;">
+                                            <label class="form-label fw-bold">Available Times *</label>
+                                            <div id="slots-list" class="d-flex flex-wrap gap-2">
+                                                <!-- Slots will be populated by JavaScript -->
+                                            </div>
+                                        </div>
+
+                                        <!-- Contact Information -->
+                                        <div class="mb-4" id="contact-section" style="display: none;">
+                                            <h5 class="mb-3">Contact Information</h5>
+                                            <div class="row">
+                                                <div class="col-md-6 mb-3">
+                                                    <label for="name" class="form-label">Name</label>
+                                                    <input type="text" class="form-control" name="name" id="name"
+                                                           t-att-value="form_data.get('name', '')"/>
+                                                </div>
+                                                <div class="col-md-6 mb-3">
+                                                    <label for="phone" class="form-label">Phone Number *</label>
+                                                    <input type="tel" class="form-control" name="phone" id="phone" required="required"
+                                                           t-att-value="form_data.get('phone', '')"/>
+                                                </div>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label for="email" class="form-label">Email (Optional)</label>
+                                                <input type="email" class="form-control" name="email" id="email"
+                                                       t-att-value="form_data.get('email', '')"/>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label for="note" class="form-label">Special Requests (Optional)</label>
+                                                <textarea class="form-control" name="note" id="note" rows="3"
+                                                          placeholder="Any special requests or notes..."><t t-esc="form_data.get('note', '')"/></textarea>
+                                            </div>
+                                        </div>
+
+                                        <!-- Submit Button -->
+                                        <div class="d-grid" id="submit-section" style="display: none;">
+                                            <button type="submit" class="btn btn-primary btn-lg">
+                                                <i class="fa fa-check me-2"/>Confirm Booking
+                                            </button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </t>
+    </template>
+
+    <!-- Thank You Page Template -->
+    <template id="booking_thanks" name="Booking Confirmation">
+        <t t-call="website.layout">
+            <div id="wrap" class="oe_structure oe_empty">
+                <div class="container mt-5">
+                    <div class="row justify-content-center">
+                        <div class="col-lg-6">
+                            <div class="card border-success">
+                                <div class="card-header bg-success text-white text-center">
+                                    <h2 class="card-title mb-0">
+                                        <i class="fa fa-check-circle me-2"/>
+                                        Booking Confirmed!
+                                    </h2>
+                                </div>
+                                <div class="card-body text-center">
+                                    <div class="mb-4">
+                                        <h4 class="text-success">Your appointment has been successfully booked!</h4>
+                                        <p class="text-muted">We'll see you at the scheduled time.</p>
+                                    </div>
+                                    
+                                    <t t-if="appointment">
+                                        <div class="appointment-details">
+                                            <div class="row mb-3">
+                                                <div class="col-sm-4 fw-bold text-end">Appointment:</div>
+                                                <div class="col-sm-8"><t t-esc="appointment.name"/></div>
+                                            </div>
+                                            <div class="row mb-3">
+                                                <div class="col-sm-4 fw-bold text-end">Barber:</div>
+                                                <div class="col-sm-8"><t t-esc="appointment.barber_id.name"/></div>
+                                            </div>
+                                            <div class="row mb-3">
+                                                <div class="col-sm-4 fw-bold text-end">Date &amp; Time:</div>
+                                                <div class="col-sm-8">
+                                                    <t t-esc="appointment.start_datetime.strftime('%A, %B %d, %Y at %H:%M')"/>
+                                                </div>
+                                            </div>
+                                            <div class="row mb-3">
+                                                <div class="col-sm-4 fw-bold text-end">Services:</div>
+                                                <div class="col-sm-8">
+                                                    <t t-foreach="appointment.service_ids" t-as="service">
+                                                        <span class="badge bg-info me-1"><t t-esc="service.name"/></span>
+                                                    </t>
+                                                </div>
+                                            </div>
+                                            <div class="row mb-3">
+                                                <div class="col-sm-4 fw-bold text-end">Duration:</div>
+                                                <div class="col-sm-8"><t t-esc="appointment.duration_minutes"/> minutes</div>
+                                            </div>
+                                            <div class="row mb-3">
+                                                <div class="col-sm-4 fw-bold text-end">Total Cost:</div>
+                                                <div class="col-sm-8 fw-bold text-primary">
+                                                    <span t-field="appointment.price_total" t-options="{'widget': 'monetary', 'display_currency': appointment.currency_id}"/>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </t>
+                                    
+                                    <div class="mt-4">
+                                        <p class="text-muted">
+                                            <small>
+                                                <i class="fa fa-info-circle me-1"/>
+                                                Please arrive 5 minutes before your scheduled time. 
+                                                If you need to reschedule or cancel, please contact us.
+                                            </small>
+                                        </p>
+                                    </div>
+                                    
+                                    <div class="mt-4">
+                                        <a href="/barber/booking" class="btn btn-outline-primary me-2">Book Another</a>
+                                        <a href="/" class="btn btn-secondary">Back to Home</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </t>
+    </template>
+</odoo>

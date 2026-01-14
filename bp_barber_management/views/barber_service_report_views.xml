@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Barber Service Performance Reports -->
+    
+    <!-- Detailed Service Lines Report -->
+    <record id="view_barber_report_pos_line_tree" model="ir.ui.view">
+        <field name="name">bp.barber.report.pos.line.tree</field>
+        <field name="model">bp.barber.report.pos.line</field>
+        <field name="arch" type="xml">
+            <tree string="Service Performance Report" create="false" edit="false">
+                <field name="date"/>
+                <field name="barber_name"/>
+                <field name="product_name"/>
+                <field name="partner_name"/>
+                <field name="qty" sum="Total Services"/>
+                <field name="unit_price" avg="Avg Price"/>
+                <field name="discount"/>
+                <field name="price_subtotal" sum="Subtotal"/>
+                <field name="price_total" sum="Total Revenue"/>
+                <field name="currency_id" invisible="1"/>
+            </tree>
+        </field>
+    </record>
+    
+    <record id="view_barber_report_pos_line_graph" model="ir.ui.view">
+        <field name="name">bp.barber.report.pos.line.graph</field>
+        <field name="model">bp.barber.report.pos.line</field>
+        <field name="arch" type="xml">
+            <graph string="Service Performance" type="bar">
+                <field name="date" type="col"/>
+                <field name="barber_name" type="row"/>
+                <field name="price_total" type="measure"/>
+                <field name="qty" type="measure"/>
+            </graph>
+        </field>
+    </record>
+    
+    <record id="view_barber_report_pos_line_pivot" model="ir.ui.view">
+        <field name="name">bp.barber.report.pos.line.pivot</field>
+        <field name="model">bp.barber.report.pos.line</field>
+        <field name="arch" type="xml">
+            <pivot string="Service Analysis">
+                <field name="barber_name" type="row"/>
+                <field name="product_name" type="row"/>
+                <field name="date" type="col"/>
+                <field name="qty" type="measure"/>
+                <field name="price_total" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+    
+    <record id="view_barber_report_pos_line_search" model="ir.ui.view">
+        <field name="name">bp.barber.report.pos.line.search</field>
+        <field name="model">bp.barber.report.pos.line</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="barber_name"/>
+                <field name="product_name"/>
+                <field name="partner_name"/>
+                <field name="date"/>
+                
+                <filter name="today" string="Today" 
+                        domain="[('date', '=', context_today().strftime('%Y-%m-%d'))]"/>
+                <filter name="this_week" string="This Week" 
+                        domain="[('date', '&gt;=', (context_today() - datetime.timedelta(days=context_today().weekday())).strftime('%Y-%m-%d'))]"/>
+                <filter name="this_month" string="This Month" 
+                        domain="[('date', '&gt;=', context_today().strftime('%Y-%m-01'))]"/>
+                
+                <separator/>
+                <filter name="my_services" string="My Services" 
+                        domain="[('barber_id.user_id', '=', uid)]"
+                        context="{'default_barber_id': uid}"/>
+                
+                <group expand="0" string="Group By">
+                    <filter name="group_barber" string="Barber" context="{'group_by': 'barber_name'}"/>
+                    <filter name="group_service" string="Service" context="{'group_by': 'product_name'}"/>
+                    <filter name="group_date" string="Date" context="{'group_by': 'date'}"/>
+                    <filter name="group_customer" string="Customer" context="{'group_by': 'partner_name'}"/>
+                    <filter name="group_day" string="Day of Week" context="{'group_by': 'day_of_week'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+    
+    <!-- Daily Summary Report -->
+    <record id="view_barber_report_daily_tree" model="ir.ui.view">
+        <field name="name">bp.barber.report.daily.tree</field>
+        <field name="model">bp.barber.report.daily</field>
+        <field name="arch" type="xml">
+            <tree string="Daily Performance" create="false" edit="false">
+                <field name="date"/>
+                <field name="barber_name"/>
+                <field name="services_count" sum="Total Services"/>
+                <field name="unique_customers" sum="Total Customers"/>
+                <field name="orders_count" sum="Total Orders"/>
+                <field name="services_per_order" avg="Avg Services/Order"/>
+                <field name="avg_service_value" avg="Avg Service Value"/>
+                <field name="total_revenue" sum="Total Revenue"/>
+                <field name="currency_id" invisible="1"/>
+            </tree>
+        </field>
+    </record>
+    
+    <record id="view_barber_report_daily_graph" model="ir.ui.view">
+        <field name="name">bp.barber.report.daily.graph</field>
+        <field name="model">bp.barber.report.daily</field>
+        <field name="arch" type="xml">
+            <graph string="Daily Performance Trends" type="line">
+                <field name="date" type="col"/>
+                <field name="barber_name" type="row"/>
+                <field name="total_revenue" type="measure"/>
+                <field name="services_count" type="measure"/>
+            </graph>
+        </field>
+    </record>
+    
+    <!-- Actions -->
+    <record id="action_barber_service_report" model="ir.actions.act_window">
+        <field name="name">Service Performance Report</field>
+        <field name="res_model">bp.barber.report.pos.line</field>
+        <field name="view_mode">tree,graph,pivot</field>
+        <field name="search_view_id" ref="view_barber_report_pos_line_search"/>
+        <field name="context">{
+            'search_default_this_month': 1,
+            'search_default_group_barber': 1
+        }</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                No service data found!
+            </p>
+            <p>
+                Service performance reports show barber statistics from POS orders.
+                Data appears here after services are sold through POS with barber assignments.
+            </p>
+        </field>
+    </record>
+    
+    <record id="action_barber_daily_report" model="ir.actions.act_window">
+        <field name="name">Daily Performance Summary</field>
+        <field name="res_model">bp.barber.report.daily</field>
+        <field name="view_mode">tree,graph</field>
+        <field name="context">{
+            'search_default_this_month': 1
+        }</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                No daily performance data found!
+            </p>
+            <p>
+                Daily performance summaries show aggregated statistics by barber and date.
+            </p>
+        </field>
+    </record>

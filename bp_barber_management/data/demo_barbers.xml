@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+    <!-- Demo Chairs -->
+    <record id="bp_chair_1" model="bp.barber.chair">
+        <field name="name">Chair 1</field>
+        <field name="code">C1</field>
+        <field name="is_available">True</field>
+        <field name="active">True</field>
+        <field name="note">Main cutting station near the window</field>
+    </record>
+
+    <record id="bp_chair_2" model="bp.barber.chair">
+        <field name="name">Chair 2</field>
+        <field name="code">C2</field>
+        <field name="is_available">True</field>
+        <field name="active">True</field>
+        <field name="note">Premium station with adjustable height</field>
+    </record>
+
+    <!-- Demo Barber Partners -->
+    <record id="partner_john_barber" model="res.partner">
+        <field name="name">John Barber</field>
+        <field name="phone">+1-555-0101</field>
+        <field name="email">john.barber@example.com</field>
+        <field name="is_company">False</field>
+    </record>
+
+    <record id="partner_mary_stylist" model="res.partner">
+        <field name="name">Mary Stylist</field>
+        <field name="phone">+1-555-0102</field>
+        <field name="email">mary.stylist@example.com</field>
+        <field name="is_company">False</field>
+    </record>
+
+    <!-- Demo Partner for Alex (Junior Barber) -->
+    <record id="partner_alex_fade" model="res.partner">
+        <field name="name">Alex Fade</field>
+        <field name="phone">+1-555-0103</field>
+        <field name="email">alex.fade@example.com</field>
+        <field name="is_company">False</field>
+    </record>
+
+    <!-- Demo Barbers -->
+    <record id="bp_barber_john" model="bp.barber.barber">
+        <field name="name">John Barber</field>
+        <field name="barber_code">JBN</field>
+        <field name="partner_id" ref="partner_john_barber"/>
+        <field name="skill_level">senior</field>
+        <field name="chair_id" ref="bp_chair_1"/>
+        <field name="active">True</field>
+        <field name="color">3</field>
+        <field name="note">&lt;p&gt;Experienced senior barber specializing in classic cuts and beard trimming.&lt;/p&gt;</field>
+    </record>
+
+    <record id="bp_barber_mary" model="bp.barber.barber">
+        <field name="name">Mary Stylist</field>
+        <field name="barber_code">MRS</field>
+        <field name="partner_id" ref="partner_mary_stylist"/>
+        <field name="skill_level">mid</field>
+        <field name="chair_id" ref="bp_chair_2"/>
+        <field name="active">True</field>
+        <field name="color">5</field>
+        <field name="note">&lt;p&gt;Skilled stylist with expertise in modern cuts and styling.&lt;/p&gt;</field>
+    </record>
+
+    <record id="bp_barber_alex" model="bp.barber.barber">
+        <field name="name">Alex Fade</field>
+        <field name="barber_code">ALX</field>
+        <field name="partner_id" ref="partner_alex_fade"/>
+        <field name="skill_level">junior</field>
+        <!-- No chair assigned - demonstrates null case -->
+        <field name="active">True</field>
+        <field name="color">2</field>
+        <field name="note">&lt;p&gt;Junior barber specializing in modern fades and trendy cuts.&lt;/p&gt;</field>
+    </record>
+</odoo>

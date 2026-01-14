@@ -1,0 +1,474 @@
+/* Barber Management POS Styles */
+
+.appointments-pane-container {
+    position: fixed;
+    top: 0;
+    right: -400px;
+    width: 400px;
+    height: 100vh;
+    background: white;
+    border-left: 1px solid #ddd;
+    transition: right 0.3s ease;
+    z-index: 1000;
+    overflow-y: auto;
+}
+
+.appointments-pane-container.show {
+    right: 0;
+}
+
+.appointments-pane {
+    padding: 16px;
+    height: 100%;
+}
+
+.appointments-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+    padding-bottom: 12px;
+    border-bottom: 2px solid #f0f0f0;
+}
+
+.appointments-header h3 {
+    margin: 0;
+    color: #333;
+    font-size: 18px;
+}
+
+.close-pane {
+    background: none;
+    border: none;
+    font-size: 20px;
+    cursor: pointer;
+    color: #666;
+}
+
+.appointments-filters {
+    margin-bottom: 16px;
+}
+
+.filter-group {
+    margin-bottom: 12px;
+}
+
+.filter-group label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 4px;
+    color: #555;
+}
+
+.filter-group select {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+.state-filters {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.state-filter-btn {
+    padding: 6px 12px;
+    border: 1px solid #ddd;
+    background: white;
+    border-radius: 16px;
+    cursor: pointer;
+    font-size: 12px;
+    transition: all 0.2s;
+}
+
+.state-filter-btn.active {
+    background: #007cba;
+    color: white;
+    border-color: #007cba;
+}
+
+.appointments-list {
+    max-height: calc(100vh - 250px);
+    overflow-y: auto;
+}
+
+.appointment-card {
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 12px;
+    margin-bottom: 12px;
+    cursor: pointer;
+    transition: all 0.2s;
+    background: white;
+}
+
+.appointment-card:hover {
+    border-color: #007cba;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(0, 124, 186, 0.1);
+}
+
+.appointment-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 8px;
+}
+
+.appointment-time {
+    font-weight: 600;
+    color: #333;
+    font-size: 16px;
+}
+
+.appointment-badge {
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.badge-info {
+    background: #d1ecf1;
+    color: #0c5460;
+}
+
+.badge-success {
+    background: #d4edda;
+    color: #155724;
+}
+
+.badge-secondary {
+    background: #e2e3e5;
+    color: #383d41;
+}
+
+.appointment-customer {
+    font-weight: 500;
+    color: #333;
+    margin-bottom: 4px;
+}
+
+.appointment-phone {
+    color: #666;
+    font-size: 12px;
+    margin-bottom: 8px;
+}
+
+.appointment-barber {
+    display: flex;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.barber-color {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    margin-right: 8px;
+}
+
+.barber-name {
+    font-size: 13px;
+    color: #555;
+}
+
+.appointment-price {
+    text-align: right;
+    font-weight: 600;
+    color: #007cba;
+}
+
+.appointment-actions {
+    text-align: center;
+    margin-top: 16px;
+}
+
+.refresh-btn {
+    background: #007cba;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: 500;
+}
+
+.refresh-btn:hover {
+    background: #005a7a;
+}
+
+.no-appointments {
+    text-align: center;
+    color: #666;
+    margin-top: 40px;
+    font-style: italic;
+}
+
+/* Barber Picker Dialog */
+.barber-picker {
+    max-width: 500px;
+}
+
+.barber-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 12px;
+    margin: 16px 0;
+}
+
+.barber-option {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 16px;
+    border: 2px solid #e0e0e0;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+    background: white;
+}
+
+.barber-option:hover {
+    border-color: #007cba;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 124, 186, 0.15);
+}
+
+.barber-avatar {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: 600;
+    font-size: 18px;
+}
+
+.barber-option-name {
+    font-weight: 500;
+    text-align: center;
+    font-size: 13px;
+    color: #333;
+}
+
+/* Order Line Barber Display */
+.orderline-barber {
+    display: flex;
+    align-items: center;
+    margin-top: 4px;
+}
+
+.orderline-barber-color {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    margin-right: 6px;
+}
+
+.orderline-barber-name {
+    font-size: 11px;
+    color: #666;
+    font-style: italic;
+}
+
+/* POS Header Appointments Button */
+.pos-appointments-btn {
+    background: #007cba;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-left: 8px;
+    font-size: 14px;
+}
+
+.pos-appointments-btn:hover {
+    background: #005a7a;
+}
+
+.pos-appointments-btn.active {
+    background: #28a745;
+}
+
+/* Receipt Barber Info */
+.receipt-barber-section {
+    margin-top: 12px;
+    padding-top: 8px;
+    border-top: 1px dashed #333;
+}
+
+.receipt-barber-title {
+    font-weight: bold;
+    margin-bottom: 4px;
+}
+
+.receipt-barber-list {
+    font-size: 12px;
+}
+
+/* Barber Assignment Status Styles */
+.barber-assignment {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 4px;
+}
+
+.barber-chip {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: 500;
+    color: white;
+}
+
+.barber-chip.barber-missing {
+    background-color: #dc3545 !important;
+    animation: pulse-red 2s infinite;
+}
+
+.barber-chip i {
+    font-size: 10px;
+}
+
+.status-required .barber-required {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.status-assigned .barber-assigned {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.status-optional {
+    opacity: 0.8;
+}
+
+.assign-barber-btn {
+    background-color: #ffc107 !important;
+    color: #212529 !important;
+    border-color: #ffc107 !important;
+    font-weight: 600;
+    font-size: 10px;
+    padding: 2px 6px;
+    border-radius: 4px;
+}
+
+.assign-barber-btn:hover {
+    background-color: #ffca2c !important;
+}
+
+.change-barber-btn,
+.remove-barber-btn {
+    padding: 1px 4px;
+    font-size: 10px;
+    line-height: 1;
+}
+
+.remove-barber-btn {
+    color: #dc3545;
+}
+
+.remove-barber-btn:hover {
+    color: #c82333;
+}
+
+@keyframes pulse-red {
+    0% {
+        box-shadow: 0 0 0 0 rgba(220, 53, 69, 0.7);
+    }
+
+    70% {
+        box-shadow: 0 0 0 10px rgba(220, 53, 69, 0);
+    }
+
+    100% {
+        box-shadow: 0 0 0 0 rgba(220, 53, 69, 0);
+    }
+}
+
+/* Barber Picker Dialog Enhancements */
+.barber-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 12px;
+    margin: 16px 0;
+}
+
+.barber-option {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 16px;
+    border: 2px solid #e0e0e0;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.2s;
+    background: white;
+    text-align: center;
+}
+
+.barber-option:hover {
+    border-color: #007cba;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 124, 186, 0.15);
+}
+
+.barber-option.no-barber {
+    border-color: #6c757d;
+    color: #6c757d;
+}
+
+.barber-option.no-barber:hover {
+    border-color: #5a6268;
+    background-color: #f8f9fa;
+}
+
+.barber-option .barber-chip {
+    margin-bottom: 8px;
+    font-size: 12px;
+    padding: 4px 12px;
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 768px) {
+    .appointments-pane-container {
+        width: 100vw;
+        right: -100vw;
+    }
+
+    .barber-grid,
+    .barber-list {
+        grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+    }
+
+    .barber-option {
+        padding: 12px;
+    }
+
+    .barber-avatar {
+        width: 40px;
+        height: 40px;
+        font-size: 16px;
+    }
+
+    .barber-chip {
+        font-size: 10px;
+        padding: 2px 6px;
+    }
+}

@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+    <!-- Demo Schedules for John Barber -->
+    <record id="schedule_john_monday" model="bp.barber.schedule">
+        <field name="barber_id" ref="bp_barber_john"/>
+        <field name="weekday">0</field>
+        <field name="start_time">9.0</field>
+        <field name="end_time">18.0</field>
+        <field name="active">True</field>
+    </record>
+    
+    <record id="schedule_john_tuesday" model="bp.barber.schedule">
+        <field name="barber_id" ref="bp_barber_john"/>
+        <field name="weekday">1</field>
+        <field name="start_time">9.0</field>
+        <field name="end_time">18.0</field>
+        <field name="active">True</field>
+    </record>
+    
+    <record id="schedule_john_wednesday" model="bp.barber.schedule">
+        <field name="barber_id" ref="bp_barber_john"/>
+        <field name="weekday">2</field>
+        <field name="start_time">9.0</field>
+        <field name="end_time">18.0</field>
+        <field name="active">True</field>
+    </record>
+    
+    <record id="schedule_john_thursday" model="bp.barber.schedule">
+        <field name="barber_id" ref="bp_barber_john"/>
+        <field name="weekday">3</field>
+        <field name="start_time">9.0</field>
+        <field name="end_time">18.0</field>
+        <field name="active">True</field>
+    </record>
+    
+    <record id="schedule_john_friday" model="bp.barber.schedule">
+        <field name="barber_id" ref="bp_barber_john"/>
+        <field name="weekday">4</field>
+        <field name="start_time">9.0</field>
+        <field name="end_time">18.0</field>
+        <field name="active">True</field>
+    </record>
+    
+    <record id="schedule_john_saturday" model="bp.barber.schedule">
+        <field name="barber_id" ref="bp_barber_john"/>
+        <field name="weekday">5</field>
+        <field name="start_time">9.0</field>
+        <field name="end_time">18.0</field>
+        <field name="active">True</field>
+    </record>
+
+    <!-- Demo Schedules for Mary Stylist -->
+    <record id="schedule_mary_monday" model="bp.barber.schedule">
+        <field name="barber_id" ref="bp_barber_mary"/>
+        <field name="weekday">0</field>
+        <field name="start_time">9.0</field>
+        <field name="end_time">18.0</field>
+        <field name="active">True</field>
+    </record>
+    
+    <record id="schedule_mary_tuesday" model="bp.barber.schedule">
+        <field name="barber_id" ref="bp_barber_mary"/>
+        <field name="weekday">1</field>
+        <field name="start_time">9.0</field>
+        <field name="end_time">18.0</field>
+        <field name="active">True</field>
+    </record>
+    
+    <record id="schedule_mary_wednesday" model="bp.barber.schedule">
+        <field name="barber_id" ref="bp_barber_mary"/>
+        <field name="weekday">2</field>
+        <field name="start_time">9.0</field>
+        <field name="end_time">18.0</field>
+        <field name="active">True</field>
+    </record>
+    
+    <record id="schedule_mary_thursday" model="bp.barber.schedule">
+        <field name="barber_id" ref="bp_barber_mary"/>
+        <field name="weekday">3</field>
+        <field name="start_time">9.0</field>
+        <field name="end_time">18.0</field>
+        <field name="active">True</field>
+    </record>
+    
+    <record id="schedule_mary_friday" model="bp.barber.schedule">
+        <field name="barber_id" ref="bp_barber_mary"/>
+        <field name="weekday">4</field>
+        <field name="start_time">9.0</field>
+        <field name="end_time">18.0</field>
+        <field name="active">True</field>
+    </record>
+    
+    <record id="schedule_mary_saturday" model="bp.barber.schedule">
+        <field name="barber_id" ref="bp_barber_mary"/>
+        <field name="weekday">5</field>
+        <field name="start_time">9.0</field>
+        <field name="end_time">18.0</field>
+        <field name="active">True</field>
+    </record>
+</odoo>

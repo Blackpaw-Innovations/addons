@@ -1,0 +1,25 @@
+<templates id="template" xml:space="preserve">
+    <t t-extend="point_of_sale.OrderReceipt" t-name="bp_pos_pay_invoice.InvoicePaymentReceipt">
+        <t t-jquery=".paymentlines" position="after">
+            <t t-if="order.is_invoice_payment">
+                <div class="invoice-payment-block">
+                    <div class="receipt-line"><strong><t t-esc="env._t('Invoice Payment')"/></strong></div>
+                    <div class="receipt-line">
+                        <span><t t-esc="env._t('Invoice')"/>: </span>
+                        <span><t t-esc="order.invoice_name or order.invoice_id"/></span>
+                    </div>
+                    <div class="receipt-line">
+                        <span><t t-esc="env._t('Amount Paid')"/>: </span>
+                        <span><t t-esc="order.invoice_payment_amount"/></span>
+                    </div>
+                    <t t-if="order.invoice_residual_after">
+                        <div class="receipt-line">
+                            <span><t t-esc="env._t('Remaining Balance')"/>: </span>
+                            <span><t t-esc="order.invoice_residual_after"/></span>
+                        </div>
+                    </t>
+                </div>
+            </t>
+        </t>
+    </t>
+</templates>

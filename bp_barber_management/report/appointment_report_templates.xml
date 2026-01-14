@@ -1,0 +1,212 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Paper Format for Barber Visit Reports -->
+    <record id="paperformat_barber_visit" model="report.paperformat">
+        <field name="name">Barber Visit Summary</field>
+        <field name="format">A4</field>
+        <field name="orientation">Portrait</field>
+        <field name="margin_top">40</field>
+        <field name="margin_bottom">23</field>
+        <field name="margin_left">7</field>
+        <field name="margin_right">7</field>
+        <field name="header_line">false</field>
+        <field name="header_spacing">35</field>
+        <field name="dpi">90</field>
+    </record>
+
+    <!-- Main QWeb Template for Appointment Visit Summary -->
+    <template id="report_appointment_visit">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="o">
+                <t t-call="web.external_layout">
+                    <div class="page">
+                        <!-- Header Section -->
+                        <div class="row mb-4">
+                            <div class="col-6">
+                                <img t-if="o.company_id.logo" t-att-src="image_data_uri(o.company_id.logo)" 
+                                     style="max-height: 60px; max-width: 200px;" alt="Company Logo"/>
+                                <h3 t-if="not o.company_id.logo" t-field="o.company_id.name" class="mb-0"/>
+                            </div>
+                            <div class="col-6 text-right">
+                                <h2 class="text-primary mb-1">Visit Summary</h2>
+                                <div class="text-muted">
+                                    <strong>Appointment #</strong> <span t-field="o.name"/>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Appointment Date/Time -->
+                        <div class="row mb-4">
+                            <div class="col-12">
+                                <div class="alert alert-info">
+                                    <div class="row">
+                                        <div class="col-6">
+                                            <strong>Start:</strong> 
+                                            <span t-field="o.start_datetime" t-options="{'widget': 'datetime', 'format': 'MMM d, yyyy HH:mm'}"/>
+                                        </div>
+                                        <div class="col-6">
+                                            <strong>End:</strong> 
+                                            <span t-field="o.end_datetime" t-options="{'widget': 'datetime', 'format': 'MMM d, yyyy HH:mm'}"/>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Customer Information Block -->
+                        <div class="row mb-4">
+                            <div class="col-6">
+                                <div class="card">
+                                    <div class="card-header bg-light">
+                                        <h5 class="mb-0">Customer Information</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <p class="mb-1">
+                                            <strong t-field="o.partner_id.name"/>
+                                        </p>
+                                        <p class="mb-1" t-if="o.phone">
+                                            <i class="fa fa-phone"/> <span t-field="o.phone"/>
+                                        </p>
+                                        <p class="mb-0" t-if="o.email">
+                                            <i class="fa fa-envelope"/> <span t-field="o.email"/>
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Barber & Chair Information Block -->
+                            <div class="col-6">
+                                <div class="card">
+                                    <div class="card-header bg-light">
+                                        <h5 class="mb-0">Service Provider</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <p class="mb-1" t-if="o.barber_id">
+                                            <strong>Barber:</strong> <span t-field="o.barber_id.name"/>
+                                        </p>
+                                        <p class="mb-0" t-if="o.chair_id">
+                                            <strong>Chair:</strong> <span t-field="o.chair_id.name"/>
+                                        </p>
+                                        <p class="mb-0" t-if="not o.barber_id and not o.chair_id">
+                                            <em class="text-muted">No specific assignment</em>
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Services Table -->
+                        <div class="row mb-4">
+                            <div class="col-12">
+                                <h4>Services Provided</h4>
+                                <table class="table table-bordered table-sm">
+                                    <thead class="thead-light">
+                                        <tr>
+                                            <th width="50%">Service</th>
+                                            <th width="20%" class="text-center">Duration (min)</th>
+                                            <th width="30%" class="text-right">Price</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <t t-foreach="o.service_ids" t-as="service">
+                                            <tr>
+                                                <td><span t-field="service.name"/></td>
+                                                <td class="text-center"><span t-field="service.duration_minutes"/></td>
+                                                <td class="text-right">
+                                                    <span t-field="service.list_price" 
+                                                          t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/>
+                                                </td>
+                                            </tr>
+                                        </t>
+                                        <t t-if="not o.service_ids">
+                                            <tr>
+                                                <td colspan="3" class="text-center text-muted">
+                                                    <em>No services specified</em>
+                                                </td>
+                                            </tr>
+                                        </t>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- Pricing Summary -->
+                        <div class="row mb-4">
+                            <div class="col-8"></div>
+                            <div class="col-4">
+                                <table class="table table-sm">
+                                    <tr>
+                                        <td><strong>Subtotal:</strong></td>
+                                        <td class="text-right">
+                                            <span t-field="o.price_subtotal" 
+                                                  t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/>
+                                        </td>
+                                    </tr>
+                                    <tr t-if="o.discount_percent and o.discount_percent > 0">
+                                        <td>
+                                            <strong>Discount (<span t-field="o.discount_percent"/>%):</strong>
+                                        </td>
+                                        <td class="text-right text-danger">
+                                            -<span t-esc="'{:,.2f}'.format((o.price_subtotal * o.discount_percent / 100) or 0)"/> 
+                                            <span t-field="o.currency_id.symbol"/>
+                                        </td>
+                                    </tr>
+                                    <tr class="border-top">
+                                        <td><strong class="h5">Total:</strong></td>
+                                        <td class="text-right">
+                                            <strong class="h5" t-field="o.price_total" 
+                                                    t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- Notes Section -->
+                        <div class="row mb-4" t-if="o.note">
+                            <div class="col-12">
+                                <div class="card">
+                                    <div class="card-header bg-light">
+                                        <h5 class="mb-0">Notes</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <p class="mb-0" t-field="o.note"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Footer Information -->
+                        <div class="row mt-5 pt-4 border-top">
+                            <div class="col-8">
+                                <div class="text-muted small">
+                                    <div t-if="o.company_id.street">
+                                        <span t-field="o.company_id.street"/>
+                                        <span t-if="o.company_id.street2">, <span t-field="o.company_id.street2"/></span>
+                                    </div>
+                                    <div t-if="o.company_id.city">
+                                        <span t-field="o.company_id.city"/>
+                                        <span t-if="o.company_id.state_id">, <span t-field="o.company_id.state_id.name"/></span>
+                                        <span t-if="o.company_id.zip"> <span t-field="o.company_id.zip"/></span>
+                                    </div>
+                                    <div t-if="o.company_id.phone">
+                                        Phone: <span t-field="o.company_id.phone"/>
+                                    </div>
+                                    <div t-if="o.company_id.website">
+                                        Web: <span t-field="o.company_id.website"/>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-4 text-right">
+                                <div class="text-muted small">
+                                    <strong>Printed on:</strong><br/>
+                                    <span t-esc="datetime.datetime.now().strftime('%B %d, %Y at %I:%M %p')"/>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+</odoo>

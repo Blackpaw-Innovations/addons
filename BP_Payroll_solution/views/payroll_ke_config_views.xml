@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <record id="view_payroll_ke_config_form" model="ir.ui.view">
+        <field name="name">bp.payroll.ke.config.form</field>
+        <field name="model">bp.payroll.ke.config</field>
+        <field name="arch" type="xml">
+            <form string="Kenya Payroll Settings">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="active"/>
+                            <field name="company_id" required="1"/>
+                            <field name="country_id"/>
+                        </group>
+                        <group>
+                            <field name="currency_id" readonly="1"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="PAYE">
+                            <group>
+                                <group>
+                                    <field name="paye_band_1_limit"/>
+                                    <field name="paye_band_1_rate"/>
+                                    <field name="paye_band_2_limit"/>
+                                    <field name="paye_band_2_rate"/>
+                                    <field name="paye_band_3_limit"/>
+                                    <field name="paye_band_3_rate"/>
+                                </group>
+                                <group>
+                                    <field name="paye_band_4_limit"/>
+                                    <field name="paye_band_4_rate"/>
+                                    <field name="paye_band_5_rate"/>
+                                    <field name="personal_relief"/>
+                                    <field name="paye_additional_relief"/>
+                                    <field name="paye_deduct_nssf"/>
+                                    <field name="paye_deduct_shif"/>
+                                    <field name="paye_deduct_housing_levy"/>
+                                </group>
+                            </group>
+                        </page>
+                        <page string="NSSF">
+                            <group>
+                                <group>
+                                    <field name="nssf_rate_employee"/>
+                                    <field name="nssf_rate_employer"/>
+                                </group>
+                                <group>
+                                    <field name="nssf_lower_earnings_limit"/>
+                                    <field name="nssf_upper_earnings_limit"/>
+                                </group>
+                            </group>
+                        </page>
+                        <page string="SHIF">
+                            <group>
+                                <group>
+                                    <field name="shif_rate"/>
+                                    <field name="shif_min_contribution"/>
+                                </group>
+                            </group>
+                        </page>
+                        <page string="Housing Levy">
+                            <group>
+                                <group>
+                                    <field name="housing_levy_rate"/>
+                                    <field name="housing_levy_base"/>
+                                </group>
+                            </group>
+                        </page>
+                        <page string="Accounting">
+                            <group>
+                                <field name="payroll_journal_id"/>
+                                <group string="Expenses">
+                                    <field name="account_basic_salary_id"/>
+                                    <field name="account_nssf_expense_id"/>
+                                    <field name="account_housing_levy_expense_id"/>
+                                    <field name="account_nita_expense_id"/>
+                                </group>
+                                <group string="Liabilities (Payables)">
+                                    <field name="account_net_pay_payable_id"/>
+                                    <field name="account_paye_payable_id"/>
+                                    <field name="account_nssf_payable_id"/>
+                                    <field name="account_shif_payable_id"/>
+                                    <field name="account_housing_levy_payable_id"/>
+                                    <field name="account_nita_payable_id"/>
+                                </group>
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_payroll_ke_config_tree" model="ir.ui.view">
+        <field name="name">bp.payroll.ke.config.tree</field>
+        <field name="model">bp.payroll.ke.config</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="company_id"/>
+                <field name="active"/>
+                <field name="country_id"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="action_payroll_ke_config" model="ir.actions.act_window">
+        <field name="name">Kenya Payroll Settings</field>
+        <field name="res_model">bp.payroll.ke.config</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <menuitem id="menu_payroll_ke_config"
+              name="Kenya Payroll Settings"
+              parent="menu_bp_payroll_configuration_root"
+              action="action_payroll_ke_config"
+              sequence="35"
+              groups="BP_Payroll_solution.group_bp_payroll_manager"/>
+</odoo>

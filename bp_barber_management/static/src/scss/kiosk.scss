@@ -1,0 +1,512 @@
+/* Barber Kiosk Styles - Optimized for TV Display */
+
+.kiosk-container {
+    background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+    color: #ffffff;
+    min-height: 100vh;
+    padding: 20px;
+    font-family: 'Segoe UI', 'Roboto', 'Helvetica', Arial, sans-serif;
+    box-sizing: border-box;
+}
+
+/* Header */
+.kiosk-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+    padding: 0 20px;
+}
+
+.company-info {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.company-logo {
+    max-height: 60px;
+    max-width: 120px;
+    object-fit: contain;
+}
+
+.company-name {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin: 0;
+    color: #ffffff;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.current-time {
+    text-align: right;
+}
+
+.current-time .time {
+    font-size: 2.2rem;
+    font-weight: 600;
+    color: #00d4aa;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+.current-time .date {
+    font-size: 1.1rem;
+    color: #cccccc;
+    margin-top: 5px;
+}
+
+/* Status Bar */
+.status-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: rgba(255, 255, 255, 0.1);
+    padding: 15px 25px;
+    border-radius: 12px;
+    margin-bottom: 30px;
+    backdrop-filter: blur(10px);
+}
+
+.status-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 1rem;
+    font-weight: 500;
+}
+
+.status-item.success {
+    color: #00d4aa;
+}
+
+.status-item.error {
+    color: #ff6b6b;
+}
+
+.status-item.reconnecting {
+    color: #ffd93d;
+}
+
+.last-update {
+    font-size: 0.9rem;
+    color: #888;
+}
+
+/* Loading */
+.loading-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 400px;
+    gap: 30px;
+}
+
+.loading-spinner {
+    width: 60px;
+    height: 60px;
+    border: 6px solid rgba(255, 255, 255, 0.1);
+    border-top: 6px solid #00d4aa;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+.loading-container h2 {
+    font-size: 1.8rem;
+    color: #cccccc;
+    margin: 0;
+}
+
+/* No Data */
+.no-data-container {
+    text-align: center;
+    padding: 80px 20px;
+    min-height: 400px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.no-data-icon {
+    font-size: 5rem;
+    color: #666;
+    margin-bottom: 30px;
+}
+
+.no-data-container h2 {
+    font-size: 2.2rem;
+    color: #cccccc;
+    margin: 0 0 15px 0;
+}
+
+.no-data-container p {
+    font-size: 1.2rem;
+    color: #888;
+    margin: 0;
+}
+
+/* Barber Grid */
+.barbers-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+    gap: 30px;
+    padding: 0 20px;
+}
+
+/* Barber Card */
+.barber-card {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 16px;
+    padding: 25px;
+    border: 2px solid rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    transition: all 0.3s ease;
+    min-height: 350px;
+}
+
+.barber-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+}
+
+/* Barber Colors */
+.barber-color-1 {
+    border-left: 6px solid #ff6b6b;
+}
+
+.barber-color-2 {
+    border-left: 6px solid #4ecdc4;
+}
+
+.barber-color-3 {
+    border-left: 6px solid #45b7d1;
+}
+
+.barber-color-4 {
+    border-left: 6px solid #96ceb4;
+}
+
+.barber-color-5 {
+    border-left: 6px solid #feca57;
+}
+
+.barber-color-6 {
+    border-left: 6px solid #ff9ff3;
+}
+
+.barber-color-7 {
+    border-left: 6px solid #54a0ff;
+}
+
+.barber-color-8 {
+    border-left: 6px solid #5f27cd;
+}
+
+.barber-color-9 {
+    border-left: 6px solid #00d2d3;
+}
+
+.barber-color-10 {
+    border-left: 6px solid #ff9f43;
+}
+
+/* Barber Header */
+.barber-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.barber-name {
+    font-size: 1.6rem;
+    font-weight: 700;
+    margin: 0;
+    color: #ffffff;
+}
+
+.chair-info {
+    font-size: 0.9rem;
+    color: #cccccc;
+    background: rgba(255, 255, 255, 0.1);
+    padding: 4px 12px;
+    border-radius: 20px;
+    margin-top: 5px;
+    display: inline-block;
+}
+
+.status-badge {
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.status-badge.busy {
+    background: #ff6b6b;
+    color: white;
+}
+
+.status-badge.available {
+    background: #00d4aa;
+    color: white;
+}
+
+/* Sections */
+.current-section,
+.upcoming-section {
+    margin-bottom: 25px;
+}
+
+.section-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 1.2rem;
+    font-weight: 600;
+    margin: 0 0 15px 0;
+    color: #cccccc;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.section-title i {
+    font-size: 1rem;
+    color: #00d4aa;
+}
+
+/* Current Appointment */
+.appointment-now {
+    background: rgba(0, 212, 170, 0.1);
+    border: 1px solid rgba(0, 212, 170, 0.3);
+    border-radius: 12px;
+    padding: 20px;
+}
+
+.time-display {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.time-range {
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: #00d4aa;
+}
+
+.remaining-time {
+    font-size: 1rem;
+    color: #ffd93d;
+    font-weight: 600;
+    background: rgba(255, 217, 61, 0.2);
+    padding: 4px 12px;
+    border-radius: 20px;
+}
+
+.customer-info {
+    margin-bottom: 10px;
+}
+
+.customer-name {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: #ffffff;
+}
+
+.services-info .services {
+    font-size: 1rem;
+    color: #cccccc;
+    font-style: italic;
+}
+
+/* No Appointment */
+.no-appointment {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: #888;
+    font-style: italic;
+    padding: 20px;
+    text-align: center;
+    justify-content: center;
+}
+
+/* Upcoming Appointments */
+.appointments-next {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.appointment-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: rgba(255, 255, 255, 0.05);
+    padding: 15px 18px;
+    border-radius: 10px;
+    border-left: 3px solid #4ecdc4;
+}
+
+.appointment-time {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    min-width: 80px;
+}
+
+.start-time {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #ffffff;
+}
+
+.eta {
+    font-size: 0.9rem;
+    color: #4ecdc4;
+    font-weight: 500;
+}
+
+.appointment-details {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    text-align: right;
+    flex: 1;
+    margin-left: 15px;
+}
+
+.appointment-details .customer-name {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #ffffff;
+    margin-bottom: 4px;
+}
+
+.appointment-details .services {
+    font-size: 0.9rem;
+    color: #cccccc;
+    font-style: italic;
+}
+
+/* No Upcoming */
+.no-upcoming {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: #888;
+    font-style: italic;
+    padding: 15px;
+    justify-content: center;
+}
+
+/* Footer */
+.kiosk-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 40px;
+    padding: 20px 25px;
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 12px;
+    font-size: 0.9rem;
+    color: #888;
+}
+
+.refresh-info {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.powered-by {
+    font-style: italic;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .kiosk-container {
+        padding: 15px;
+    }
+
+    .company-name {
+        font-size: 1.8rem;
+    }
+
+    .current-time .time {
+        font-size: 1.6rem;
+    }
+
+    .barbers-grid {
+        grid-template-columns: 1fr;
+        gap: 20px;
+        padding: 0;
+    }
+
+    .kiosk-header {
+        flex-direction: column;
+        gap: 20px;
+        text-align: center;
+    }
+
+    .status-bar {
+        flex-direction: column;
+        gap: 10px;
+        text-align: center;
+    }
+}
+
+@media (min-width: 1400px) {
+    .barbers-grid {
+        grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+    }
+
+    .company-name {
+        font-size: 3rem;
+    }
+
+    .current-time .time {
+        font-size: 2.5rem;
+    }
+}
+
+/* TV Optimizations */
+@media screen and (min-width: 1920px) {
+    .kiosk-container {
+        padding: 40px;
+    }
+
+    .company-name {
+        font-size: 3.5rem;
+    }
+
+    .barber-name {
+        font-size: 2rem;
+    }
+
+    .time-range {
+        font-size: 1.6rem;
+    }
+
+    .barber-card {
+        min-height: 450px;
+        padding: 35px;
+    }
+}

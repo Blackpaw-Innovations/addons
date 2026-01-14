@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <defs>
+    <style>
+      .scissors-handle1 { fill: #ff7b7b; }
+      .scissors-handle2 { fill: #a855a8; }
+      .scissors-blade { fill: #ff7b7b; }
+    </style>
+  </defs>
+  
+  <!-- Left handle (circle) -->
+  <circle cx="140" cy="200" r="90" class="scissors-handle1"/>
+  <circle cx="140" cy="200" r="35" fill="white"/>
+  
+  <!-- Right handle (circle) -->
+  <circle cx="140" cy="400" r="90" class="scissors-handle2"/>
+  <circle cx="140" cy="400" r="35" fill="white"/>
+  
+  <!-- Top blade -->
+  <path d="M200 170 L450 120 L480 140 L470 170 L420 180 L200 210 Z" class="scissors-blade"/>
+  <circle cx="200" cy="190" r="8" fill="white"/>
+  
+  <!-- Bottom blade -->
+  <path d="M200 430 L450 480 L480 460 L470 430 L420 420 L200 390 Z" class="scissors-handle2"/>
+  
+  <!-- Pivot point -->
+  <circle cx="200" cy="300" r="15" fill="#666"/>
+</svg>

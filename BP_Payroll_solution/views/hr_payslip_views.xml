@@ -1,0 +1,430 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <!-- Payslip Run -->
+    <record id="view_hr_payslip_run_tree" model="ir.ui.view">
+        <field name="name">hr.payslip.run.tree.bp</field>
+        <field name="model">hr.payslip.run</field>
+        <field name="arch" type="xml">
+            <tree string="Payroll Batches">
+                <field name="name"/>
+                <field name="date_start"/>
+                <field name="date_end"/>
+                <field name="company_id"/>
+                <field name="state"/>
+                <field name="bp_prevalidated"/>
+                <field name="bp_total_net"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_hr_payslip_run_form" model="ir.ui.view">
+        <field name="name">hr.payslip.run.form.bp</field>
+        <field name="model">hr.payslip.run</field>
+        <field name="arch" type="xml">
+            <form string="Payroll Batch">
+                <header>
+                    <button name="action_open_generate_wizard" type="object" string="Generate Payslips" class="btn-primary" invisible="state != 'draft' or slip_ids"/>
+                    <button name="action_compute_slips" type="object" string="Compute" class="btn-secondary" invisible="state not in ('draft', 'verify') or not slip_ids"/>
+                    <button name="action_prevalidate" type="object" string="Pre-Validate" class="btn-secondary" invisible="state not in ('draft', 'verify')"/>
+                    
+                    <button name="action_submit_to_finance" type="object" string="Submit to Finance" class="btn-primary" 
+                            invisible="state != 'verify'" groups="BP_Payroll_solution.group_bp_payroll_officer"/>
+                    
+                    <button name="action_finance_approve" type="object" string="Approve (Finance)" class="btn-primary" 
+                            invisible="state != 'approval' or bp_finance_approved" groups="BP_Payroll_solution.group_bp_payroll_accountant"/>
+                    
+                    <button name="action_director_approve" type="object" string="Approve (Director)" class="btn-primary" 
+                            invisible="state != 'approval' or not bp_finance_approved" groups="BP_Payroll_solution.group_bp_payroll_director"/>
+                    
+                    <button name="action_approve_all_payslips" type="object" string="Approve All Payslips" class="btn-secondary" 
+                            invisible="state != 'payment_ready' or bp_all_payslips_approved" groups="BP_Payroll_solution.group_bp_payroll_accountant"/>
+                            
+                    <button name="action_pay_batch" type="object" string="Pay" class="btn-primary" 
+                            invisible="state != 'payment_ready' or not bp_all_payslips_approved" groups="BP_Payroll_solution.group_bp_payroll_accountant"/>
+
+                    <button name="action_reset_to_draft" type="object" string="Reset to Draft" invisible="state == 'draft'"/>
+                    <button name="%(BP_Payroll_solution.report_payslip_run_bp_action)d" string="Print Report" type="action"/>
+                    <field name="stage_id" widget="statusbar" options="{'fold_field': 'fold'}"/>
+                    <field name="state" invisible="1"/>
+                    <field name="bp_all_payslips_approved" invisible="1"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_moves" type="object" class="oe_stat_button" icon="fa-bars" invisible="not move_ids" string="Journal Entries"/>
+                    </div>
+                    <field name="move_ids" invisible="1"/>
+                    <group col="4">
+                        <group>
+                            <field name="name"/>
+                            <field name="company_id" required="1"/>
+                        </group>
+                        <group>
+                            <field name="date_start" required="1"/>
+                            <field name="date_end" required="1"/>
+                            <field name="bp_prevalidated" readonly="1"/>
+                            <field name="bp_finance_approved" invisible="1"/>
+                        </group>
+                        <group>
+                            <field name="analytic_account_id"/>
+                            <field name="bp_note" placeholder="Notes for payroll reviewers and accountants"/>
+                        </group>
+                    </group>
+                    <group string="Totals (computed)" col="4">
+                        <field name="bp_total_gross" readonly="1"/>
+                        <field name="bp_total_deductions" readonly="1"/>
+                        <field name="bp_total_employer_cost" readonly="1"/>
+                        <field name="bp_total_net" readonly="1"/>
+                    </group>
+                    <notebook>
+                        <page string="Payslips">
+                            <field name="slip_ids">
+                                <tree editable="bottom" string="Payslips">
+                                    <field name="employee_id"/>
+                                    <field name="date_from"/>
+                                    <field name="date_to"/>
+                                    <field name="structure_id"/>
+                                    <field name="state"/>
+                                    <field name="total_net" readonly="1"/>
+                                </tree>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="hr_payslip_run_filter" model="ir.ui.view">
+        <field name="name">hr.payslip.run.search.bp</field>
+        <field name="model">hr.payslip.run</field>
+        <field name="arch" type="xml">
+            <search string="Payroll Batches">
+                <filter string="In Progress" name="state_verify" domain="[('state','=','verify')]"/>
+                <field name="name"/>
+                <field name="company_id"/>
+                <field name="date_end"/>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_hr_payslip_run" model="ir.actions.act_window">
+        <field name="name">Payroll Batches</field>
+        <field name="res_model">hr.payslip.run</field>
+        <field name="view_mode">tree,form</field>
+        <field name="search_view_id" ref="hr_payslip_run_filter"/>
+    </record>
+
+    <!-- Payslip -->
+    <record id="view_hr_payslip_tree" model="ir.ui.view">
+        <field name="name">hr.payslip.tree.bp</field>
+        <field name="model">hr.payslip</field>
+        <field name="arch" type="xml">
+            <tree string="Payslips">
+                <field name="name"/>
+                <field name="employee_id"/>
+                <field name="date_from"/>
+                <field name="date_to"/>
+                <field name="state"/>
+                <field name="total_net" sum="Total Net"/>
+                <field name="bp_ready_for_payment"/>
+                <field name="bp_prevalidated"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_hr_payslip_form" model="ir.ui.view">
+        <field name="name">hr.payslip.form.bp</field>
+        <field name="model">hr.payslip</field>
+        <field name="arch" type="xml">
+            <form string="Payslip">
+                <header>
+                    <button name="action_compute_inputs" string="Compute Sheet" type="object" class="btn-primary" invisible="state != 'draft'"/>
+
+                    <button name="action_submit_finance" type="object" string="Submit to Finance" class="btn-primary" 
+                            invisible="state != 'verify'" groups="BP_Payroll_solution.group_bp_payroll_officer"/>
+                    
+                    <button name="action_finance_approve" type="object" string="Approve (Finance)" class="btn-primary" 
+                            invisible="state != 'approval' or bp_finance_approved" groups="BP_Payroll_solution.group_bp_payroll_accountant"/>
+                    
+                    <button name="action_director_approve" type="object" string="Approve (Director)" class="btn-primary" 
+                            invisible="state != 'approval' or not bp_finance_approved" groups="BP_Payroll_solution.group_bp_payroll_director"/>
+                            
+                    <button name="action_reject" string="Reject" type="object" class="btn-secondary" 
+                            invisible="state in ('draft', 'done', 'cancel')"/>
+
+                    <button name="action_pay" string="Confirm Payment" type="object" class="btn-primary" 
+                            invisible="state != 'payment_ready'" groups="BP_Payroll_solution.group_bp_payroll_accountant"/>
+
+                    <button name="action_reset_to_draft" string="Reset to Draft" type="object" invisible="state == 'draft'"/>
+                    <field name="stage_id" widget="statusbar" options="{'fold_field': 'fold'}"/>
+                    <field name="state" invisible="1"/>
+                    <field name="bp_finance_approved" invisible="1"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_journal_entry" type="object" class="oe_stat_button" icon="fa-bars" invisible="not move_id" string="Journal Entry"/>
+                    </div>
+                    <field name="move_id" invisible="1"/>
+                    <group col="4">
+                        <group>
+                            <field name="name"/>
+                            <field name="employee_id" required="1"/>
+                            <field name="contract_id"/>
+                        </group>
+                        <group>
+                            <field name="structure_id"/>
+                            <field name="payslip_run_id"/>
+                            <field name="bp_prevalidated" readonly="1"/>
+                        </group>
+                        <group>
+                            <field name="date_from" required="1"/>
+                            <field name="date_to" required="1"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Worked Days &amp; Inputs">
+                            <group>
+                                <group string="Worked Days">
+                                    <field name="worked_days_line_ids">
+                                        <tree editable="bottom">
+                                            <field name="name"/>
+                                            <field name="code"/>
+                                            <field name="number_of_days"/>
+                                            <field name="number_of_hours"/>
+                                        </tree>
+                                    </field>
+                                </group>
+                                <group string="Inputs">
+                                    <field name="input_line_ids">
+                                        <tree editable="bottom">
+                                            <field name="name"/>
+                                            <field name="code"/>
+                                            <field name="amount"/>
+                                            <field name="note"/>
+                                        </tree>
+                                    </field>
+                                </group>
+                            </group>
+                        </page>
+                        <page string="Salary Computations">
+                            <div class="alert alert-info" role="alert">
+                                Earnings and allowances are shown in green, statutory and other deductions in red, and employer costs in blue.
+                            </div>
+                            <field name="line_ids" widget="section_and_note_one2many" domain="['|', ('total', '!=', 0.0), ('display_type', '!=', False)]"
+                                   options="{'limit': 50}" context="{'limit': 50}" class="o_bp_payslip_lines_tree">
+                                <tree editable="bottom" class="o_bp_payslip_lines" default_order="sequence, code" limit="50">
+                                    <control>
+                                        <create name="add_line_control" string="Add a line"/>
+                                        <create name="add_section_control" string="Add a section" context="{'default_display_type': 'line_section'}"/>
+                                        <create name="add_note_control" string="Add a note" context="{'default_display_type': 'line_note'}"/>
+                                    </control>
+                                    <field name="display_type" invisible="1"/>
+                                    <field name="name" widget="section_and_note_text"/>
+                                    <field name="code"/>
+                                    <field name="category_id"/>
+                                    <field name="credit" string="Credit" sum="Total Credit" optional="show"/>
+                                    <field name="debit" string="Debit" sum="Total Debit" optional="show"/>
+                                    <field name="note" column_invisible="1"/>
+                                </tree>
+                            </field>
+                            <group string="Net Pay Summary">
+                                <field name="total_net_pay" readonly="1" class="fw-bold"/>
+                            </group>
+                        </page>
+                        <page string="Payment">
+                            <group>
+                                <field name="bp_ready_for_payment"/>
+                                <field name="bp_payment_reference"/>
+                            </group>
+                        </page>
+                        <page string="Totals">
+                            <group>
+                                <group>
+                                    <field name="total_earnings" readonly="1"/>
+                                    <field name="total_deductions" readonly="1"/>
+                                </group>
+                                <group>
+                                    <field name="total_employer_cost" readonly="1"/>
+                                    <field name="total_net_pay" readonly="1" class="fw-bold"/>
+                                </group>
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="hr_payslip_filter" model="ir.ui.view">
+        <field name="name">hr.payslip.search.bp</field>
+        <field name="model">hr.payslip</field>
+        <field name="arch" type="xml">
+            <search string="Payslips">
+                <filter string="Ready for Payment" name="ready_payment" domain="[('bp_ready_for_payment','=',True)]"/>
+                <field name="employee_id"/>
+                <field name="state"/>
+                <field name="date_from"/>
+                <field name="date_to"/>
+                <field name="payslip_run_id"/>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_view_hr_payslip" model="ir.actions.act_window">
+        <field name="name">Payslips</field>
+        <field name="res_model">hr.payslip</field>
+        <field name="view_mode">tree,form</field>
+        <field name="search_view_id" ref="hr_payslip_filter"/>
+    </record>
+
+    <!-- Salary Rule Categories -->
+    <record id="view_hr_salary_rule_category_tree" model="ir.ui.view">
+        <field name="name">hr.salary.rule.category.tree.bp</field>
+        <field name="model">hr.salary.rule.category</field>
+        <field name="arch" type="xml">
+            <tree string="Salary Rule Categories">
+                <field name="name"/>
+                <field name="code"/>
+                <field name="sequence"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_hr_salary_rule_category_form" model="ir.ui.view">
+        <field name="name">hr.salary.rule.category.form.bp</field>
+        <field name="model">hr.salary.rule.category</field>
+        <field name="arch" type="xml">
+            <form string="Salary Rule Category">
+                <sheet>
+                    <group>
+                        <field name="name"/>
+                        <field name="code"/>
+                        <field name="sequence"/>
+                        <field name="note"/>
+                    </group>
+                    <group string="Accounting">
+                        <field name="debit_account_id"/>
+                        <field name="credit_account_id"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_hr_salary_rule_category" model="ir.actions.act_window">
+        <field name="name">Salary Rule Categories</field>
+        <field name="res_model">hr.salary.rule.category</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <!-- Salary Rules -->
+    <record id="view_hr_salary_rule_tree" model="ir.ui.view">
+        <field name="name">hr.salary.rule.tree.bp</field>
+        <field name="model">hr.salary.rule</field>
+        <field name="arch" type="xml">
+            <tree string="Salary Rules">
+                <field name="name"/>
+                <field name="code"/>
+                <field name="category_id"/>
+                <field name="amount_select"/>
+                <field name="amount"/>
+                <field name="quantity"/>
+                <field name="active"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_hr_salary_rule_form" model="ir.ui.view">
+        <field name="name">hr.salary.rule.form.bp</field>
+        <field name="model">hr.salary.rule</field>
+        <field name="arch" type="xml">
+            <form string="Salary Rule">
+                <sheet>
+                    <group>
+                        <field name="name"/>
+                        <field name="code"/>
+                        <field name="sequence"/>
+                        <field name="active"/>
+                        <field name="display_type"/>
+                    </group>
+                    <group>
+                        <field name="category_id" required="1"/>
+                        <field name="amount_select"/>
+                        <field name="amount"/>
+                        <field name="quantity"/>
+                    </group>
+                    <group>
+                        <field name="struct_ids" widget="many2many_tags"/>
+                    </group>
+                    <notebook>
+                        <page string="Accounting">
+                            <group>
+                                <field name="debit_account_id"/>
+                                <field name="credit_account_id"/>
+                            </group>
+                        </page>
+                        <page string="Notes">
+                            <field name="note"/>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_hr_salary_rule" model="ir.actions.act_window">
+        <field name="name">Salary Rules</field>
+        <field name="res_model">hr.salary.rule</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <!-- Payroll Structures -->
+    <record id="view_hr_payroll_structure_tree" model="ir.ui.view">
+        <field name="name">hr.payroll.structure.tree.bp</field>
+        <field name="model">hr.payroll.structure</field>
+        <field name="arch" type="xml">
+            <tree string="Payroll Structures">
+                <field name="name"/>
+                <field name="code"/>
+                <field name="company_id"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_hr_payroll_structure_form" model="ir.ui.view">
+        <field name="name">hr.payroll.structure.form.bp</field>
+        <field name="model">hr.payroll.structure</field>
+        <field name="arch" type="xml">
+            <form string="Payroll Structure">
+                <sheet>
+                    <group>
+                        <field name="name"/>
+                        <field name="code"/>
+                        <field name="company_id" required="1"/>
+                        <field name="note"/>
+                    </group>
+                    <field name="rule_ids" widget="many2many_tags" string="Salary Rules"/>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_hr_payroll_structure" model="ir.actions.act_window">
+        <field name="name">Payroll Structures</field>
+        <field name="res_model">hr.payroll.structure</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <record id="action_download_csv_server" model="ir.actions.server">
+        <field name="name">Download CSV</field>
+        <field name="model_id" ref="model_hr_payslip"/>
+        <field name="binding_model_id" ref="model_hr_payslip"/>
+        <field name="binding_view_types">form</field>
+        <field name="state">code</field>
+        <field name="code">
+action = records.action_download_csv()
+        </field>
+    </record>
+
+
+</odoo>

@@ -1,0 +1,50 @@
+<odoo>
+    <!-- Wizard Form -->
+    <record id="view_customer_statement_wizard_form" model="ir.ui.view">
+        <field name="name">bp.customer.statement.wizard.form</field>
+        <field name="model">bp.customer.statement.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Customer Statement" version="7.0">
+                <group>
+                    <field name="partner_id" options="{'no_create': True}"/>
+                    <field name="date_from"/>
+                    <field name="date_to"/>
+                </group>
+                <footer>
+                    <button string="Print" type="object" name="action_print_statement" class="btn-primary"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <!-- Action to open wizard -->
+    <record id="action_customer_statement_wizard" model="ir.actions.act_window">
+        <field name="name">Customer Statement</field>
+        <field name="res_model">bp.customer.statement.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+
+    <!-- Smart button on partner -->
+    <record id="view_partner_form_customer_statement_inherit" model="ir.ui.view">
+        <field name="name">res.partner.form.customer.statement</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_partner_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//div[@name='button_box']" position="inside">
+                <button
+                    name="%(action_customer_statement_wizard)d"
+                    type="action"
+                    class="oe_stat_button"
+                    icon="fa-file-text-o"
+                    context="{'default_partner_id': active_id}"
+                >
+                    <div class="o_stat_info">
+                        <span class="o_stat_text">Statement</span>
+                    </div>
+                </button>
+            </xpath>
+        </field>
+    </record>
+</odoo>

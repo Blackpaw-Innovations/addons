@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates>
+    <t t-name="bp_barber_management.kiosk_app_template">
+        <div class="kiosk-container">
+            <!-- Header -->
+            <div class="kiosk-header">
+                <div class="company-info">
+                    <img t-if="config.companyLogo" 
+                         t-att-src="config.companyLogo" 
+                         alt="Logo" 
+                         class="company-logo"/>
+                    <h1 class="company-name" t-esc="config.companyName"></h1>
+                </div>
+                
+                <div class="current-time">
+                    <div class="time" t-esc="getCurrentTimeDisplay()"></div>
+                    <div class="date" t-esc="getCurrentDateDisplay()"></div>
+                </div>
+            </div>
+
+            <!-- Status Bar -->
+            <div class="status-bar">
+                <div t-if="state.reconnecting" class="status-item reconnecting">
+                    <i class="fa fa-refresh fa-spin"></i>
+                    Updating...
+                </div>
+                
+                <div t-elif="state.error" class="status-item error">
+                    <i class="fa fa-exclamation-triangle"></i>
+                    <t t-esc="state.error"/> (retrying...)
+                </div>
+                
+                <div t-else="" class="status-item success">
+                    <i class="fa fa-check-circle"></i>
+                    <span t-if="hasBarbers">
+                        <t t-esc="activeBarbersCount"/> of <t t-esc="state.data.barbers.length"/> barbers active
+                    </span>
+                    <span t-else="">No barbers available today</span>
+                </div>
+                
+                <div class="last-update" t-if="state.lastUpdate">
+                    Last updated: <t t-esc="state.lastUpdate.toLocaleTimeString()"/>
+                </div>
+            </div>
+
+            <!-- Main Content -->
+            <div class="kiosk-content">
+                <!-- Loading State -->
+                <div t-if="state.loading" class="loading-container">
+                    <div class="loading-spinner"></div>
+                    <h2>Loading barber information...</h2>
+                </div>
+
+                <!-- No Barbers -->
+                <div t-elif="!hasBarbers" class="no-data-container">
+                    <div class="no-data-icon">
+                        <i class="fa fa-calendar-times-o"></i>
+                    </div>
+                    <h2>No barbers available today</h2>
+                    <p>Please check back later or contact the shop directly.</p>
+                </div>
+
+                <!-- Barber Grid -->
+                <div t-else="" class="barbers-grid">
+                    <div t-foreach="state.data.barbers" t-as="barber" t-key="barber.id" 
+                         class="barber-card" 
+                         t-att-class="getBarberColorClass(barber.color)">
+                         
+                        <!-- Barber Header -->
+                        <div class="barber-header">
+                            <div class="barber-info">
+                                <h2 class="barber-name" t-esc="barber.name"></h2>
+                                <span t-if="barber.chair" class="chair-info" t-esc="barber.chair"></span>
+                            </div>
+                            <div class="barber-status">
+                                <span t-if="barber.now" class="status-badge busy">Busy</span>
+                                <span t-else="" class="status-badge available">Available</span>
+                            </div>
+                        </div>
+
+                        <!-- Current Appointment -->
+                        <div class="current-section">
+                            <h3 class="section-title">
+                                <i class="fa fa-scissors"></i>
+                                Now Serving
+                            </h3>
+                            
+                            <div t-if="barber.now" class="appointment-now">
+                                <div class="time-display">
+                                    <span class="time-range" t-esc="formatTimeRange(barber.now.start, barber.now.end)"></span>
+                                    <span class="remaining-time" t-esc="getRemainingTimeDisplay(barber.now.remaining_min)"></span>
+                                </div>
+                                
+                                <div class="customer-info">
+                                    <span class="customer-name" t-esc="getCustomerDisplayName(barber.now.partner)"></span>
+                                </div>
+                                
+                                <div class="services-info">
+                                    <span class="services" t-esc="barber.now.services"></span>
+                                </div>
+                            </div>
+                            
+                            <div t-else="" class="no-appointment">
+                                <i class="fa fa-clock-o"></i>
+                                <span>No current appointment</span>
+                            </div>
+                        </div>
+
+                        <!-- Upcoming Appointments -->
+                        <div class="upcoming-section">
+                            <h3 class="section-title">
+                                <i class="fa fa-clock-o"></i>
+                                Up Next
+                            </h3>
+                            
+                            <div t-if="barber.next and barber.next.length" class="appointments-next">
+                                <div t-foreach="barber.next" t-as="apt" t-key="apt.apt" class="appointment-item">
+                                    <div class="appointment-time">
+                                        <span class="start-time" t-esc="formatTime(apt.start)"></span>
+                                        <span class="eta" t-esc="getETADisplay(apt.eta_min)"></span>
+                                    </div>
+                                    <div class="appointment-details">
+                                        <span class="customer-name" t-esc="getCustomerDisplayName(apt.partner)"></span>
+                                        <span class="services" t-esc="apt.services"></span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div t-else="" class="no-upcoming">
+                                <i class="fa fa-calendar-o"></i>
+                                <span>No upcoming appointments</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <div class="kiosk-footer">
+                <div class="refresh-info">
+                    <i class="fa fa-refresh"></i>
+                    Auto-refreshing every <t t-esc="config.refreshSeconds"/> seconds
+                </div>
+                
+                <div class="powered-by">
+                    Powered by Odoo Barber Management
+                </div>
+            </div>
+        </div>
+    </t>
+</templates>

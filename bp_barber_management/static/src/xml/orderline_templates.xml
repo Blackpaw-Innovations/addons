@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates id="template" xml:space="preserve">
+    <!-- Add barber info to orderline display -->
+    <t t-name="Orderline" t-inherit="point_of_sale.Orderline" t-inherit-mode="extension" owl="1">
+        <xpath expr="//ul[hasclass('info-list')]" position="inside">
+            <li t-if="line.requires_service_provider and line.barber_name" class="info barber-assigned">
+                <i class="fa fa-scissors"/> 
+                Barber: <span t-esc="line.barber_name"/>
+            </li>
+            <li t-if="line.requires_service_provider and !line.barber_name" class="info barber-required">
+                <i class="fa fa-exclamation-triangle" style="color: orange;"/> 
+                Barber Required
+            </li>
+        </xpath>
+    </t>
+</templates>

@@ -1,0 +1,209 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <template id="report_payslip_run_bp">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="o">
+                <t t-call="web.external_layout">
+                    <t t-set="data" t-value="o.get_batch_report_data()"/>
+                    <t t-set="currency" t-value="data.get('currency')"/>
+                    <t t-set="summary" t-value="data.get('summary', {})"/>
+                    <t t-set="earnings" t-value="data.get('earnings', [])"/>
+                    <t t-set="deductions" t-value="data.get('deductions', [])"/>
+                    <t t-set="employer" t-value="data.get('employer', [])"/>
+                    <t t-set="payslips" t-value="data.get('payslips', [])"/>
+                    <t t-set="states" t-value="data.get('states', {})"/>
+
+                    <div class="page bp_batch_report" style="font-family: 'Roboto', sans-serif; color: #333;">
+                        <style>
+                            .bp_batch_report h1, .bp_batch_report h2, .bp_batch_report h3 { font-weight: 700; margin: 0; }
+                            .bp_batch_report .text-muted { color: #6c757d !important; }
+                            .bp_batch_report .text-accent { color: #2C3E50; }
+                            .bp_batch_report .table-header { background-color: #F1F3F5; font-weight: 600; color: #495057; }
+                            .bp_batch_report .table td, .bp_batch_report .table th { padding: 8px 12px; border-color: #e9ecef; }
+                            .bp_batch_report .divider { border-bottom: 1px solid #dee2e6; margin: 12px 0; }
+                            .bp_batch_report .pill { border-radius: 999px; padding: 4px 10px; font-weight: 700; font-size: 11px; color: #fff; display: inline-block; }
+                            .bp_batch_report .pill.ready { background: #0ea5e9; }
+                            .bp_batch_report .pill.done { background: #10b981; }
+                            .bp_batch_report .pill.pending { background: #f59e0b; }
+                            .bp_batch_report .pill.cancel { background: #ef4444; }
+                            .bp_batch_report .card-band { border: 1px solid #e9ecef; border-radius: 6px; padding: 10px 12px; }
+                        </style>
+
+                        <!-- Header -->
+                        <div class="row mb-3 align-items-end">
+                            <div class="col-6">
+                                <h2 class="text-accent">Payroll Batch Report</h2>
+                                <div class="text-muted">Batch: <span t-field="o.name"/></div>
+                                <div class="text-muted">Period: <t t-esc="data.get('period')"/></div>
+                                <div class="text-muted">Company: <span t-field="o.company_id.name"/></div>
+                            </div>
+                            <div class="col-6 text-end">
+                                <h1 class="text-accent mb-1"><span t-field="o.state"/></h1>
+                                <div class="text-muted">Generated: <t t-esc="data.get('report_generation_date', '')"/></div>
+                                <div class="text-muted">Payslips: <t t-esc="summary.get('payslip_count', 0)"/></div>
+                            </div>
+                        </div>
+                        <div class="divider"/>
+
+                        <!-- Summary KPIs -->
+                        <div class="row mb-3">
+                            <div class="col-3">
+                                <div class="card-band">
+                                    <div class="text-muted small text-uppercase fw-bold">Gross Payroll</div>
+                                    <div class="h5 fw-bold text-nowrap text-primary mb-0">
+                                        <t t-esc="summary.get('gross', 0.0)" t-options='{"widget": "monetary", "display_currency": currency}'/>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-3">
+                                <div class="card-band">
+                                    <div class="text-muted small text-uppercase fw-bold">Deductions</div>
+                                    <div class="h5 fw-bold text-nowrap text-danger mb-0">
+                                        <t t-esc="summary.get('deductions', 0.0)" t-options='{"widget": "monetary", "display_currency": currency}'/>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-3">
+                                <div class="card-band">
+                                    <div class="text-muted small text-uppercase fw-bold">Net Pay</div>
+                                    <div class="h5 fw-bold text-nowrap text-success mb-0">
+                                        <t t-esc="summary.get('net', 0.0)" t-options='{"widget": "monetary", "display_currency": currency}'/>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-3">
+                                <div class="card-band">
+                                    <div class="text-muted small text-uppercase fw-bold">Employer Cost</div>
+                                    <div class="h5 fw-bold text-nowrap text-secondary mb-0">
+                                        <t t-esc="summary.get('employer_cost', 0.0)" t-options='{"widget": "monetary", "display_currency": currency}'/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Earnings & Deductions -->
+                        <div class="row mb-4">
+                            <div class="col-6 pe-4">
+                                <h6 class="text-accent text-uppercase fw-bold mb-3 border-bottom pb-2">Earnings</h6>
+                                <table class="table table-sm table-borderless">
+                                    <tbody>
+                                        <tr t-foreach="earnings" t-as="line" t-key="line['label']" class="border-bottom">
+                                            <td class="ps-2 py-2"><t t-esc="line.get('label')"/></td>
+                                            <td class="text-end pe-2 py-2 text-nowrap">
+                                                <t t-esc="line.get('value', 0.0)" t-options='{"widget": "monetary", "display_currency": currency}'/>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                    <tfoot>
+                                        <tr class="fw-bold bg-light">
+                                            <td class="ps-2 py-2">Total Gross Pay</td>
+                                            <td class="text-end pe-2 py-2 text-nowrap">
+                                                <t t-esc="summary.get('gross', 0.0)" t-options='{"widget": "monetary", "display_currency": currency}'/>
+                                            </td>
+                                        </tr>
+                                    </tfoot>
+                                </table>
+                            </div>
+                            <div class="col-6 ps-4">
+                                <h6 class="text-accent text-uppercase fw-bold mb-3 border-bottom pb-2">Deductions</h6>
+                                <table class="table table-sm table-borderless">
+                                    <tbody>
+                                        <tr t-foreach="deductions" t-as="line" t-key="line['label']" class="border-bottom">
+                                            <td class="ps-2 py-2"><t t-esc="line.get('label')"/></td>
+                                            <td class="text-end pe-2 py-2 text-nowrap">
+                                                <t t-esc="line.get('value', 0.0)" t-options='{"widget": "monetary", "display_currency": currency}'/>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                    <tfoot>
+                                        <tr class="fw-bold bg-light">
+                                            <td class="ps-2 py-2">Total Deductions</td>
+                                            <td class="text-end pe-2 py-2 text-nowrap">
+                                                <t t-esc="summary.get('deductions', 0.0)" t-options='{"widget": "monetary", "display_currency": currency}'/>
+                                            </td>
+                                        </tr>
+                                    </tfoot>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- Employer + Status -->
+                        <div class="row mb-4">
+                            <div class="col-6 pe-3">
+                                <h6 class="text-muted text-uppercase small fw-bold mb-2">Employer Contributions</h6>
+                                <t t-if="employer">
+                                    <table class="table table-sm">
+                                        <tbody>
+                                            <tr t-foreach="employer" t-as="line" t-key="line['label']">
+                                                <td class="ps-2"><t t-esc="line.get('label')"/></td>
+                                                <td class="text-end pe-2">
+                                                    <t t-esc="line.get('value', 0.0)" t-options='{"widget": "monetary", "display_currency": currency}'/>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </t>
+                                <t t-if="not employer">
+                                    <p class="text-muted small">No employer contributions in this batch.</p>
+                                </t>
+                            </div>
+                            <div class="col-6 ps-3">
+                                <h6 class="text-muted text-uppercase small fw-bold mb-2">Payslip Status</h6>
+                                <table class="table table-sm">
+                                    <tbody>
+                                        <tr t-foreach="states.items()" t-as="item" t-key="item[0]">
+                                            <td class="ps-2 text-capitalize"><t t-esc="item[0]"/></td>
+                                            <td class="text-end pe-2 fw-bold"><t t-esc="item[1]"/></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- Payslip List -->
+                        <div class="row mb-4" style="page-break-inside: avoid;">
+                            <div class="col-12">
+                                <h5 class="text-accent mb-3 border-bottom pb-2">Payslip Details</h5>
+                                <table class="table table-sm table-striped">
+                                    <thead class="table-header">
+                                        <tr>
+                                            <th class="ps-3 py-2">Employee</th>
+                                            <th class="py-2">Reference</th>
+                                            <th class="text-end pe-3 py-2">Net Pay</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr t-foreach="payslips" t-as="slip">
+                                            <td class="ps-3 py-2"><t t-esc="slip.get('employee')"/></td>
+                                            <td class="py-2"><t t-esc="slip.get('name')"/></td>
+                                            <td class="text-end pe-3 py-2 text-nowrap">
+                                                <t t-esc="slip.get('net', 0.0)" t-options='{"widget": "monetary", "display_currency": currency}'/>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- Footer -->
+                        <div class="text-center text-muted small mt-auto pt-3 border-top">
+                            <p class="mb-1">This is a system-generated payroll batch report.</p>
+                            <p class="mb-1" t-if="o.company_id.email">Contact: <span t-field="o.company_id.email"/></p>
+                            <p>Page <span class="page"/> of <span class="topage"/></p>
+                        </div>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+
+    <record id="report_payslip_run_bp_action" model="ir.actions.report">
+        <field name="name">Payroll Batch Report</field>
+        <field name="model">hr.payslip.run</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">BP_Payroll_solution.report_payslip_run_bp</field>
+        <field name="report_file">BP_Payroll_solution.report_payslip_run_bp</field>
+        <field name="binding_model_id" ref="model_hr_payslip_run"/>
+        <field name="binding_type">report</field>
+    </record>
+</odoo>

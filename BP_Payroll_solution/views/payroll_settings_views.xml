@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <record id="view_res_config_settings_bp_payroll" model="ir.ui.view">
+        <field name="name">res.config.settings.view.form.bp.payroll</field>
+        <field name="model">res.config.settings</field>
+        <field name="inherit_id" ref="base.res_config_settings_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//form" position="inside">
+                <app data-string="Payroll" string="Payroll" name="BP_Payroll_solution">
+                    <block title="General">
+                        <setting id="payroll_auto_post" help="Automatically post payroll journal entries on confirmation.">
+                            <field name="payroll_auto_post"/>
+                        </setting>
+                        <setting id="payroll_requires_bank_account" help="Require employees to have a bank account before validation.">
+                            <field name="payroll_requires_bank_account"/>
+                        </setting>
+                        <setting id="bp_show_payslip_smart_button" help="Show the Payslips smart button on the Employee form.">
+                            <field name="bp_show_payslip_smart_button"/>
+                        </setting>
+                    </block>
+
+                    <block title="Defaults">
+                        <setting id="payroll_journal_id" help="Default journal used when creating payroll entries.">
+                            <field name="payroll_journal_id" options="{'no_open': True}"/>
+                        </setting>
+                        <setting id="payroll_structure_id" help="Default payroll structure for new contracts.">
+                            <field name="payroll_structure_id" options="{'no_open': True}"/>
+                        </setting>
+                        <setting id="payroll_analytic_account_id" help="Default analytic account for payroll entries.">
+                            <field name="payroll_analytic_account_id" options="{'no_open': True}"/>
+                        </setting>
+                    </block>
+                </app>
+            </xpath>
+        </field>
+    </record>
+</odoo>

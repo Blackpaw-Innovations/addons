@@ -1,0 +1,194 @@
+<odoo>
+    <template id="customer_statement_report">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="doc">
+                <t t-call="web.external_layout">
+                    <t t-set="lines" t-value="doc._get_statement_lines()"/>
+                    <t t-set="closing_balance" t-value="lines and lines[-1]['balance'] or 0.0"/>
+                    <style>
+                        .bp-legacy-wrap {
+                            font-family: 'Helvetica Neue', Arial, sans-serif;
+                            color: #1f1f1f;
+                            font-size: 12px;
+                        }
+                        .bp-header-row {
+                            display: flex;
+                            justify-content: space-between;
+                            align-items: flex-start;
+                            margin-bottom: 12px;
+                        }
+                        .bp-company-block {
+                            max-width: 55%;
+                            line-height: 1.4;
+                        }
+                        .bp-title-block {
+                            text-align: right;
+                        }
+                        .bp-title-block h2 {
+                            margin: 0;
+                            font-size: 22px;
+                            letter-spacing: 0.3px;
+                        }
+                        .bp-box {
+                            border: 1px solid #3a3a3a;
+                            padding: 8px 10px;
+                            margin-bottom: 10px;
+                        }
+                        .bp-grid {
+                            display: grid;
+                            grid-template-columns: 1fr 1fr;
+                            gap: 10px;
+                        }
+                        .bp-label {
+                            font-weight: 600;
+                        }
+                        .bp-table {
+                            width: 100%;
+                            border-collapse: collapse;
+                            margin-top: 8px;
+                        }
+                        .bp-table th,
+                        .bp-table td {
+                            border: 1px solid #3a3a3a;
+                            padding: 6px 6px;
+                            vertical-align: top;
+                        }
+                        .bp-table th {
+                            background: #efefef;
+                            font-size: 11px;
+                            text-transform: uppercase;
+                            letter-spacing: 0.3px;
+                        }
+                        .bp-text-right {
+                            text-align: right;
+                            white-space: nowrap;
+                        }
+                        .bp-aging-table {
+                            width: 100%;
+                            border-collapse: collapse;
+                            margin-top: 14px;
+                        }
+                        .bp-aging-table th,
+                        .bp-aging-table td {
+                            border: 1px solid #3a3a3a;
+                            padding: 6px;
+                            text-align: right;
+                        }
+                        .bp-aging-table th {
+                            background: #efefef;
+                            text-transform: uppercase;
+                            font-size: 11px;
+                        }
+                        .bp-aging-table td:first-child,
+                        .bp-aging-table th:first-child {
+                            text-align: left;
+                        }
+                    </style>
+
+                    <div class="page bp-legacy-wrap">
+                        <div class="bp-header-row">
+                            <div class="bp-company-block">
+                                <div t-esc="doc.env.company.name"/>
+                                <div t-esc="doc.env.company.partner_id.contact_address"/>
+                            </div>
+                            <div class="bp-title-block">
+                                <h2>Statement</h2>
+                                <div class="bp-box">
+                                    <div class="bp-label">Date</div>
+                                    <div>
+                                        <span t-esc="doc.date_to or doc.create_date.date()"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="bp-grid">
+                            <div class="bp-box">
+                                <div class="bp-label" style="margin-bottom: 4px;">Invoice To</div>
+                                <div t-esc="doc.partner_id.display_name"/>
+                                <div t-esc="doc.partner_id.contact_address"/>
+                            </div>
+                            <div class="bp-box">
+                                <div class="bp-label">Amount Due</div>
+                                <div class="bp-text-right" t-esc="closing_balance" t-options="{'widget': 'monetary', 'display_currency': doc.env.company.currency_id}"/>
+                            </div>
+                        </div>
+
+                        <table class="bp-table">
+                            <thead>
+                                <tr>
+                                    <th style="width: 12%;">Date</th>
+                                    <th style="width: 48%;">Description</th>
+                                    <th style="width: 20%;" class="bp-text-right">Amount</th>
+                                    <th style="width: 20%;" class="bp-text-right">Balance</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <t t-if="not lines">
+                                    <tr>
+                                        <td colspan="4" class="bp-text-right">No activity for this period.</td>
+                                    </tr>
+                                </t>
+                                <t t-foreach="lines" t-as="line">
+                                    <tr>
+                                        <td>
+                                            <div t-esc="line['date']"/>
+                                        </td>
+                                        <td>
+                                            <div><strong t-esc="line['doc_type']"/> <t t-esc="line['name']"/></div>
+                                            <div t-esc="line['origin']"/>
+                                        </td>
+                                        <td class="bp-text-right">
+                                            <t t-set="amount" t-value="line['debit'] - line['credit']"/>
+                                            <span t-esc="amount" t-options="{'widget': 'monetary', 'display_currency': line['currency']}"/>
+                                        </td>
+                                        <td class="bp-text-right">
+                                            <span t-esc="line['balance']" t-options="{'widget': 'monetary', 'display_currency': line['currency']}"/>
+                                        </td>
+                                    </tr>
+                                </t>
+                            </tbody>
+                        </table>
+
+                        <table class="bp-aging-table">
+                            <thead>
+                                <tr>
+                                    <th>Current</th>
+                                    <th>1-30 Days Past Due</th>
+                                    <th>31-60 Days Past Due</th>
+                                    <th>61-90 Days Past Due</th>
+                                    <th>Over 90 Days Past Due</th>
+                                    <th>Amount Due</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>
+                                        <span t-esc="closing_balance" t-options="{'widget': 'monetary', 'display_currency': doc.env.company.currency_id}"/>
+                                    </td>
+                                    <td>0.00</td>
+                                    <td>0.00</td>
+                                    <td>0.00</td>
+                                    <td>0.00</td>
+                                    <td>
+                                        <span t-esc="closing_balance" t-options="{'widget': 'monetary', 'display_currency': doc.env.company.currency_id}"/>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+
+    <report
+        id="action_customer_statement_report"
+        model="bp.customer.statement.wizard"
+        string="Customer Statement"
+        report_type="qweb-html"
+        name="BP_Optical_solution.customer_statement_report"
+        file="BP_Optical_solution.customer_statement_report"
+        print_report_name="'Customer Statement - %s' % (object.partner_id.display_name)"
+    />
+</odoo>

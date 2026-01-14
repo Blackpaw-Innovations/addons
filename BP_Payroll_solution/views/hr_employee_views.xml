@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_employee_form_inherit_payroll" model="ir.ui.view">
+        <field name="name">hr.employee.form.inherit.payroll</field>
+        <field name="model">hr.employee</field>
+        <field name="inherit_id" ref="hr.view_employee_form"/>
+        <field name="arch" type="xml">
+            <div name="button_box" position="inside">
+                <field name="bp_display_payslip_button" invisible="1"/>
+                <button name="action_view_payslips"
+                        type="object"
+                        class="oe_stat_button"
+                        icon="fa-money"
+                        groups="hr.group_hr_user"
+                        invisible="not bp_display_payslip_button">
+                    <field name="payslip_count" widget="statinfo" string="Payslips"/>
+                </button>
+            </div>
+        </field>
+    </record>
+</odoo>

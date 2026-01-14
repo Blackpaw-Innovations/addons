@@ -1,0 +1,232 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <!-- Tax Bands -->
+    <record id="view_bp_payroll_tax_band_tree" model="ir.ui.view">
+        <field name="name">bp.payroll.tax.band.tree</field>
+        <field name="model">bp.payroll.tax.band</field>
+        <field name="arch" type="xml">
+            <tree string="Tax Bands" default_order="sequence">
+                <field name="sequence" widget="handle"/>
+                <field name="name"/>
+                <field name="company_id"/>
+                <field name="country_id"/>
+                <field name="date_from"/>
+                <field name="date_to"/>
+                <field name="lower_bound"/>
+                <field name="upper_bound"/>
+                <field name="rate"/>
+                <field name="quick_deduction"/>
+                <field name="active"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_bp_payroll_tax_band_form" model="ir.ui.view">
+        <field name="name">bp.payroll.tax.band.form</field>
+        <field name="model">bp.payroll.tax.band</field>
+        <field name="arch" type="xml">
+            <form string="Tax Band">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="name"/>
+                            <field name="company_id" required="1"/>
+                            <field name="country_id"/>
+                            <field name="active"/>
+                        </group>
+                        <group>
+                            <field name="date_from" required="1"/>
+                            <field name="date_to"/>
+                            <field name="sequence"/>
+                        </group>
+                    </group>
+                    <group>
+                        <group>
+                            <field name="lower_bound" required="1"/>
+                            <field name="upper_bound"/>
+                            <field name="currency_id" invisible="1"/>
+                        </group>
+                        <group>
+                            <field name="rate" required="1"/>
+                            <field name="quick_deduction"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Notes">
+                            <field name="notes"/>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_bp_payroll_tax_band" model="ir.actions.act_window">
+        <field name="name">Tax Bands</field>
+        <field name="res_model">bp.payroll.tax.band</field>
+        <field name="view_mode">tree,form</field>
+        <field name="context">{}</field>
+    </record>
+
+    <record id="view_bp_payroll_tax_band_filter" model="ir.ui.view">
+        <field name="name">bp.payroll.tax.band.search</field>
+        <field name="model">bp.payroll.tax.band</field>
+        <field name="arch" type="xml">
+            <search string="Tax Bands">
+                <field name="name"/>
+                <field name="company_id"/>
+                <field name="country_id"/>
+                <field name="date_from"/>
+            </search>
+        </field>
+    </record>
+
+    <!-- Contributions -->
+    <record id="view_bp_payroll_contribution_tree" model="ir.ui.view">
+        <field name="name">bp.payroll.contribution.tree</field>
+        <field name="model">bp.payroll.contribution</field>
+        <field name="arch" type="xml">
+            <tree string="Contributions" default_order="date_from desc">
+                <field name="name"/>
+                <field name="contribution_type"/>
+                <field name="amount_type"/>
+                <field name="base"/>
+                <field name="employee_rate"/>
+                <field name="employer_rate"/>
+                <field name="employee_fixed"/>
+                <field name="employer_fixed"/>
+                <field name="date_from"/>
+                <field name="date_to"/>
+                <field name="active"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_bp_payroll_contribution_form" model="ir.ui.view">
+        <field name="name">bp.payroll.contribution.form</field>
+        <field name="model">bp.payroll.contribution</field>
+        <field name="arch" type="xml">
+            <form string="Contribution Rule">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="name"/>
+                            <field name="company_id" required="1"/>
+                            <field name="country_id"/>
+                            <field name="contribution_type" required="1"/>
+                            <field name="amount_type" required="1"/>
+                            <field name="base" required="1"/>
+                            <field name="rule_category_id" />
+                        </group>
+                        <group>
+                            <field name="date_from" required="1"/>
+                            <field name="date_to"/>
+                            <field name="active"/>
+                        </group>
+                    </group>
+                    <group string="Employee Share">
+                        <field name="employee_rate"/>
+                        <field name="employee_fixed"/>
+                        <field name="floor"/>
+                        <field name="ceiling"/>
+                    </group>
+                    <group string="Employer Share">
+                        <field name="employer_rate"/>
+                        <field name="employer_fixed"/>
+                    </group>
+                    <notebook>
+                        <page string="Notes">
+                            <field name="description"/>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_bp_payroll_contribution" model="ir.actions.act_window">
+        <field name="name">Contributions</field>
+        <field name="res_model">bp.payroll.contribution</field>
+        <field name="view_mode">tree,form</field>
+        <field name="context">{}</field>
+    </record>
+
+    <record id="view_bp_payroll_contribution_filter" model="ir.ui.view">
+        <field name="name">bp.payroll.contribution.search</field>
+        <field name="model">bp.payroll.contribution</field>
+        <field name="arch" type="xml">
+            <search string="Contributions">
+                <filter name="current" string="Active Today" domain="['|', ('date_to', '=', False), ('date_to', '&gt;=', context_today())]"/>
+                <field name="name"/>
+                <field name="contribution_type"/>
+                <field name="company_id"/>
+                <field name="date_from"/>
+            </search>
+        </field>
+    </record>
+
+    <!-- Benefit / Deduction Policies -->
+    <record id="view_bp_payroll_benefit_policy_tree" model="ir.ui.view">
+        <field name="name">bp.payroll.benefit.policy.tree</field>
+        <field name="model">bp.payroll.benefit.policy</field>
+        <field name="arch" type="xml">
+            <tree string="Policies" default_order="date_from desc">
+                <field name="name"/>
+                <field name="policy_type"/>
+                <field name="amount_type"/>
+                <field name="employee_share"/>
+                <field name="employer_share"/>
+                <field name="employee_fixed"/>
+                <field name="employer_fixed"/>
+                <field name="date_from"/>
+                <field name="date_to"/>
+                <field name="active"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_bp_payroll_benefit_policy_form" model="ir.ui.view">
+        <field name="name">bp.payroll.benefit.policy.form</field>
+        <field name="model">bp.payroll.benefit.policy</field>
+        <field name="arch" type="xml">
+            <form string="Benefit / Deduction Policy">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="name"/>
+                            <field name="company_id" required="1"/>
+                            <field name="country_id"/>
+                            <field name="policy_type" required="1"/>
+                            <field name="amount_type" required="1"/>
+                        </group>
+                        <group>
+                            <field name="date_from" required="1"/>
+                            <field name="date_to"/>
+                            <field name="active"/>
+                        </group>
+                    </group>
+                    <group string="Employee">
+                        <field name="employee_share"/>
+                        <field name="employee_fixed"/>
+                    </group>
+                    <group string="Employer">
+                        <field name="employer_share"/>
+                        <field name="employer_fixed"/>
+                    </group>
+                    <notebook>
+                        <page string="Notes">
+                            <field name="note"/>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_bp_payroll_benefit_policy" model="ir.actions.act_window">
+        <field name="name">Benefit / Deduction Policies</field>
+        <field name="res_model">bp.payroll.benefit.policy</field>
+        <field name="view_mode">tree,form</field>
+        <field name="context">{}</field>
+    </record>
+</odoo>

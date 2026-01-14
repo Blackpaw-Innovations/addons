@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <!-- Cron Job: Optical Follow-up Reminder -->
+        <record id="ir_cron_optical_follow_up_reminder" model="ir.cron">
+            <field name="name">Optical Follow-up Reminder</field>
+            <field name="model_id" ref="model_optical_test"/>
+            <field name="state">code</field>
+            <field name="code">model.optical_follow_up_reminder_cron()</field>
+            <field name="interval_number">1</field>
+            <field name="interval_type">days</field>
+            <field name="numbercall">-1</field>
+            <field name="active" eval="True"/>
+            <field name="doall" eval="False"/>
+        </record>
+
+        <!-- Cron Job: Optical Prescription Expiry Reminder -->
+        <record id="ir_cron_optical_expiry_reminder" model="ir.cron">
+            <field name="name">Optical Prescription Expiry Reminder</field>
+            <field name="model_id" ref="model_optical_test"/>
+            <field name="state">code</field>
+            <field name="code">model.optical_expiry_reminder_cron()</field>
+            <field name="interval_number">1</field>
+            <field name="interval_type">days</field>
+            <field name="numbercall">-1</field>
+            <field name="active" eval="True"/>
+            <field name="doall" eval="False"/>
+        </record>
+    </data>
+</odoo>

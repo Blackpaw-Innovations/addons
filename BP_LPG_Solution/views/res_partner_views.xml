@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_res_partner_form_lpg" model="ir.ui.view">
+        <field name="name">res.partner.form.lpg</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_partner_form" />
+        <field name="arch" type="xml">
+            <xpath expr="//notebook" position="inside">
+                <page string="Cylinders">
+                    <group>
+                        <field name="cylinder_count" readonly="1" />
+                    </group>
+                    <field name="cylinder_ids">
+                        <tree>
+                            <field name="name" />
+                            <field name="product_id" />
+                            <field name="cylinder_status" />
+                            <field name="last_movement_date" />
+                        </tree>
+                    </field>
+                </page>
+            </xpath>
+        </field>
+    </record>
+</odoo>

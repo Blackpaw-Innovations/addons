@@ -1,0 +1,268 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="BP_Payroll_solution.PayrollDashboard">
+        <div class="bp-payroll-dashboard container-fluid">
+            <t t-if="state.loading">
+                <div class="o_view_nocontent_smiling_face">
+                    <span class="o_view_nocontent_smiling_face_title">Loading payroll dashboard...</span>
+                </div>
+            </t>
+            <t t-elif="state.error">
+                <div class="alert alert-danger" role="alert">
+                    <strong>Could not load dashboard:</strong> <t t-esc="state.error"/>
+                </div>
+            </t>
+            <t t-else="">
+                <!-- Top Bar -->
+                <div class="row g-3 top-bar">
+                    <div class="col d-flex align-items-center gap-2">
+                        <span class="fw-semibold">Payroll Period:</span>
+                        <select class="form-select form-select-sm w-auto"
+                                t-on-change="(ev) => onPeriodChange(ev.target.value)">
+                            <t t-foreach="periodOptions" t-as="option" t-key="option.value">
+                                <option t-att-value="option.value"
+                                        t-att-selected="option.value === state.filters.period ? 'selected' : null">
+                                    <t t-esc="option.label"/>
+                                </option>
+                            </t>
+                        </select>
+                        <span class="fw-semibold ms-3">Status:</span>
+                        <select class="form-select form-select-sm w-auto"
+                                t-on-change="(ev) => onStatusChange(ev.target.value)">
+                            <t t-foreach="statusOptions" t-as="option" t-key="option.value">
+                                <option t-att-value="option.value"
+                                        t-att-selected="option.value === state.filters.status ? 'selected' : null">
+                                    <t t-esc="option.label"/>
+                                </option>
+                            </t>
+                        </select>
+                    </div>
+                    <div class="col-auto d-flex gap-2">
+                        <button class="btn btn-outline-primary btn-sm" t-on-click="onGeneratePayslips">Generate Payslips</button>
+                        <button class="btn btn-primary btn-sm" t-on-click="onApprovePayroll">Approve Payroll</button>
+                    </div>
+                </div>
+
+                <!-- Row 1: KPIs -->
+                <div class="row g-3 mt-2 kpi-row">
+                    <div class="col-12 col-md-6 col-xl-3">
+                        <div class="kpi-card clickable" t-on-click="() => openPayslips([['state','in',['done','paid']]], 'Paid Payslips')">
+                            <div class="label">Gross Payroll</div>
+                            <div class="value text-primary" t-esc="formatCurrency(state.summary.gross)"/>
+                            <div class="meta">Approved this period</div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-md-6 col-xl-3">
+                        <div class="kpi-card clickable" t-on-click="() => openPayslips([], 'All Payslips')">
+                            <div class="label">Net Pay</div>
+                            <div class="value text-success" t-esc="formatCurrency(state.summary.net)"/>
+                            <div class="meta">After all deductions</div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-md-6 col-xl-3">
+                        <div class="kpi-card clickable">
+                            <div class="label">Total Deductions</div>
+                            <div class="value text-warning" t-esc="formatCurrency(state.summary.deductions)"/>
+                            <div class="meta">Statutory + Others</div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-md-6 col-xl-3">
+                        <div class="kpi-card clickable">
+                            <div class="label">Employer Contributions</div>
+                            <div class="value text-info" t-esc="formatCurrency(state.summary.employer)"/>
+                            <div class="meta">NSSF / SHIF / Pension</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Row 2: Trend & Payment Readiness -->
+                <div class="row g-3 mt-1">
+                    <div class="col-12 col-lg-8">
+                        <div class="panel h-100">
+                            <div class="panel-header">
+                                <div class="title">Gross vs Net Trend</div>
+                                <div class="subtitle">Last 6 months</div>
+                            </div>
+                            <div class="panel-body">
+                                <canvas t-ref="grossNetTrendRef" height="220"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-lg-4">
+                        <div class="panel h-100 clickable" t-on-click="() => openPayslips([['state','in',['draft','verify']]], 'Pending Payslips')">
+                            <div class="panel-header">
+                                <div class="title">Payment Readiness</div>
+                            </div>
+                            <div class="panel-body payment-readiness">
+                                <div class="row">
+                                    <div class="col-8 body-text">Pending Payslips</div>
+                                    <div class="col-4 text-end heading-md" t-esc="state.summary.pending"/>
+                                </div>
+                                <div class="small text-muted mt-2">Use approvals to move them to paid.</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Row 3: Breakdowns (Earnings, Deductions, Employer) -->
+                <div class="row g-3 mt-1">
+                    <!-- Earnings List -->
+                    <div class="col-12 col-lg-4">
+                        <div class="panel h-100 earnings-list-panel">
+                            <div class="panel-header">
+                                <div class="title">Earnings Breakdown</div>
+                            </div>
+                            <div class="panel-body">
+                                <div class="earnings-list">
+                                    <t t-foreach="state.earningsList" t-as="item" t-key="item.label">
+                                        <div class="earnings-row">
+                                            <div class="label" t-esc="item.label"/>
+                                            <div class="amount-block">
+                                                <div class="bar-track">
+                                                    <div class="bar-fill"
+                                                         t-att-style="'width:' + item.percent + '%; background-color:' + item.color"/>
+                                                </div>
+                                                <div class="amount" t-esc="formatCurrency(item.value)"/>
+                                            </div>
+                                        </div>
+                                    </t>
+                                    <div class="earnings-total">
+                                        <span>Total Gross Pay</span>
+                                        <span class="total-amount" t-esc="formatCurrency(state.earningsTotal)"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Deductions -->
+                    <div class="col-12 col-lg-4">
+                        <div class="panel h-100 deductions-panel">
+                            <div class="panel-header d-flex justify-content-between align-items-center">
+                                <div class="title">Deductions</div>
+                                <div class="trend-chip">
+                                    <i class="fa fa-line-chart me-1"/> Trend: none
+                                </div>
+                            </div>
+                            <div class="panel-body">
+                                <div class="d-flex flex-column align-items-center mb-3">
+                                    <div style="position: relative; width: 180px; height: 180px;">
+                                        <canvas t-ref="deductionsChart"></canvas>
+                                        <div class="donut-center">
+                                            <div class="donut-label" t-esc="state.deductionsTop.label || 'N/A'"/>
+                                            <div class="donut-percent" t-esc="state.deductionsTop.percent ? state.deductionsTop.percent + '%' : '—'"/>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="deductions-list">
+                                    <t t-foreach="state.deductionsList" t-as="item" t-key="item.label">
+                                        <div class="ded-row">
+                                            <span class="label" t-esc="item.label"/>
+                                            <span class="amount" t-esc="formatCurrency(item.value)"/>
+                                        </div>
+                                    </t>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Employer Cost -->
+                    <div class="col-12 col-lg-4">
+                        <div class="panel h-100">
+                            <div class="panel-header">
+                                <div class="title">Employer Cost</div>
+                            </div>
+                            <div class="panel-body">
+                                <div class="employer-cost-list">
+                                    <t t-foreach="state.employerBreakdown" t-as="item" t-key="item.label">
+                                        <div t-attf-class="employer-row {{item.isTotal ? 'total-row' : ''}} {{item.isGrandTotal ? 'grand-total-row' : ''}}">
+                                            <div class="label" t-esc="item.label"/>
+                                            <div class="amount" t-esc="formatCurrency(item.value)"/>
+                                        </div>
+                                    </t>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Row 4: Dept Cost & Warnings -->
+                <div class="row g-3 mt-1">
+                    <div class="col-12 col-lg-6">
+                        <div class="panel h-100 dept-cost-panel">
+                            <div class="panel-header d-flex justify-content-between align-items-center">
+                                <div class="title">Department Cost</div>
+                                <div class="trend-chip">
+                                    <i class="fa fa-line-chart me-1"/> Enviget
+                                </div>
+                            </div>
+                            <div class="panel-body">
+                                <div class="dept-cost-list">
+                                    <t t-foreach="state.departmentCosts" t-as="dept" t-key="dept.name">
+                                        <div class="dept-row">
+                                            <div class="label" t-esc="dept.name"/>
+                                            <div class="bar-amount">
+                                                <div class="bar-track">
+                                                    <div class="bar-fill"
+                                                         t-att-style="'width:' + dept.percent + '%; background-color:' + dept.color"/>
+                                                </div>
+                                                <div class="amount" t-esc="formatCurrency(dept.value)"/>
+                                            </div>
+                                        </div>
+                                    </t>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-lg-6">
+                        <div class="panel h-100 warnings-batches">
+                            <div class="panel-header">
+                                <div class="title">Warnings</div>
+                            </div>
+                            <div class="panel-body">
+                                <div class="warning-list">
+                                    <t t-foreach="state.warnings" t-as="warn" t-key="warn.label">
+                                        <div class="warn-row" t-on-click="() => openWarning(warn)">
+                                            <span class="count" t-esc="warn.value"/>
+                                            <span class="label" t-esc="warn.label"/>
+                                        </div>
+                                    </t>
+                                    <t t-if="!state.warnings.length">
+                                        <div class="text-muted small">No warnings</div>
+                                    </t>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-lg-6">
+                        <div class="panel h-100 warnings-batches">
+                            <div class="panel-header d-flex justify-content-between align-items-center">
+                                <div class="title">Batches</div>
+                                <a href="javascript:void(0)" class="link-primary small" t-on-click="openAllBatches">All</a>
+                            </div>
+                            <div class="panel-body">
+                                <div class="batch-list">
+                                    <t t-foreach="state.payRuns" t-as="run" t-key="run.id">
+                                        <div class="batch-row" t-on-click="() => openBatch(run.id)">
+                                            <span class="pill" t-attf-class="pill state-{{run.state_class or 'info'}}" t-esc="run.state_label"/>
+                                            <div class="batch-info">
+                                                <div class="name" t-esc="run.name"/>
+                                                <div class="meta text-muted small">
+                                                    <t t-esc="run.period"/>
+                                                    <span class="ms-2">(<t t-esc="run.slip_count"/> Payslips)</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </t>
+                                    <t t-if="!state.payRuns.length">
+                                        <div class="text-muted small">No batches yet</div>
+                                    </t>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </t>
+        </div>
+    </t>
+</templates>

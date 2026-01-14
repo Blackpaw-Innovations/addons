@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Extend Settings Form -->
+    <record id="view_res_config_settings_bp_barber_notify" model="ir.ui.view">
+        <field name="name">res.config.settings.bp.barber.notify</field>
+        <field name="model">res.config.settings</field>
+        <field name="inherit_id" ref="base.res_config_settings_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//div[@class='settings']" position="inside">
+                <div class="app_settings_block" data-string="Barber Notifications" string="Barber Notifications" data-key="bp_barber_notifications">
+                    <h2>Appointment Notifications</h2>
+                    <div class="row mt16 o_settings_container">
+                        <!-- Confirmation Email -->
+                        <div class="col-12 col-lg-6 o_setting_box">
+                            <div class="o_setting_left_pane">
+                                <field name="bp_barber_notify_on_confirm" widget="boolean_toggle"/>
+                            </div>
+                            <div class="o_setting_right_pane">
+                                <label for="bp_barber_notify_on_confirm" string="Send Confirmation Email"/>
+                                <div class="text-muted">
+                                    Send email notification when appointments are confirmed
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Calendar Invite -->
+                        <div class="col-12 col-lg-6 o_setting_box" attrs="{'invisible': [('bp_barber_notify_on_confirm', '=', False)]}">
+                            <div class="o_setting_left_pane">
+                                <field name="bp_barber_notify_send_ics" widget="boolean_toggle"/>
+                            </div>
+                            <div class="o_setting_right_pane">
+                                <label for="bp_barber_notify_send_ics" string="Attach Calendar Invite"/>
+                                <div class="text-muted">
+                                    Include ICS calendar file in confirmation emails
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Reminder Emails -->
+                        <div class="col-12 col-lg-6 o_setting_box">
+                            <div class="o_setting_left_pane">
+                                <field name="bp_barber_notify_reminder_enabled" widget="boolean_toggle"/>
+                            </div>
+                            <div class="o_setting_right_pane">
+                                <label for="bp_barber_notify_reminder_enabled" string="Send Reminder Emails"/>
+                                <div class="text-muted">
+                                    Send automatic reminders before appointments
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Primary Reminder Hours -->
+                        <div class="col-12 col-lg-6 o_setting_box" attrs="{'invisible': [('bp_barber_notify_reminder_enabled', '=', False)]}">
+                            <div class="o_setting_left_pane">
+                            </div>
+                            <div class="o_setting_right_pane">
+                                <label for="bp_barber_notify_reminder_hours_primary" string="Primary Reminder"/>
+                                <div class="d-flex align-items-center">
+                                    <field name="bp_barber_notify_reminder_hours_primary" class="o_input_9"/>
+                                    <span class="ms-2">hours before</span>
+                                </div>
+                                <div class="text-muted">
+                                    Send first reminder this many hours before appointment
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Secondary Reminder Hours -->
+                        <div class="col-12 col-lg-6 o_setting_box" attrs="{'invisible': [('bp_barber_notify_reminder_enabled', '=', False)]}">
+                            <div class="o_setting_left_pane">
+                            </div>
+                            <div class="o_setting_right_pane">
+                                <label for="bp_barber_notify_reminder_hours_secondary" string="Secondary Reminder"/>
+                                <div class="d-flex align-items-center">
+                                    <field name="bp_barber_notify_reminder_hours_secondary" class="o_input_9"/>
+                                    <span class="ms-2">hours before (0 = disabled)</span>
+                                </div>
+                                <div class="text-muted">
+                                    Send second reminder closer to appointment time
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- No-Show Follow-up -->
+                        <div class="col-12 col-lg-6 o_setting_box">
+                            <div class="o_setting_left_pane">
+                                <field name="bp_barber_notify_followup_noshow" widget="boolean_toggle"/>
+                            </div>
+                            <div class="o_setting_right_pane">
+                                <label for="bp_barber_notify_followup_noshow" string="No-Show Follow-up"/>
+                                <div class="text-muted">
+                                    Send follow-up email and create activity for no-shows
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Information Box -->
+                        <div class="col-12 o_setting_box">
+                            <div class="alert alert-info">
+                                <h4><i class="fa fa-envelope"></i> Email Notifications</h4>
+                                <p>
+                                    Email notifications are sent to customers who have email addresses and haven't opted out.
+                                    Confirmation emails include tokenized links allowing customers to confirm or cancel appointments.
+                                </p>
+                                <ul class="mt-2 mb-0">
+                                    <li>Confirmation emails are sent when appointments move to "Confirmed" status</li>
+                                    <li>Reminder emails are sent automatically based on configured timing</li>
+                                    <li>No-show follow-ups include rebooking links and create follow-up activities</li>
+                                    <li>All emails respect customer opt-out preferences</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </xpath>
+        </field>
+    </record>
+</odoo>

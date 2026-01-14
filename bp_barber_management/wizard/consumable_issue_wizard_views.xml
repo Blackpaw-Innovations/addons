@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Issue Wizard Form View -->
+    <record id="view_bp_consumable_issue_wizard_form" model="ir.ui.view">
+        <field name="name">bp.barber.consumable.issue.wizard.form</field>
+        <field name="model">bp.barber.consumable.issue.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Issue Consumables to Barber">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="barber_id"/>
+                        </group>
+                        <group>
+                            <field name="note"/>
+                        </group>
+                    </group>
+                    
+                    <field name="line_ids">
+                        <tree editable="bottom">
+                            <field name="product_id"/>
+                            <field name="qty"/>
+                            <field name="uom_id"/>
+                        </tree>
+                    </field>
+                    
+                    <div class="alert alert-info" role="alert" style="margin-top: 16px;">
+                        <h5><i class="fa fa-info-circle"/> Issue Process</h5>
+                        <p>This will transfer the specified quantities to the barber's personal stock.</p>
+                        <p><strong>With Stock Module:</strong> Internal transfers will be created</p>
+                        <p><strong>Without Stock Module:</strong> Ledger entries will be recorded</p>
+                    </div>
+                </sheet>
+                <footer>
+                    <button name="action_issue" type="object" string="Issue Now" class="oe_highlight"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <!-- Issue Wizard Action -->
+    <record id="action_bp_consumable_issue_wizard" model="ir.actions.act_window">
+        <field name="name">Issue Consumables</field>
+        <field name="res_model">bp.barber.consumable.issue.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+
+    <!-- Consumption Report Wizard -->
+    <record id="view_bp_consumable_report_wizard_form" model="ir.ui.view">
+        <field name="name">bp.barber.consumable.report.wizard.form</field>
+        <field name="model">bp.barber.consumable.report.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Consumable Usage Report">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="date_from"/>
+                            <field name="date_to"/>
+                            <field name="report_type"/>
+                        </group>
+                        <group>
+                            <field name="barber_ids" widget="many2many_tags"/>
+                            <field name="product_ids" widget="many2many_tags"/>
+                        </group>
+                    </group>
+                </sheet>
+                <footer>
+                    <button name="action_generate_report" type="object" string="Generate Report" class="oe_highlight"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <!-- Consumption Report Wizard Action -->
+    <record id="action_bp_consumable_report_wizard" model="ir.actions.act_window">
+        <field name="name">Consumable Usage Report</field>
+        <field name="res_model">bp.barber.consumable.report.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+
+    <!-- Ledger Tree View (for debugging/admin) -->
+    <record id="view_bp_consumable_ledger_tree" model="ir.ui.view">
+        <field name="name">bp.barber.consumable.ledger.tree</field>
+        <field name="model">bp.barber.consumable.ledger</field>
+        <field name="arch" type="xml">
+            <tree string="Consumable Ledger" decoration-success="move_type == 'issue'" decoration-info="move_type == 'consume'">
+                <field name="date"/>
+                <field name="barber_id"/>
+                <field name="product_id"/>
+                <field name="move_type"/>
+                <field name="qty"/>
+                <field name="uom_id"/>
+                <field name="origin_note"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Ledger Action -->
+    <record id="action_bp_consumable_ledger" model="ir.actions.act_window">
+        <field name="name">Consumable Ledger</field>
+        <field name="res_model">bp.barber.consumable.ledger</field>
+        <field name="view_mode">tree</field>
+        <field name="context">{
+            'search_default_group_barber': 1,
+            'search_default_group_product': 1
+        }</field>
+    </record>
+</odoo>

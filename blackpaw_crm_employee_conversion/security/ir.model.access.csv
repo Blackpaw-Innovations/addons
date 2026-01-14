@@ -1,0 +1,2 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_crm_employee_conversion_crm_employee_conversion,crm_employee_conversion.crm_employee_conversion,model_crm_employee_conversion_crm_employee_conversion,base.group_user,1,1,1,1

@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Extend Service Form with BOM Tab -->
+    <record id="view_bp_service_form_bom" model="ir.ui.view">
+        <field name="name">bp.barber.service.form.bom</field>
+        <field name="model">bp.barber.service</field>
+        <field name="inherit_id" ref="view_bp_service_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//notebook" position="inside">
+                <page string="Bill of Materials" name="bom">
+                    <field name="bom_ids">
+                        <tree editable="bottom">
+                            <field name="product_id"/>
+                            <field name="qty"/>
+                            <field name="uom_id"/>
+                            <field name="note"/>
+                        </tree>
+                    </field>
+                    <div class="alert alert-info" role="alert" style="margin-top: 16px;">
+                        <h5><i class="fa fa-info-circle"/> Bill of Materials</h5>
+                        <p>Define consumable products that are automatically used when this service is performed.</p>
+                        <p>Quantities will be deducted from barber stock when appointments are completed or POS orders are paid.</p>
+                    </div>
+                </page>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Service BOM Tree View -->
+    <record id="view_bp_service_bom_tree" model="ir.ui.view">
+        <field name="name">bp.barber.service.bom.tree</field>
+        <field name="model">bp.barber.service.bom</field>
+        <field name="arch" type="xml">
+            <tree string="Service BOM">
+                <field name="service_id"/>
+                <field name="product_id"/>
+                <field name="qty"/>
+                <field name="uom_id"/>
+                <field name="note"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Service BOM Form View -->
+    <record id="view_bp_service_bom_form" model="ir.ui.view">
+        <field name="name">bp.barber.service.bom.form</field>
+        <field name="model">bp.barber.service.bom</field>
+        <field name="arch" type="xml">
+            <form string="Service BOM">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="service_id"/>
+                            <field name="product_id"/>
+                        </group>
+                        <group>
+                            <field name="qty"/>
+                            <field name="uom_id"/>
+                            <field name="company_id" readonly="1"/>
+                        </group>
+                    </group>
+                    <group>
+                        <field name="note"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Service BOM Search View -->
+    <record id="view_bp_service_bom_search" model="ir.ui.view">
+        <field name="name">bp.barber.service.bom.search</field>
+        <field name="model">bp.barber.service.bom</field>
+        <field name="arch" type="xml">
+            <search string="Search Service BOM">
+                <field name="service_id" string="Service"/>
+                <field name="product_id" string="Product"/>
+                <separator/>
+                <group expand="0" string="Group By">
+                    <filter string="Service" name="group_service" context="{'group_by': 'service_id'}"/>
+                    <filter string="Product" name="group_product" context="{'group_by': 'product_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Service BOM Action -->
+    <record id="action_bp_service_bom" model="ir.actions.act_window">
+        <field name="name">Service BOM</field>
+        <field name="res_model">bp.barber.service.bom</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create your first service BOM!
+            </p>
+            <p>
+                Service Bill of Materials define which consumable products are 
+                automatically used when services are performed. This enables 
+                automatic tracking of consumable usage and inventory management.
+            </p>
+        </field>
+    </record>
+</odoo>
