@@ -1,0 +1,3 @@
+[submodule "BP_fuel_solution"]
+	path = BP_fuel_solution
+	url = https://github.com/Blackpaw-Innovations/bp-fuel-solution.git
