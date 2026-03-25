@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_move_form_bp_legacy_etr_archive" model="ir.ui.view">
+        <field name="name">account.move.form.bp.legacy.etr.archive</field>
+        <field name="model">account.move</field>
+        <field name="inherit_id" ref="account.view_move_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//notebook" position="before">
+                <field name="bp_legacy_etr_archive_present" invisible="1"/>
+            </xpath>
+            <xpath expr="//notebook" position="inside">
+                <page name="bp_legacy_etr_archive"
+                      string="Legacy ETR Archive"
+                      groups="account.group_account_manager,base.group_system"
+                      invisible="not bp_legacy_etr_archive_present">
+                    <group>
+                        <group string="Legacy Values">
+                            <field name="bp_legacy_oscu_receipt_number" readonly="1"/>
+                            <field name="bp_legacy_oscu_invoice_number" readonly="1"/>
+                            <field name="bp_legacy_control_unit" readonly="1"/>
+                            <field name="bp_legacy_oscu_datetime" readonly="1"/>
+                            <field name="bp_legacy_oscu_confirmation_datetime" readonly="1"/>
+                            <field name="bp_legacy_studio_etr" readonly="1"/>
+                            <field name="bp_legacy_studio_nakuru_etr" readonly="1"/>
+                        </group>
+                        <group string="Archive Provenance">
+                            <field name="bp_legacy_source_dump" readonly="1"/>
+                            <field name="bp_legacy_source_record_id" readonly="1"/>
+                            <field name="bp_legacy_archive_match_method" readonly="1"/>
+                            <field name="bp_legacy_archive_imported_at" readonly="1"/>
+                            <field name="bp_legacy_archive_imported_by" readonly="1"/>
+                        </group>
+                    </group>
+                    <group>
+                        <group string="OSCU Payload">
+                            <field name="bp_legacy_oscu_signature" readonly="1"/>
+                            <field name="bp_legacy_oscu_internal_data" readonly="1"/>
+                        </group>
+                        <group string="Notes">
+                            <field name="bp_legacy_archive_note" readonly="1" nolabel="1"/>
+                        </group>
+                    </group>
+                </page>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_account_move_filter_bp_legacy_etr_archive" model="ir.ui.view">
+        <field name="name">account.move.search.bp.legacy.etr.archive</field>
+        <field name="model">account.move</field>
+        <field name="inherit_id" ref="account.view_account_move_filter"/>
+        <field name="arch" type="xml">
+            <xpath expr="//search/group" position="before">
+                <separator/>
+                <filter name="bp_legacy_etr_archive"
+                        string="Legacy ETR"
+                        domain="[('bp_legacy_etr_archive_present', '=', True)]"
+                        groups="account.group_account_manager,base.group_system"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_account_invoice_filter_bp_legacy_etr_archive" model="ir.ui.view">
+        <field name="name">account.invoice.search.bp.legacy.etr.archive</field>
+        <field name="model">account.move</field>
+        <field name="inherit_id" ref="account.view_account_invoice_filter"/>
+        <field name="arch" type="xml">
+            <xpath expr="//search/group" position="before">
+                <separator/>
+                <filter name="bp_legacy_etr_archive"
+                        string="Legacy ETR"
+                        domain="[('bp_legacy_etr_archive_present', '=', True)]"
+                        groups="account.group_account_manager,base.group_system"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>
