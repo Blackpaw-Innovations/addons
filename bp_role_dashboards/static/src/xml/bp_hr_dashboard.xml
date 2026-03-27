@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="utf-8"?>
+<templates xml:space="preserve">
+
+<t t-name="bp_role_dashboards.HrDashboard">
+    <div class="bprd_wrap o_action">
+
+        <div class="bprd_topbar">
+            <span class="bprd_topbar_title">Human Resources</span>
+            <span class="bprd_topbar_role">Intelligence Dashboard</span>
+            <span class="bprd_topbar_badge" style="background:#c62828;">RESTRICTED</span>
+            <div class="bprd_topbar_sep">|</div>
+            <button class="bprd_btn_refresh" t-on-click="load" t-att-disabled="state.isLoading || undefined">
+                <i t-att-class="state.isLoading ? 'fa fa-spinner fa-spin' : 'fa fa-refresh'"/>
+                Refresh
+            </button>
+            <span class="bprd_topbar_time" t-esc="now"/>
+        </div>
+
+        <div class="bprd_body">
+            <t t-if="state.isLoading">
+                <div class="bprd_loading">
+                    <i class="fa fa-circle-o-notch fa-spin fa-2x"/>
+                    <span>Loading HR Dashboard…</span>
+                </div>
+            </t>
+
+            <t t-elif="state.data">
+                <div class="bprd_dash">
+
+                    <div class="bprd_page_header">
+                        <div>
+                            <div class="bprd_page_title">Human Resources</div>
+                            <div class="bprd_page_sub">People Intelligence Report — Restricted</div>
+                        </div>
+                        <div class="bprd_page_period">
+                            <t t-esc="state.data.period"/>
+                            <span>Refreshed <t t-esc="now"/></span>
+                        </div>
+                    </div>
+
+                    <!-- KPI strip -->
+                    <div class="bprd_kpi_strip">
+                        <t t-foreach="state.data.kpis" t-as="kpi" t-key="kpi.label">
+                            <div t-att-class="'bprd_kpi_card v-' + kpi.variant">
+                                <div class="bprd_kpi_label" t-esc="kpi.label"/>
+                                <div class="bprd_kpi_value" t-esc="kpi.value"/>
+                                <div class="bprd_kpi_sub" t-esc="kpi.sub"/>
+                            </div>
+                        </t>
+                    </div>
+
+                    <!-- Overtime trend + Leave liability -->
+                    <div class="bprd_sec">Overtime &amp; Leave Liability</div>
+                    <div class="bprd_col2">
+
+                        <!-- OT trend table -->
+                        <div class="bprd_panel">
+                            <div class="bprd_panel_title">Overtime Hours — 6 Month Trend</div>
+                            <t t-if="state.data.tables.ot_trend.length">
+                                <table class="bprd_table">
+                                    <thead><tr>
+                                        <th>Month</th>
+                                        <th class="tr">OT Hours</th>
+                                        <th>Trend</th>
+                                    </tr></thead>
+                                    <tbody>
+                                        <t t-set="max_ot" t-value="maxVal(state.data.tables.ot_trend, 'ot_hours')"/>
+                                        <t t-foreach="state.data.tables.ot_trend" t-as="row" t-key="row.label">
+                                            <tr>
+                                                <td t-esc="row.label"/>
+                                                <td class="tr bold" t-esc="row.ot_hours + 'h'"/>
+                                                <td>
+                                                    <div class="bprd_bar_wrap">
+                                                        <div class="bprd_bar_fill"
+                                                             t-att-style="'width:' + Math.round(row.ot_hours / max_ot * 100) + '%;background:' + (row.ot_hours / max_ot > 0.8 ? '#ef4444' : '#1c1c1c')"/>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        </t>
+                                    </tbody>
+                                </table>
+                            </t>
+                            <t t-else="">
+                                <div class="bprd_empty">No overtime data available</div>
+                            </t>
+                        </div>
+
+                        <!-- Leave liability -->
+                        <div class="bprd_panel">
+                            <div class="bprd_panel_title">Leave Liability by Department</div>
+                            <t t-if="state.data.tables.leave_liability.length">
+                                <t t-set="max_ll" t-value="maxVal(state.data.tables.leave_liability, 'liability')"/>
+                                <t t-foreach="state.data.tables.leave_liability" t-as="row" t-key="row.dept">
+                                    <div style="margin-bottom:10px;">
+                                        <div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:3px;">
+                                            <span style="font-weight:600;" t-esc="row.dept"/>
+                                            <span t-esc="fmt(row.liability)"/>
+                                        </div>
+                                        <div class="bprd_bar_wrap">
+                                            <div class="bprd_bar_fill" t-att-style="'width:' + Math.round(row.liability / max_ll * 100) + '%'"/>
+                                        </div>
+                                    </div>
+                                </t>
+                            </t>
+                            <t t-else="">
+                                <div class="bprd_empty">No leave allocation data available</div>
+                            </t>
+                        </div>
+                    </div>
+
+                    <!-- Attrition detail -->
+                    <t t-if="state.data.tables.attrition_detail.length">
+                        <div class="bprd_sec">Attrition Detail — YTD</div>
+                        <div class="bprd_panel">
+                            <table class="bprd_table">
+                                <thead><tr>
+                                    <th>Employee</th>
+                                    <th>Department</th>
+                                    <th>Reason</th>
+                                    <th class="tc">Tenure (months)</th>
+                                </tr></thead>
+                                <tbody>
+                                    <t t-foreach="state.data.tables.attrition_detail" t-as="row" t-key="row.name">
+                                        <tr>
+                                            <td class="bold" t-esc="row.name"/>
+                                            <td t-esc="row.dept"/>
+                                            <td class="muted" t-esc="row.reason"/>
+                                            <td class="tc" t-esc="row.tenure_mo"/>
+                                        </tr>
+                                    </t>
+                                </tbody>
+                            </table>
+                        </div>
+                    </t>
+
+                    <!-- BPSI Signals -->
+                    <div class="bprd_sec">BPSI Intelligence Signals</div>
+                    <div class="bprd_signals_grid">
+                        <t t-foreach="state.data.signals" t-as="sig" t-key="sig.code + sig_index">
+                            <div class="bprd_signal_card">
+                                <div class="bprd_signal_top">
+                                    <div class="bprd_signal_badge" t-att-style="'background:' + sig.color" t-esc="sig.code"/>
+                                    <div class="bprd_signal_head">
+                                        <div class="bprd_signal_name" t-esc="sig.name"/>
+                                    </div>
+                                </div>
+                                <div class="bprd_signal_body">
+                                    <div class="bprd_signal_desc" t-esc="sig.desc"/>
+                                    <t t-if="sig.nums.length">
+                                        <div class="bprd_signal_nums">
+                                            <t t-foreach="sig.nums" t-as="n" t-key="n.label">
+                                                <div class="bprd_signal_num">
+                                                    <span class="bprd_signal_num_label" t-esc="n.label"/>
+                                                    <span class="bprd_signal_num_val" t-esc="n.value"/>
+                                                </div>
+                                            </t>
+                                        </div>
+                                    </t>
+                                </div>
+                                <div class="bprd_signal_footer">
+                                    <span class="bprd_signal_perspective"
+                                          t-att-style="'background:' + sig.perspective_color"
+                                          t-esc="sig.perspective"/>
+                                    <div class="bprd_signal_action" t-esc="sig.action"/>
+                                </div>
+                            </div>
+                        </t>
+                    </div>
+                    <div class="bprd_signals_note">Signals are computed from live Odoo data. Thresholds are calibrated for SME context.</div>
+
+                    <div class="bprd_footer">HR Manager — Restricted · Blackpaw Innovations</div>
+                </div>
+            </t>
+
+            <t t-else="">
+                <div class="bprd_empty">No data available.</div>
+            </t>
+        </div>
+    </div>
+</t>
+
+</templates>

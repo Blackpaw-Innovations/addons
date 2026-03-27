@@ -1,0 +1,38 @@
+# -*- coding: utf-8 -*-
+{
+    "name": "Blackpaw Role Dashboards",
+    "version": "19.0.1.0.1",
+    "summary": "Tier-2 intelligence dashboards for Finance, HR, Sales, Operations and Fuel roles",
+    "category": "Blackpaw/Intelligence",
+    "author": "Blackpaw Innovations",
+    "maintainer": "Blackpaw Innovations",
+    "website": "https://www.blackpawinnovations.com",
+    "support": "support@blackpawinnovations.com",
+    "license": "LGPL-3",
+    "depends": ["account", "hr", "hr_attendance", "crm", "sale", "mail", "web"],
+    "data": [
+        "security/ir.model.access.csv",
+        "data/bp_cron.xml",
+        "views/bp_watchlist_views.xml",
+        "views/bp_role_dashboards_actions.xml",
+    ],
+    "assets": {
+        "web.assets_backend": [
+            "bp_role_dashboards/static/src/scss/bp_role_dashboards.scss",
+            "bp_role_dashboards/static/src/js/bp_finance_dashboard.js",
+            "bp_role_dashboards/static/src/js/bp_hr_dashboard.js",
+            "bp_role_dashboards/static/src/js/bp_sales_dashboard.js",
+            "bp_role_dashboards/static/src/js/bp_operations_dashboard.js",
+            "bp_role_dashboards/static/src/js/bp_fuel_dashboard.js",
+            "bp_role_dashboards/static/src/js/bp_personal_dashboard.js",
+            "bp_role_dashboards/static/src/xml/bp_finance_dashboard.xml",
+            "bp_role_dashboards/static/src/xml/bp_hr_dashboard.xml",
+            "bp_role_dashboards/static/src/xml/bp_sales_dashboard.xml",
+            "bp_role_dashboards/static/src/xml/bp_operations_dashboard.xml",
+            "bp_role_dashboards/static/src/xml/bp_fuel_dashboard.xml",
+            "bp_role_dashboards/static/src/xml/bp_personal_dashboard.xml",
+        ],
+    },
+    "installable": True,
+    "application": False,
+}

@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- ── List View ──────────────────────────────────────────────────────── -->
+
+    <record id="view_bp_watchlist_list" model="ir.ui.view">
+        <field name="name">bp.intelligence.watchlist.list</field>
+        <field name="model">bp.intelligence.watchlist</field>
+        <field name="arch" type="xml">
+            <list string="Intelligence Watchlist" decoration-danger="priority == 'high'" decoration-warning="priority == 'medium'">
+                <field name="watch_type" widget="badge" decoration-info="watch_type == 'customer'" decoration-success="watch_type == 'supplier'"/>
+                <field name="name" string="Tracked Item"/>
+                <field name="priority" widget="priority"/>
+                <field name="ar_threshold" optional="hide" string="AR Alert (≥)"/>
+                <field name="days_overdue_threshold" optional="hide" string="Overdue Alert (days)"/>
+                <field name="notes" optional="hide"/>
+                <field name="active" widget="toggle_button" optional="show"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- ── Form View ──────────────────────────────────────────────────────── -->
+
+    <record id="view_bp_watchlist_form" model="ir.ui.view">
+        <field name="name">bp.intelligence.watchlist.form</field>
+        <field name="model">bp.intelligence.watchlist</field>
+        <field name="arch" type="xml">
+            <form string="Watchlist Item">
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="name" readonly="1"/></h1>
+                    </div>
+                    <group>
+                        <group string="Track">
+                            <field name="watch_type" widget="radio" options="{'horizontal': true}"/>
+                            <field name="partner_id"
+                                   invisible="watch_type not in ('customer', 'supplier')"
+                                   domain="[('customer_rank', '>', 0)] if watch_type == 'customer' else [('supplier_rank', '>', 0)]"
+                                   options="{'no_create': True}"/>
+                            <field name="product_id"
+                                   invisible="watch_type != 'product'"
+                                   options="{'no_create': True}"/>
+                            <field name="employee_id"
+                                   invisible="watch_type != 'employee'"
+                                   options="{'no_create': True}"/>
+                            <field name="priority" widget="priority"/>
+                            <field name="active"/>
+                        </group>
+                        <group string="Alert Thresholds">
+                            <field name="ar_threshold"
+                                   invisible="watch_type not in ('customer', 'supplier')"
+                                   string="Flag if AR exceeds"/>
+                            <field name="days_overdue_threshold"
+                                   invisible="watch_type not in ('customer', 'supplier')"
+                                   string="Flag if overdue more than (days)"/>
+                        </group>
+                    </group>
+                    <group string="Notes">
+                        <field name="notes" nolabel="1" placeholder="Context for this item — why it matters, what threshold triggers a call..."/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- ── Search View ────────────────────────────────────────────────────── -->
+
+    <record id="view_bp_watchlist_search" model="ir.ui.view">
+        <field name="name">bp.intelligence.watchlist.search</field>
+        <field name="model">bp.intelligence.watchlist</field>
+        <field name="arch" type="xml">
+            <search>
+                <filter name="customers" string="Customers" domain="[('watch_type', '=', 'customer')]"/>
+                <filter name="suppliers" string="Suppliers" domain="[('watch_type', '=', 'supplier')]"/>
+                <filter name="products" string="Products" domain="[('watch_type', '=', 'product')]"/>
+                <filter name="employees" string="Employees" domain="[('watch_type', '=', 'employee')]"/>
+                <filter name="high_priority" string="High Priority" domain="[('priority', '=', 'high')]"/>
+                <filter name="inactive" string="Archived" domain="[('active', '=', False)]"/>
+                <filter name="group_type" string="Group by Type" context="{'group_by': 'watch_type'}"/>
+            </search>
+        </field>
+    </record>
+
+    <!-- ── Action ─────────────────────────────────────────────────────────── -->
+
+    <record id="action_bp_watchlist" model="ir.actions.act_window">
+        <field name="name">Intelligence Watchlist</field>
+        <field name="res_model">bp.intelligence.watchlist</field>
+        <field name="view_mode">list,form</field>
+        <field name="context">{'search_default_active': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                No items on your watchlist yet
+            </p>
+            <p>
+                Add customers, suppliers, products or employees to track them
+                in your weekly intelligence briefs and dashboard signals.
+            </p>
+        </field>
+    </record>
+
+</odoo>

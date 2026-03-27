@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="utf-8"?>
+<templates xml:space="preserve">
+
+<t t-name="bp_role_dashboards.OperationsDashboard">
+    <div class="bprd_wrap o_action">
+
+        <div class="bprd_topbar">
+            <span class="bprd_topbar_title">Operations</span>
+            <span class="bprd_topbar_role">Intelligence Dashboard</span>
+            <span class="bprd_topbar_badge" style="background:#2e7d32;">RESTRICTED</span>
+            <div class="bprd_topbar_sep">|</div>
+            <button class="bprd_btn_refresh" t-on-click="load" t-att-disabled="state.isLoading || undefined">
+                <i t-att-class="state.isLoading ? 'fa fa-spinner fa-spin' : 'fa fa-refresh'"/>
+                Refresh
+            </button>
+            <span class="bprd_topbar_time" t-esc="now"/>
+        </div>
+
+        <div class="bprd_body">
+            <t t-if="state.isLoading">
+                <div class="bprd_loading">
+                    <i class="fa fa-circle-o-notch fa-spin fa-2x"/>
+                    <span>Loading Operations Dashboard…</span>
+                </div>
+            </t>
+
+            <t t-elif="state.data">
+                <div class="bprd_dash">
+
+                    <div class="bprd_page_header">
+                        <div>
+                            <div class="bprd_page_title">Operations</div>
+                            <div class="bprd_page_sub">Field &amp; Job Card Intelligence — Restricted</div>
+                        </div>
+                        <div class="bprd_page_period">
+                            <t t-esc="state.data.period"/>
+                            <span>Refreshed <t t-esc="now"/></span>
+                        </div>
+                    </div>
+
+                    <!-- KPI strip -->
+                    <div class="bprd_kpi_strip">
+                        <t t-foreach="state.data.kpis" t-as="kpi" t-key="kpi.label">
+                            <div t-att-class="'bprd_kpi_card v-' + kpi.variant">
+                                <div class="bprd_kpi_label" t-esc="kpi.label"/>
+                                <div class="bprd_kpi_value" t-esc="kpi.value"/>
+                                <div class="bprd_kpi_sub" t-esc="kpi.sub"/>
+                            </div>
+                        </t>
+                    </div>
+
+                    <!-- Active jobs -->
+                    <t t-if="state.data.tables.active_jobs.length">
+                        <div class="bprd_sec">Active Jobs</div>
+                        <div class="bprd_panel">
+                            <table class="bprd_table">
+                                <thead><tr>
+                                    <th>Job Card</th>
+                                    <th>Client</th>
+                                    <th>Technician</th>
+                                    <th class="tc">Due</th>
+                                    <th>Progress</th>
+                                </tr></thead>
+                                <tbody>
+                                    <t t-foreach="state.data.tables.active_jobs" t-as="job" t-key="job.name">
+                                        <tr>
+                                            <td class="bold" t-esc="job.name"/>
+                                            <td t-esc="job.client"/>
+                                            <td t-esc="job.tech"/>
+                                            <td class="tc muted" t-esc="job.due"/>
+                                            <td>
+                                                <div class="bprd_bar_wrap">
+                                                    <div class="bprd_bar_fill" t-att-style="'width:' + (job.progress || 0) + '%'"/>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </t>
+                                </tbody>
+                            </table>
+                        </div>
+                    </t>
+
+                    <!-- Awaiting sign-off -->
+                    <t t-if="state.data.tables.awaiting.length">
+                        <div class="bprd_sec">Awaiting Client Sign-Off</div>
+                        <div class="bprd_panel">
+                            <table class="bprd_table">
+                                <thead><tr>
+                                    <th>Job Card</th>
+                                    <th>Client</th>
+                                    <th>Technician</th>
+                                    <th class="tc">Status</th>
+                                </tr></thead>
+                                <tbody>
+                                    <t t-foreach="state.data.tables.awaiting" t-as="job" t-key="job.name">
+                                        <tr>
+                                            <td class="bold" t-esc="job.name"/>
+                                            <td t-esc="job.client"/>
+                                            <td t-esc="job.tech"/>
+                                            <td class="tc"><span class="bprd_pill warn">Pending</span></td>
+                                        </tr>
+                                    </t>
+                                </tbody>
+                            </table>
+                        </div>
+                    </t>
+
+                    <!-- BPSI Signals -->
+                    <div class="bprd_sec">BPSI Intelligence Signals</div>
+                    <div class="bprd_signals_grid">
+                        <t t-foreach="state.data.signals" t-as="sig" t-key="sig.code + sig_index">
+                            <div class="bprd_signal_card">
+                                <div class="bprd_signal_top">
+                                    <div class="bprd_signal_badge" t-att-style="'background:' + sig.color" t-esc="sig.code"/>
+                                    <div class="bprd_signal_head">
+                                        <div class="bprd_signal_name" t-esc="sig.name"/>
+                                    </div>
+                                </div>
+                                <div class="bprd_signal_body">
+                                    <div class="bprd_signal_desc" t-esc="sig.desc"/>
+                                    <t t-if="sig.nums.length">
+                                        <div class="bprd_signal_nums">
+                                            <t t-foreach="sig.nums" t-as="n" t-key="n.label">
+                                                <div class="bprd_signal_num">
+                                                    <span class="bprd_signal_num_label" t-esc="n.label"/>
+                                                    <span class="bprd_signal_num_val" t-esc="n.value"/>
+                                                </div>
+                                            </t>
+                                        </div>
+                                    </t>
+                                </div>
+                                <div class="bprd_signal_footer">
+                                    <span class="bprd_signal_perspective"
+                                          t-att-style="'background:' + sig.perspective_color"
+                                          t-esc="sig.perspective"/>
+                                    <div class="bprd_signal_action" t-esc="sig.action"/>
+                                </div>
+                            </div>
+                        </t>
+                    </div>
+                    <div class="bprd_signals_note">Signals are computed from live Odoo data. Job card data requires bp_jobcards_app.</div>
+
+                    <div class="bprd_footer">Operations Manager — Restricted · Blackpaw Innovations</div>
+                </div>
+            </t>
+
+            <t t-else="">
+                <div class="bprd_empty">No data available.</div>
+            </t>
+        </div>
+    </div>
+</t>
+
+</templates>

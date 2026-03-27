@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- ── CLIENT ACTIONS ───────────────────────────────────────────────── -->
+
+    <record id="action_bp_dash_finance" model="ir.actions.client">
+        <field name="name">Finance Intelligence Dashboard</field>
+        <field name="tag">bp_dash_finance</field>
+        <field name="target">current</field>
+    </record>
+
+    <record id="action_bp_dash_hr" model="ir.actions.client">
+        <field name="name">HR Intelligence Dashboard</field>
+        <field name="tag">bp_dash_hr</field>
+        <field name="target">current</field>
+    </record>
+
+    <record id="action_bp_dash_sales" model="ir.actions.client">
+        <field name="name">Sales Intelligence Dashboard</field>
+        <field name="tag">bp_dash_sales</field>
+        <field name="target">current</field>
+    </record>
+
+    <record id="action_bp_dash_operations" model="ir.actions.client">
+        <field name="name">Operations Intelligence Dashboard</field>
+        <field name="tag">bp_dash_operations</field>
+        <field name="target">current</field>
+    </record>
+
+    <record id="action_bp_dash_fuel" model="ir.actions.client">
+        <field name="name">Fuel Station Intelligence Dashboard</field>
+        <field name="tag">bp_dash_fuel</field>
+        <field name="target">current</field>
+    </record>
+
+    <record id="action_bp_dash_personal" model="ir.actions.client">
+        <field name="name">My Cockpit</field>
+        <field name="tag">bp_dash_personal</field>
+        <field name="target">current</field>
+    </record>
+
+    <!-- ── MENU ITEMS ────────────────────────────────────────────────────── -->
+
+    <!-- Finance: under Accounting > Reporting -->
+    <menuitem id="menu_bp_dash_finance"
+              name="Finance Intelligence"
+              action="action_bp_dash_finance"
+              parent="account.menu_finance_reports"
+              sequence="99"/>
+
+    <!-- HR: under Employees top-level > Reporting -->
+    <menuitem id="menu_bp_dash_hr"
+              name="HR Intelligence"
+              action="action_bp_dash_hr"
+              parent="hr.hr_menu_hr_reports"
+              sequence="99"/>
+
+    <!-- Sales: under Sales > Reporting -->
+    <menuitem id="menu_bp_dash_sales"
+              name="Sales Intelligence"
+              action="action_bp_dash_sales"
+              parent="sale.menu_sale_report"
+              sequence="99"/>
+
+    <!-- Operations: top-level Blackpaw menu or standalone -->
+    <menuitem id="menu_bp_dash_root"
+              name="Blackpaw Intelligence"
+              web_icon="bp_role_dashboards,static/description/icon.png"
+              sequence="98"
+              groups="base.group_user"/>
+
+    <menuitem id="menu_bp_dash_operations"
+              name="Operations Dashboard"
+              action="action_bp_dash_operations"
+              parent="menu_bp_dash_root"
+              sequence="10"/>
+
+    <menuitem id="menu_bp_dash_fuel_sub"
+              name="Fuel Station Dashboard"
+              action="action_bp_dash_fuel"
+              parent="menu_bp_dash_root"
+              sequence="20"/>
+
+    <menuitem id="menu_bp_dash_finance_sub"
+              name="Finance Dashboard"
+              action="action_bp_dash_finance"
+              parent="menu_bp_dash_root"
+              sequence="30"/>
+
+    <menuitem id="menu_bp_dash_hr_sub"
+              name="HR Dashboard"
+              action="action_bp_dash_hr"
+              parent="menu_bp_dash_root"
+              sequence="40"/>
+
+    <menuitem id="menu_bp_dash_sales_sub"
+              name="Sales Dashboard"
+              action="action_bp_dash_sales"
+              parent="menu_bp_dash_root"
+              sequence="50"/>
+
+    <menuitem id="menu_bp_dash_personal"
+              name="My Cockpit"
+              action="action_bp_dash_personal"
+              parent="menu_bp_dash_root"
+              sequence="60"/>
+
+    <menuitem id="menu_bp_watchlist"
+              name="Intelligence Watchlist"
+              action="action_bp_watchlist"
+              parent="menu_bp_dash_root"
+              sequence="90"
+              groups="base.group_system"/>
+
+</odoo>
