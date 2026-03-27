@@ -9,8 +9,9 @@
     "website": "https://www.blackpawinnovations.com",
     "support": "support@blackpawinnovations.com",
     "license": "LGPL-3",
-    "depends": ["account", "hr", "hr_attendance", "crm", "sale", "mail", "web", "blackpaw_bi_dashboard"],
+    "depends": ["account", "hr", "hr_attendance", "crm", "sale", "mail", "web", "blackpaw_ai_service"],
     "data": [
+        "security/bp_role_dashboards_security.xml",
         "security/ir.model.access.csv",
         "data/bp_cron.xml",
         "views/bp_watchlist_views.xml",
