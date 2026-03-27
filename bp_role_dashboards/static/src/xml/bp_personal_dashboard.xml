@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="utf-8"?>
+<templates xml:space="preserve">
+
+<t t-name="bp_role_dashboards.BpPersonalDashboard">
+  <div class="bprd_wrap bprd_personal">
+
+    <!-- Loading -->
+    <t t-if="state.isLoading">
+      <div class="bprd_loading">
+        <div class="bprd_spinner"/>
+        <span>Loading your cockpit…</span>
+      </div>
+    </t>
+
+    <t t-elif="state.data">
+      <t t-set="d" t-value="state.data"/>
+
+      <!-- Top bar -->
+      <div class="bprd_topbar">
+        <div class="bprd_topbar_left">
+          <h1 class="bprd_dash_title">My Cockpit</h1>
+          <span class="bprd_period" t-esc="d.period"/>
+        </div>
+        <div class="bprd_topbar_right">
+          <span class="bprd_company_tag" t-esc="d.company_name"/>
+        </div>
+      </div>
+
+      <div class="bprd_body">
+
+        <!-- ── Quick Stats Strip ───────────────────────────────────────────── -->
+        <div class="bprd_kpi_strip">
+          <div t-att-class="'bprd_kpi_card ' + (d.overdue_task_count > 0 ? 'v-danger' : 'v-success')">
+            <div class="bprd_kpi_val" t-esc="d.overdue_task_count"/>
+            <div class="bprd_kpi_label">Overdue Tasks</div>
+          </div>
+          <div t-att-class="'bprd_kpi_card ' + (d.high_priority_count > 0 ? 'v-warn' : 'v-default')">
+            <div class="bprd_kpi_val" t-esc="d.high_priority_count"/>
+            <div class="bprd_kpi_label">High Priority</div>
+          </div>
+          <div t-att-class="'bprd_kpi_card ' + (d.pending_approvals.length > 0 ? 'v-warn' : 'v-default')">
+            <div class="bprd_kpi_val" t-esc="d.pending_approvals.length"/>
+            <div class="bprd_kpi_label">Pending Approvals</div>
+          </div>
+          <div t-att-class="'bprd_kpi_card ' + (d.upcoming_meetings.length > 0 ? 'v-primary' : 'v-default')">
+            <div class="bprd_kpi_val" t-esc="d.upcoming_meetings.length"/>
+            <div class="bprd_kpi_label">Upcoming Meetings</div>
+          </div>
+        </div>
+
+        <!-- ── Main grid ──────────────────────────────────────────────────── -->
+        <div class="bprd_col2">
+
+          <!-- My Tasks -->
+          <div class="bprd_panel">
+            <div class="bprd_panel_head">My Tasks</div>
+            <t t-if="d.my_tasks.length">
+              <table class="bprd_table">
+                <thead>
+                  <tr>
+                    <th>Task</th>
+                    <th>Project</th>
+                    <th>Due</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <t t-foreach="d.my_tasks" t-as="task" t-key="task.id">
+                    <tr t-att-class="task.overdue ? 'bprd_row_danger' : (task.priority === '1' ? 'bprd_row_warn' : '')">
+                      <td>
+                        <span t-if="task.overdue" class="bprd_dot_red">●</span>
+                        <span t-elif="task.priority === '1'" class="bprd_dot_amber">◐</span>
+                        <span t-esc="task.name"/>
+                      </td>
+                      <td t-esc="task.project"/>
+                      <td t-esc="task.deadline"/>
+                    </tr>
+                  </t>
+                </tbody>
+              </table>
+            </t>
+            <p t-else="" class="bprd_empty">No open tasks assigned to you.</p>
+          </div>
+
+          <!-- Upcoming Meetings -->
+          <div class="bprd_panel">
+            <div class="bprd_panel_head">Next 3 Days</div>
+            <t t-if="d.upcoming_meetings.length">
+              <table class="bprd_table">
+                <thead>
+                  <tr><th>Meeting</th><th>When</th><th>Duration</th></tr>
+                </thead>
+                <tbody>
+                  <t t-foreach="d.upcoming_meetings" t-as="m" t-key="m_index">
+                    <tr>
+                      <td t-esc="m.name"/>
+                      <td t-esc="m.start"/>
+                      <td><t t-esc="m.duration"/>h</td>
+                    </tr>
+                  </t>
+                </tbody>
+              </table>
+            </t>
+            <p t-else="" class="bprd_empty">No meetings in the next 3 days.</p>
+          </div>
+
+          <!-- Leave Balance -->
+          <div class="bprd_panel">
+            <div class="bprd_panel_head">My Leave Balance</div>
+            <t t-if="d.leave_balance.length">
+              <table class="bprd_table">
+                <thead>
+                  <tr><th>Leave Type</th><th>Allocated</th><th>Remaining</th></tr>
+                </thead>
+                <tbody>
+                  <t t-foreach="d.leave_balance" t-as="lb" t-key="lb_index">
+                    <tr>
+                      <td t-esc="lb.type"/>
+                      <td t-esc="lb.allocated"/>
+                      <td t-esc="lb.remaining"/>
+                    </tr>
+                  </t>
+                </tbody>
+              </table>
+            </t>
+            <p t-else="" class="bprd_empty">No leave allocations found.</p>
+          </div>
+
+          <!-- Pending Approvals + Payslip -->
+          <div class="bprd_panel">
+            <div class="bprd_panel_head">Pending Approvals</div>
+            <t t-if="d.pending_approvals.length">
+              <table class="bprd_table">
+                <thead>
+                  <tr><th>Type</th><th>Item</th><th>Status</th></tr>
+                </thead>
+                <tbody>
+                  <t t-foreach="d.pending_approvals" t-as="ap" t-key="ap_index">
+                    <tr>
+                      <td><span class="bprd_badge_neutral" t-esc="ap.type"/></td>
+                      <td t-esc="ap.name"/>
+                      <td t-esc="ap.state"/>
+                    </tr>
+                  </t>
+                </tbody>
+              </table>
+            </t>
+            <p t-else="" class="bprd_empty">No items awaiting approval.</p>
+
+            <!-- Last Payslip -->
+            <t t-if="d.last_payslip">
+              <div class="bprd_payslip_strip">
+                <span class="bprd_payslip_label">Last Payslip</span>
+                <span class="bprd_payslip_period" t-esc="d.last_payslip.period"/>
+                <span class="bprd_payslip_net">
+                  <t t-esc="d.last_payslip.currency"/>
+                  <t t-esc="component.fmt(d.last_payslip.net)"/>
+                </span>
+              </div>
+            </t>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Footer -->
+      <div class="bprd_footer">
+        <span>Blackpaw Intelligence</span>
+        <span t-esc="d.company_name"/>
+      </div>
+    </t>
+
+  </div>
+</t>
+
+</templates>

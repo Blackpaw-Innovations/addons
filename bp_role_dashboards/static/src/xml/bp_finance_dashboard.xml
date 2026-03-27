@@ -1,0 +1,208 @@
+<?xml version="1.0" encoding="utf-8"?>
+<templates xml:space="preserve">
+
+<t t-name="bp_role_dashboards.FinanceDashboard">
+    <div class="bprd_wrap o_action">
+
+        <!-- TOP BAR -->
+        <div class="bprd_topbar">
+            <span class="bprd_topbar_title">Finance &amp; Accounts</span>
+            <span class="bprd_topbar_role">Intelligence Dashboard</span>
+            <span class="bprd_topbar_badge" style="background:#1565c0;">RESTRICTED</span>
+            <div class="bprd_topbar_sep">|</div>
+            <button class="bprd_btn_refresh" t-on-click="load" t-att-disabled="state.isLoading || undefined">
+                <i t-att-class="state.isLoading ? 'fa fa-spinner fa-spin' : 'fa fa-refresh'"/>
+                Refresh
+            </button>
+            <span class="bprd_topbar_time" t-esc="now"/>
+        </div>
+
+        <!-- BODY -->
+        <div class="bprd_body">
+            <t t-if="state.isLoading">
+                <div class="bprd_loading">
+                    <i class="fa fa-circle-o-notch fa-spin fa-2x"/>
+                    <span>Loading Finance Dashboard…</span>
+                </div>
+            </t>
+
+            <t t-elif="state.data">
+                <div class="bprd_dash">
+
+                    <!-- Page header -->
+                    <div class="bprd_page_header">
+                        <div>
+                            <div class="bprd_page_title">Finance &amp; Accounts</div>
+                            <div class="bprd_page_sub">Management Intelligence Report — Restricted</div>
+                        </div>
+                        <div class="bprd_page_period">
+                            <t t-esc="state.data.period"/>
+                            <span>Refreshed <t t-esc="now"/></span>
+                        </div>
+                    </div>
+
+                    <!-- KPI strip -->
+                    <div class="bprd_kpi_strip">
+                        <t t-foreach="state.data.kpis" t-as="kpi" t-key="kpi.label">
+                            <div t-att-class="'bprd_kpi_card v-' + kpi.variant">
+                                <div class="bprd_kpi_label" t-esc="kpi.label"/>
+                                <div class="bprd_kpi_value" t-esc="kpi.value"/>
+                                <div class="bprd_kpi_sub" t-esc="kpi.sub"/>
+                            </div>
+                        </t>
+                    </div>
+
+                    <!-- AR Aging -->
+                    <div class="bprd_sec">Accounts Receivable Aging</div>
+                    <div class="bprd_col13">
+                        <div class="bprd_panel">
+                            <div class="bprd_panel_title">Aging by Client — Top 10</div>
+                            <table class="bprd_table">
+                                <thead><tr>
+                                    <th>Client</th>
+                                    <th class="tr">Current</th>
+                                    <th class="tr">1–30 Days</th>
+                                    <th class="tr">&gt;30 Days</th>
+                                </tr></thead>
+                                <tbody>
+                                    <t t-foreach="state.data.tables.aging" t-as="row" t-key="row.name">
+                                        <tr>
+                                            <td class="bold" t-esc="row.name"/>
+                                            <td class="tr" t-esc="fmt(row.current)"/>
+                                            <td class="tr" t-esc="fmt(row.d30)"/>
+                                            <td t-att-class="'tr' + (row.d60 > 0 ? ' bold' : '')" t-esc="fmt(row.d60)"/>
+                                        </tr>
+                                    </t>
+                                    <t t-if="!state.data.tables.aging.length">
+                                        <tr><td colspan="4" class="muted">No outstanding receivables</td></tr>
+                                    </t>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Revenue concentration -->
+                        <div class="bprd_panel">
+                            <div class="bprd_panel_title">Revenue Concentration</div>
+                            <t t-foreach="state.data.tables.concentration" t-as="c" t-key="c.name">
+                                <div style="margin-bottom:10px;">
+                                    <div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:3px;">
+                                        <span style="font-weight:600;" t-esc="c.name"/>
+                                        <span t-esc="c.pct + '%'"/>
+                                    </div>
+                                    <div class="bprd_bar_wrap">
+                                        <div class="bprd_bar_fill" t-att-style="'width:' + c.pct + '%;background:' + (c.pct > 35 ? '#ef4444' : (c.pct > 25 ? '#f59e0b' : '#1c1c1c'))"/>
+                                    </div>
+                                </div>
+                            </t>
+                            <t t-if="!state.data.tables.concentration.length">
+                                <div class="bprd_empty">No revenue this month</div>
+                            </t>
+                        </div>
+                    </div>
+
+                    <!-- Revenue trend + Payables -->
+                    <div class="bprd_sec">Revenue Trend &amp; Payables</div>
+                    <div class="bprd_col2">
+                        <!-- 6-month trend -->
+                        <div class="bprd_panel">
+                            <div class="bprd_panel_title">Revenue vs Expenses — 6 Months</div>
+                            <table class="bprd_table">
+                                <thead><tr>
+                                    <th>Month</th>
+                                    <th class="tr">Revenue</th>
+                                    <th class="tr">Expenses</th>
+                                    <th class="tr">GP</th>
+                                </tr></thead>
+                                <tbody>
+                                    <t t-foreach="state.data.tables.trend" t-as="t_row" t-key="t_row.label">
+                                        <tr>
+                                            <td t-esc="t_row.label"/>
+                                            <td class="tr bold" t-esc="fmt(t_row.revenue)"/>
+                                            <td class="tr muted" t-esc="fmt(t_row.expenses)"/>
+                                            <td t-att-class="'tr ' + (t_row.revenue - t_row.expenses > 0 ? '' : 'bold')"
+                                                t-esc="fmt(t_row.revenue - t_row.expenses)"/>
+                                        </tr>
+                                    </t>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Payables watchlist -->
+                        <div class="bprd_panel">
+                            <div class="bprd_panel_title">Payables Watchlist</div>
+                            <table class="bprd_table">
+                                <thead><tr>
+                                    <th>Vendor</th>
+                                    <th>Ref</th>
+                                    <th class="tr">Amount</th>
+                                    <th class="tc">Due</th>
+                                    <th class="tc">Status</th>
+                                </tr></thead>
+                                <tbody>
+                                    <t t-foreach="state.data.tables.payables" t-as="p" t-key="p.ref">
+                                        <tr>
+                                            <td class="bold" t-esc="p.partner"/>
+                                            <td class="muted" t-esc="p.ref"/>
+                                            <td class="tr bold" t-esc="fmt(p.amount)"/>
+                                            <td class="tc muted" t-esc="p.due"/>
+                                            <td class="tc">
+                                                <span t-att-class="'bprd_pill ' + (p.overdue ? 'alert' : 'ok')"
+                                                      t-esc="p.overdue ? 'Overdue' : 'Current'"/>
+                                            </td>
+                                        </tr>
+                                    </t>
+                                    <t t-if="!state.data.tables.payables.length">
+                                        <tr><td colspan="5" class="muted">No outstanding payables</td></tr>
+                                    </t>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- BPSI Signals -->
+                    <div class="bprd_sec">BPSI Intelligence Signals</div>
+                    <div class="bprd_signals_grid">
+                        <t t-foreach="state.data.signals" t-as="sig" t-key="sig.code + sig_index">
+                            <div class="bprd_signal_card">
+                                <div class="bprd_signal_top">
+                                    <div class="bprd_signal_badge" t-att-style="'background:' + sig.color" t-esc="sig.code"/>
+                                    <div class="bprd_signal_head">
+                                        <div class="bprd_signal_name" t-esc="sig.name"/>
+                                    </div>
+                                </div>
+                                <div class="bprd_signal_body">
+                                    <div class="bprd_signal_desc" t-esc="sig.desc"/>
+                                    <t t-if="sig.nums.length">
+                                        <div class="bprd_signal_nums">
+                                            <t t-foreach="sig.nums" t-as="n" t-key="n.label">
+                                                <div class="bprd_signal_num">
+                                                    <span class="bprd_signal_num_label" t-esc="n.label"/>
+                                                    <span class="bprd_signal_num_val" t-esc="n.value"/>
+                                                </div>
+                                            </t>
+                                        </div>
+                                    </t>
+                                </div>
+                                <div class="bprd_signal_footer">
+                                    <span class="bprd_signal_perspective"
+                                          t-att-style="'background:' + sig.perspective_color"
+                                          t-esc="sig.perspective"/>
+                                    <div class="bprd_signal_action" t-esc="sig.action"/>
+                                </div>
+                            </div>
+                        </t>
+                    </div>
+                    <div class="bprd_signals_note">Signals are computed from live Odoo data. Thresholds are calibrated for SME context.</div>
+
+                    <div class="bprd_footer">Finance Manager — Restricted · Blackpaw Innovations</div>
+                </div>
+            </t>
+
+            <t t-else="">
+                <div class="bprd_empty">No data available.</div>
+            </t>
+        </div>
+    </div>
+</t>
+
+</templates>

@@ -1,0 +1,11 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_bp_finance_dashboard,access_bp_finance_dashboard,model_bp_finance_dashboard,base.group_user,1,0,0,0
+access_bp_hr_dashboard,access_bp_hr_dashboard,model_bp_hr_dashboard,base.group_user,1,0,0,0
+access_bp_sales_dashboard,access_bp_sales_dashboard,model_bp_sales_dashboard,base.group_user,1,0,0,0
+access_bp_operations_dashboard,access_bp_operations_dashboard,model_bp_operations_dashboard,base.group_user,1,0,0,0
+access_bp_fuel_dashboard,access_bp_fuel_dashboard,model_bp_fuel_dashboard,base.group_user,1,0,0,0
+access_bp_personal_dashboard,access_bp_personal_dashboard,model_bp_personal_dashboard,base.group_user,1,0,0,0
+access_bp_brief_cron_user,access_bp_brief_cron_user,model_bp_brief_cron,base.group_user,1,0,0,0
+access_bp_brief_cron_admin,access_bp_brief_cron_admin,model_bp_brief_cron,base.group_system,1,1,1,1
+access_bp_intelligence_watchlist_user,access_bp_intelligence_watchlist_user,model_bp_intelligence_watchlist,base.group_user,1,0,0,0
+access_bp_intelligence_watchlist_mgr,access_bp_intelligence_watchlist_mgr,model_bp_intelligence_watchlist,group_bp_dashboards_manager,1,1,1,1

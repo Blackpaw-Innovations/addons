@@ -1,0 +1,571 @@
+// ── BP Role Dashboards — shared styles ───────────────────────────────────────
+
+$bp-font: "Lato", "Lucida Grande", Helvetica, Verdana, Arial, sans-serif;
+$bg-page: #eceef2;
+$bg-card: #ffffff;
+$text-dark: #1c1c1c;
+$text-muted: #888;
+$text-light: #aaa;
+$border: #f0f0f0;
+$radius: 4px;
+$shadow: 0 1px 4px rgba(0,0,0,.08);
+
+// ── WRAPPER ───────────────────────────────────────────────────────────────────
+
+.bprd_wrap {
+    font-family: $bp-font;
+    color: $text-dark;
+    background: $bg-page;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    overflow: hidden;
+}
+
+// ── TOP BAR ───────────────────────────────────────────────────────────────────
+
+.bprd_topbar {
+    background: #161616;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 20px;
+    flex-shrink: 0;
+    flex-wrap: wrap;
+    min-height: 44px;
+}
+
+.bprd_topbar_title {
+    color: #ffffff;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: .4px;
+    margin-right: 4px;
+}
+
+.bprd_topbar_role {
+    color: #aaa;
+    font-size: 11px;
+    font-weight: 300;
+    margin-right: 10px;
+}
+
+.bprd_topbar_badge {
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    padding: 2px 7px;
+    border-radius: 2px;
+    margin-right: 6px;
+    color: #ffffff;
+}
+
+.bprd_topbar_sep { color: #3a3a3a; padding: 0 6px; font-size: 14px; }
+
+.bprd_topbar_time {
+    margin-left: auto;
+    font-size: 10px;
+    color: #555;
+    font-weight: 300;
+}
+
+.bprd_btn_refresh {
+    background: none;
+    border: 1px solid #3a3a3a;
+    color: #bbb;
+    padding: 4px 12px;
+    border-radius: 3px;
+    font-size: 11px;
+    font-family: $bp-font;
+    cursor: pointer;
+    transition: all .15s;
+
+    .fa { margin-right: 5px; }
+    &:hover { background: #fff; color: #1c1c1c; border-color: #fff; }
+    &:disabled { opacity: 0.5; cursor: not-allowed; }
+}
+
+// ── SCROLL BODY ───────────────────────────────────────────────────────────────
+
+.bprd_body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 24px 24px 48px;
+}
+
+.bprd_dash {
+    max-width: 1280px;
+    margin: 0 auto;
+}
+
+// ── PAGE HEADER ───────────────────────────────────────────────────────────────
+
+.bprd_page_header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: 20px;
+    border-bottom: 2px solid #1c1c1c;
+    padding-bottom: 12px;
+}
+
+.bprd_page_title {
+    font-size: 22px;
+    font-weight: 900;
+    letter-spacing: -.4px;
+    line-height: 1;
+}
+
+.bprd_page_sub {
+    font-size: 11px;
+    font-weight: 300;
+    color: $text-muted;
+    margin-top: 4px;
+}
+
+.bprd_page_period {
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1.2px;
+    text-align: right;
+
+    span {
+        display: block;
+        font-size: 9px;
+        font-weight: 300;
+        color: $text-light;
+        text-transform: none;
+        letter-spacing: 0;
+        margin-top: 2px;
+    }
+}
+
+// ── SECTION HEADER ────────────────────────────────────────────────────────────
+
+.bprd_sec {
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 1.8px;
+    text-transform: uppercase;
+    color: #1c1c1c;
+    border-left: 3px solid #1c1c1c;
+    padding: 2px 0 2px 8px;
+    margin: 28px 0 14px;
+}
+
+// ── KPI STRIP ─────────────────────────────────────────────────────────────────
+
+.bprd_kpi_strip {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 10px;
+    margin-bottom: 4px;
+}
+
+.bprd_kpi_card {
+    background: $bg-card;
+    border-radius: $radius;
+    padding: 14px 16px 12px;
+    box-shadow: $shadow;
+    border-top: 3px solid #e8e8e8;
+
+    &.v-primary { border-top-color: #1c1c1c; }
+    &.v-success  { border-top-color: #22c55e; }
+    &.v-danger   { border-top-color: #ef4444; }
+    &.v-warn     { border-top-color: #f59e0b; }
+    &.v-default  { border-top-color: #e8e8e8; }
+}
+
+.bprd_kpi_label {
+    font-size: 8px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: $text-light;
+    margin-bottom: 6px;
+}
+
+.bprd_kpi_value {
+    font-size: 20px;
+    font-weight: 900;
+    line-height: 1;
+    letter-spacing: -.5px;
+    color: $text-dark;
+
+    .v-primary &  { color: #1c1c1c; }
+    .v-success &  { color: #22c55e; }
+    .v-danger &   { color: #ef4444; }
+    .v-warn &     { color: #f59e0b; }
+}
+
+.bprd_kpi_sub {
+    font-size: 9px;
+    font-weight: 300;
+    color: $text-light;
+    margin-top: 4px;
+}
+
+// ── PANEL ─────────────────────────────────────────────────────────────────────
+
+.bprd_panel {
+    background: $bg-card;
+    border-radius: $radius;
+    padding: 18px 20px;
+    box-shadow: $shadow;
+}
+
+.bprd_panel_title {
+    font-size: 9px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1.4px;
+    color: $text-muted;
+    margin-bottom: 14px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid $border;
+}
+
+// ── GRID HELPERS ──────────────────────────────────────────────────────────────
+
+.bprd_col2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; align-items: start; }
+.bprd_col3 { display: grid; grid-template-columns: 1.3fr 1fr 1fr; gap: 16px; align-items: start; }
+.bprd_col13 { display: grid; grid-template-columns: 1.4fr 1fr; gap: 16px; align-items: start; }
+
+// ── TABLE ─────────────────────────────────────────────────────────────────────
+
+.bprd_table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 11px;
+
+    th {
+        background: #1c1c1c;
+        color: #ffffff;
+        font-size: 9px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: .8px;
+        padding: 8px 10px;
+        text-align: left;
+        white-space: nowrap;
+
+        &.tc { text-align: center; }
+        &.tr { text-align: right; }
+    }
+
+    td {
+        padding: 7px 10px;
+        border-bottom: 1px solid $border;
+        vertical-align: middle;
+
+        &.tc { text-align: center; }
+        &.tr { text-align: right; }
+        &.bold { font-weight: 700; }
+        &.muted { font-weight: 300; color: $text-muted; }
+    }
+
+    tr:last-child td { border-bottom: none; }
+    tr:nth-child(even) td { background: #fafafa; }
+
+    tfoot td {
+        background: #1c1c1c !important;
+        color: #ffffff;
+        font-weight: 700;
+    }
+}
+
+// ── PILL ──────────────────────────────────────────────────────────────────────
+
+.bprd_pill {
+    display: inline-block;
+    font-size: 9px;
+    font-weight: 700;
+    padding: 2px 7px;
+    border-radius: 10px;
+    letter-spacing: .4px;
+
+    &.ok    { background: #e8f5e9; color: #2e7d32; }
+    &.warn  { background: #fff8e1; color: #e65100; }
+    &.alert { background: #ffebee; color: #c62828; }
+    &.info  { background: #e3f2fd; color: #1565c0; }
+    &.cold  { background: #f3e5f5; color: #6a1b9a; }
+}
+
+// ── BAR (inline progress bar) ─────────────────────────────────────────────────
+
+.bprd_bar_wrap {
+    background: #f0f0f0;
+    border-radius: 2px;
+    height: 5px;
+    overflow: hidden;
+    min-width: 60px;
+}
+
+.bprd_bar_fill {
+    height: 100%;
+    border-radius: 2px;
+    background: #1c1c1c;
+    transition: width 0.3s;
+}
+
+// ── SIGNAL CARDS ─────────────────────────────────────────────────────────────
+
+.bprd_signals_grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+}
+
+.bprd_signal_card {
+    background: $bg-card;
+    border-radius: $radius;
+    box-shadow: $shadow;
+    overflow: hidden;
+}
+
+.bprd_signal_top {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 12px 14px 10px;
+    border-bottom: 1px solid $border;
+}
+
+.bprd_signal_badge {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: #ffffff;
+    padding: 4px 8px;
+    border-radius: 2px;
+    flex-shrink: 0;
+    margin-top: 1px;
+}
+
+.bprd_signal_head {
+    flex: 1;
+}
+
+.bprd_signal_code {
+    font-size: 8px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: $text-muted;
+    margin-bottom: 2px;
+}
+
+.bprd_signal_name {
+    font-size: 11px;
+    font-weight: 700;
+    line-height: 1.25;
+}
+
+.bprd_signal_body {
+    padding: 10px 14px;
+}
+
+.bprd_signal_desc {
+    font-size: 10px;
+    font-weight: 300;
+    color: #444;
+    line-height: 1.55;
+    margin-bottom: 8px;
+}
+
+.bprd_signal_nums {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-bottom: 10px;
+}
+
+.bprd_signal_num {
+    background: #f4f4f8;
+    border-radius: 3px;
+    padding: 4px 8px;
+    font-size: 9px;
+}
+
+.bprd_signal_num_label {
+    color: #999;
+    font-weight: 300;
+    display: block;
+    font-size: 8px;
+}
+
+.bprd_signal_num_val {
+    font-weight: 700;
+    color: $text-dark;
+}
+
+.bprd_signal_footer {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 8px;
+    border-top: 1px solid $border;
+    padding: 8px 14px;
+    background: #fafafa;
+}
+
+.bprd_signal_perspective {
+    font-size: 8px;
+    font-weight: 700;
+    letter-spacing: .8px;
+    text-transform: uppercase;
+    color: #ffffff;
+    padding: 2px 7px;
+    border-radius: 2px;
+    flex-shrink: 0;
+}
+
+.bprd_signal_action {
+    font-size: 9px;
+    font-weight: 300;
+    color: #777;
+    line-height: 1.45;
+    flex: 1;
+
+    strong { color: $text-dark; font-weight: 700; }
+}
+
+.bprd_signals_note {
+    text-align: center;
+    font-size: 8px;
+    color: #bbb;
+    font-weight: 300;
+    margin-top: 10px;
+    font-style: italic;
+}
+
+// ── LOADING / EMPTY ───────────────────────────────────────────────────────────
+
+.bprd_loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    padding: 80px 24px;
+    color: $text-muted;
+    font-size: 13px;
+
+    .fa { color: #b0b0b0; }
+}
+
+.bprd_empty {
+    text-align: center;
+    padding: 60px 24px;
+    color: $text-muted;
+    font-size: 13px;
+}
+
+// ── FUNNEL ────────────────────────────────────────────────────────────────────
+
+.bprd_funnel_row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 6px 0;
+    border-bottom: 1px solid $border;
+    font-size: 11px;
+
+    &:last-child { border-bottom: none; }
+}
+
+.bprd_funnel_label { flex: 1; font-weight: 600; }
+.bprd_funnel_count { width: 40px; text-align: right; color: $text-muted; font-size: 10px; }
+.bprd_funnel_bar { flex: 2; }
+.bprd_funnel_value { width: 80px; text-align: right; font-weight: 700; font-size: 10px; }
+
+// ── FOOTER ────────────────────────────────────────────────────────────────────
+
+.bprd_footer {
+    margin-top: 32px;
+    padding: 12px 0;
+    border-top: 1px solid #ddd;
+    font-size: 9px;
+    color: $text-light;
+    text-align: center;
+    letter-spacing: .5px;
+}
+
+// ── PERSONAL COCKPIT ──────────────────────────────────────────────────────────
+
+.bprd_personal {
+    .bprd_topbar {
+        background: #0f172a;
+    }
+
+    .bprd_payslip_strip {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-top: 16px;
+        padding: 10px 14px;
+        background: #f8fafc;
+        border-radius: $radius;
+        border: 1px solid $border;
+    }
+
+    .bprd_payslip_label {
+        font-size: 11px;
+        text-transform: uppercase;
+        color: $text-muted;
+        letter-spacing: .05em;
+    }
+
+    .bprd_payslip_period {
+        font-size: 13px;
+        color: $text-dark;
+    }
+
+    .bprd_payslip_net {
+        margin-left: auto;
+        font-size: 15px;
+        font-weight: 700;
+        color: #0f172a;
+    }
+
+    .bprd_row_danger td {
+        background: #fff5f5;
+        color: #c53030;
+    }
+
+    .bprd_row_warn td {
+        background: #fffbeb;
+    }
+
+    .bprd_dot_red {
+        color: #ef4444;
+        margin-right: 4px;
+    }
+
+    .bprd_dot_amber {
+        color: #f59e0b;
+        margin-right: 4px;
+    }
+
+    .bprd_badge_neutral {
+        display: inline-block;
+        padding: 1px 7px;
+        border-radius: 10px;
+        font-size: 11px;
+        background: #e2e8f0;
+        color: #475569;
+    }
+}
+
+// ── WATCHLIST FORM helper ─────────────────────────────────────────────────────
+
+.bprd_empty {
+    color: $text-muted;
+    font-size: 12px;
+    text-align: center;
+    padding: 16px 0;
+    margin: 0;
+}
