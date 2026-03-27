@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 {
     "name": "Blackpaw Role Dashboards",
-    "version": "19.0.1.0.1",
+    "version": "19.0.1.1.0",
     "summary": "Tier-2 intelligence dashboards for Finance, HR, Sales, Operations and Fuel roles",
     "category": "Blackpaw/Intelligence",
     "author": "Blackpaw Innovations",
@@ -9,7 +9,7 @@
     "website": "https://www.blackpawinnovations.com",
     "support": "support@blackpawinnovations.com",
     "license": "LGPL-3",
-    "depends": ["account", "hr", "hr_attendance", "crm", "sale", "mail", "web"],
+    "depends": ["account", "hr", "hr_attendance", "crm", "sale", "mail", "web", "blackpaw_bi_dashboard"],
     "data": [
         "security/ir.model.access.csv",
         "data/bp_cron.xml",

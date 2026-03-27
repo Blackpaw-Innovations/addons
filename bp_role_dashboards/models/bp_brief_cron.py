@@ -42,6 +42,7 @@ class BpBriefCron(models.TransientModel):
         signals = data.get("signals", [])
 
         subject = f"Finance Intelligence Brief — {period} | {company.name}"
+        opener  = self._get_brief_opener("Finance", kpis, signals)
 
         signal_lines = ""
         for sig in signals:
@@ -54,6 +55,8 @@ class BpBriefCron(models.TransientModel):
         for label, value in kpis.items():
             kpi_lines += f"<tr><td style='padding:3px 8px;color:#64748b'>{label}</td><td style='padding:3px 8px;font-weight:600'>{value}</td></tr>"
 
+        opener_html = f"<p style='padding:0 0 16px;margin:0;font-size:13px;color:#1e293b;line-height:1.6'>{opener}</p>" if opener else ""
+
         body = f"""
         <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;color:#1e293b">
           <div style="background:#1e293b;padding:20px 24px;border-radius:8px 8px 0 0">
@@ -61,6 +64,7 @@ class BpBriefCron(models.TransientModel):
             <p style="margin:4px 0 0;color:#94a3b8;font-size:13px">Finance Intelligence — {period}</p>
           </div>
           <div style="background:#f8fafc;padding:20px 24px">
+            {opener_html}
             <table style="width:100%;border-collapse:collapse;margin-bottom:20px">{kpi_lines}</table>
             <h3 style="font-size:13px;color:#475569;text-transform:uppercase;letter-spacing:.05em;margin:0 0 8px">Active Signals</h3>
             <table style="width:100%;border-collapse:collapse">{signal_lines}</table>
@@ -94,6 +98,7 @@ class BpBriefCron(models.TransientModel):
         signals = data.get("signals", [])
 
         subject = f"People Intelligence Brief — {period} | {company.name}"
+        opener  = self._get_brief_opener("HR", kpis, signals)
 
         signal_lines = ""
         for sig in signals:
@@ -105,6 +110,8 @@ class BpBriefCron(models.TransientModel):
             for l, v in kpis.items()
         )
 
+        opener_html = f"<p style='padding:0 0 16px;margin:0;font-size:13px;color:#1e293b;line-height:1.6'>{opener}</p>" if opener else ""
+
         body = f"""
         <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;color:#1e293b">
           <div style="background:#7c3aed;padding:20px 24px;border-radius:8px 8px 0 0">
@@ -112,6 +119,7 @@ class BpBriefCron(models.TransientModel):
             <p style="margin:4px 0 0;color:#ddd6fe;font-size:13px">People Intelligence — {period}</p>
           </div>
           <div style="background:#f8fafc;padding:20px 24px">
+            {opener_html}
             <table style="width:100%;border-collapse:collapse;margin-bottom:20px">{kpi_lines}</table>
             <h3 style="font-size:13px;color:#475569;text-transform:uppercase;letter-spacing:.05em;margin:0 0 8px">Active Signals</h3>
             <table style="width:100%;border-collapse:collapse">{signal_lines}</table>
@@ -145,6 +153,7 @@ class BpBriefCron(models.TransientModel):
         signals = data.get("signals", [])
 
         subject = f"Revenue Intelligence Brief — {period} | {company.name}"
+        opener  = self._get_brief_opener("Sales", kpis, signals)
 
         signal_lines = ""
         for sig in signals:
@@ -156,6 +165,8 @@ class BpBriefCron(models.TransientModel):
             for l, v in kpis.items()
         )
 
+        opener_html = f"<p style='padding:0 0 16px;margin:0;font-size:13px;color:#1e293b;line-height:1.6'>{opener}</p>" if opener else ""
+
         body = f"""
         <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;color:#1e293b">
           <div style="background:#0284c7;padding:20px 24px;border-radius:8px 8px 0 0">
@@ -163,6 +174,7 @@ class BpBriefCron(models.TransientModel):
             <p style="margin:4px 0 0;color:#bae6fd;font-size:13px">Revenue Intelligence — {period}</p>
           </div>
           <div style="background:#f8fafc;padding:20px 24px">
+            {opener_html}
             <table style="width:100%;border-collapse:collapse;margin-bottom:20px">{kpi_lines}</table>
             <h3 style="font-size:13px;color:#475569;text-transform:uppercase;letter-spacing:.05em;margin:0 0 8px">Active Signals</h3>
             <table style="width:100%;border-collapse:collapse">{signal_lines}</table>
@@ -173,6 +185,36 @@ class BpBriefCron(models.TransientModel):
         </div>
         """
         return subject, body
+
+    # ── AI Opener ─────────────────────────────────────────────────────────────
+
+    def _get_brief_opener(self, role, kpis, signals):
+        """
+        Call blackpaw.ai.service to generate a 2-sentence opener for the brief.
+        Fails silently — returns None if AI unavailable.
+        """
+        try:
+            top_signals = [
+                {"code": s.get("code", ""), "name": s.get("name", ""), "severity": s.get("color", "")}
+                for s in (signals or [])[:3]
+            ]
+            data_dict = {
+                "company": self.env.company.name,
+                "role": role,
+                "kpis": kpis,
+                "top_signals": top_signals,
+            }
+            cache_key = (
+                f"brief_opener_{role}_{self.env.company.id}_"
+                f"{__import__('datetime').date.today().isocalendar()[1]}"
+            )
+            return self.env["blackpaw.ai.service"].generate(
+                prompt_key="bi.role_brief.opener",
+                data_dict=data_dict,
+                cache_key=cache_key,
+            )
+        except Exception:
+            return None
 
     # ── Helpers ───────────────────────────────────────────────────────────────
 
